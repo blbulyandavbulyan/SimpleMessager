@@ -39,7 +39,7 @@ public class ClientServerThread extends Thread{
             while(!termintaed){
                 try{
                     Message msg = (Message) in.readObject();
-                    sPs.println(msg);
+                    Server.printMessage(msg);
                     if(msg.getReceiver()!= null){
                         String msgReceiver = msg.getReceiver();
                         if(!Objects.equals(msgReceiver, clientName)){

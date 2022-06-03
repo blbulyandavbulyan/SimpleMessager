@@ -1,5 +1,6 @@
 package common;
 
+import general.Message;
 import threads.ClientServerThread;
 import threads.UnnamedClientThread;
 
@@ -13,6 +14,7 @@ public class Server {
     static final Map<String, ClientServerThread> clients = new HashMap<>();
     static final Set<UnnamedClientThread> unnamedClients = new HashSet<>();
     static final PrintStream sPs = System.out;
+    static boolean showMessagesFromUser = true;
     public static void removeClient(String clientName){
         clients.remove(clientName);
     }
@@ -33,6 +35,15 @@ public class Server {
             client.terminate();
         }
         Server.clients.clear();
+    }
+    synchronized public void serverPrint(Object obj){
+        sPs.println(obj);
+    }
+    public static void printMessage(Message msg){
+        if(showMessagesFromUser)sPs.println(msg);
+    }
+    public static void setShowMessagesFromUser(boolean showMessagesFromUser){
+        Server.showMessagesFromUser = showMessagesFromUser;
     }
     public static PrintStream getsPs() {
         return sPs;
@@ -62,6 +73,7 @@ public class Server {
         }
         finally {
             for (var client : clients.values())client.terminate();
+            for(var unnamedClient : unnamedClients)unnamedClient.terminate();
         }
     }
 

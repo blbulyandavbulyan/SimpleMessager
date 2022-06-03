@@ -39,8 +39,7 @@ public class Message implements Serializable {
     public String getReceiver() {
         return receiver;
     }
-    private void removeExtraSpaces(){
-        //удаление лишних пробелов в начале сообщения и в конце сообщения
-        message = message.trim();
+    public String getSender(){
+        return sender;
     }
 }
