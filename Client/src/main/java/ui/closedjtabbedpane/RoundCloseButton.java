@@ -15,6 +15,7 @@ import java.awt.geom.*;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.jar.JarFile;
 
 public class RoundCloseButton extends JButton {
     private static String svgIcon;
@@ -22,9 +23,11 @@ public class RoundCloseButton extends JButton {
     private static String svgRollIcon;
     static{
         try {
-            svgIcon = new String(Files.readAllBytes(Path.of(ClassLoader.getSystemResource("icons/close-icon.svg").getPath())));
-            svgPressIcon =  new String(Files.readAllBytes(Path.of(ClassLoader.getSystemResource("icons/close-icon-pressed.svg").getPath())));
-            svgRollIcon =  new String(Files.readAllBytes(Path.of(ClassLoader.getSystemResource("icons/close-icon-focused.svg").getPath())));
+            ClassLoader cL = Thread.currentThread().getContextClassLoader();
+            svgIcon = new String(cL.getResourceAsStream("resources/icons/close-icon.svg").readAllBytes());
+            svgPressIcon = new String(cL.getResourceAsStream("resources/icons/close-icon-pressed.svg").readAllBytes());
+            svgRollIcon =  new String(cL.getResourceAsStream("resources/icons/close-icon-focused.svg").readAllBytes());
+
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -52,6 +55,8 @@ public class RoundCloseButton extends JButton {
     public RoundCloseButton() {
         // These statements enlarge the button so that it
         // becomes a circle rather than an oval.
+
+
         Dimension size = getPreferredSize();
         size.width = size.height = Math.max(size.width,size.height);
         setPreferredSize(size);

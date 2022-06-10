@@ -12,25 +12,8 @@ public class MainBot {
     static Set<BotThread> botThreads = new HashSet<>();
     static CountDownLatch cdl;
     public static void main(String[] args) {
-        Scanner in = new Scanner(System.in);
-        System.out.println("Ввведите количество ботов-потоков:");
-        int n = in.nextInt();
-        String host  = "localhost";
-        int port = 1234;
-        cdl = new CountDownLatch(n);
-        for (int i = 0; i < n; i++){
-            try {
-                botThreads.add(new BotThread("testBot" + i, new InetSocketAddress(host, port)));
-            } catch (IOException e) {
-                System.err.println("Не удалось создать бота под номером " + i);
-                e.printStackTrace();
-            }
-        }
-        try {
-            if(cdl.await(2, TimeUnit.MINUTES))System.out.println("Процедура создания ботов закончена.");
-            else System.out.println("Что-то пошло не так...");
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        byte a = -29;
+        int b = -29 & 0xff;
+        System.out.println(b);
     }
 }

@@ -1,4 +1,4 @@
-import general.Message;
+import general.message.Message;
 
 import java.io.*;
 import java.net.Socket;

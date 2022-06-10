@@ -8,7 +8,6 @@ import java.awt.event.ActionListener;
 
 public class ClosableJTabedPane {
     private static class TabCloseButton extends RoundCloseButton{
-        private int tabIndex;
         public TabCloseButton(JTabbedPane tabPane, int tabIndex){
             super.addActionListener((a)-> tabPane.removeTabAt(tabIndex)
             );

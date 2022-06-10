@@ -1,9 +1,13 @@
 package ui;
 
-import general.Message;
+
+import common.interfaces.MessageSender;
+import general.message.Message;
+import serverconnection.MessagesReaderThread;
 import serverconnection.ServerConnection;
 import ui.closedjtabbedpane.ClosableJTabedPane;
-import common.MessagePrinter;
+import common.interfaces.MessagePrinter;
+import ui.closedjtabbedpane.JTabbedPaneWithCloseableTabs;
 
 import javax.swing.*;
 import java.awt.*;
@@ -12,49 +16,79 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.util.HashMap;
+
 public class MainWindow extends JFrame implements MessagePrinter {
-    private JPanel panel1;
     private JTextField messageField;
     private JButton sendBtn;
-    private JTabbedPane dialogsTappedPane;
+    private JTabbedPaneWithCloseableTabs dialogsTappedPane;
     private JTextArea generalDialogArea;
-    private HashMap<String, JTextArea> privateDialogs = new HashMap<>();
-    private ServerConnection connection;
+    private final HashMap<String, JTextArea> privateDialogs = new HashMap<>();
+    private MessageSender messageSender;
     private String myUserName;
+    private MessagesReaderThread readerThread;
     public static void main(String[] args) {
         MainWindow mw = new MainWindow();
         mw.pack();
         mw.setSize(new Dimension(500, 500));
         mw.setVisible(true);
         Message msg1 = new Message("Hello, i am johan", "johan", "you"),
-        msg2 = new Message("Hello, i am georgy", "georgy", "you");
-        for(int i = 0; i < 1000; i++){
+                msg2 = new Message("Hello, i am georgy", "georgy", "you");
+        for (int i = 0; i < 1000; i++) {
             mw.printMessage(msg1);
             mw.printMessage(msg2);
         }
     }
-    private void init(){
-        ActionListener sendMessage = (e)->{
+
+    private static Message getMessageWithReceiverFromMsgStr(String msgStr, String senderName) {
+        String receiverName = null;
+        char[] msgChars = msgStr.toCharArray();
+        if (msgChars[0] == '@') {
+            msgChars[0] = ' ';
+            StringBuilder receiverNameBuilder = new StringBuilder();
+            int i = 1;
+            for (; i < msgChars.length && (msgChars[i] != ',' && msgChars[i] != ' '); i++) {
+                receiverNameBuilder.append(msgChars[i]);
+                msgChars[i] = ' ';
+            }
+            msgChars[i] = ' ';
+            receiverName = receiverNameBuilder.toString();
+
+        }
+        return new Message(String.valueOf(msgChars).trim(), senderName, receiverName);
+    }
+
+    private void init() {
+        messageField = new JTextField();
+        sendBtn = new JButton("Отправить");
+
+        ActionListener sendMessage = (e) -> {
             String message = messageField.getText().trim();
-            if(!message.isBlank()){
-                String receiverUserName = null;
+            if (!message.isBlank()) {
                 int selectedDialogIndex = dialogsTappedPane.getSelectedIndex();
-                if(selectedDialogIndex > 0){
-                    receiverUserName = dialogsTappedPane.getTitleAt(selectedDialogIndex);
+                Message msg = null;
+                if (selectedDialogIndex > 0) {
+                    String receiverUserName = dialogsTappedPane.getTitleAt(selectedDialogIndex);
+                    msg = new Message(message, myUserName, receiverUserName);
+                } else if (selectedDialogIndex == 0) {
+                    msg = getMessageWithReceiverFromMsgStr(message, myUserName);
                 }
-                Message msg = new Message(message, myUserName, receiverUserName);
                 try {
-                    connection.sendMessage(msg);
-                    printMessage(msg);
-                }
-                catch (IOException ex) {
+                    if (msg != null) {
+                        messageSender.sendMessage(msg);
+                        printMessage(msg);
+                        messageField.setText("");
+                    } else
+                        JOptionPane.showMessageDialog(((JComponent) e.getSource()).getParent(), "Ошибка отправки сообщения, по каким-то причинам оно null", "Ошибка отправки", JOptionPane.ERROR_MESSAGE);
+
+                } catch (IOException ex) {
                     ex.printStackTrace();
-                    JOptionPane.showMessageDialog(this,
-                            (connection.isClosed() ? "Произошла ошибка отправки сообщения, соединение было закрыто." : "Произошла неизвестная ошибка при отправке сообщения."),
+                    JOptionPane.showMessageDialog(((JComponent) e.getSource()).getParent(),
+                            (messageSender.isClosed() ? "Произошла ошибка отправки сообщения, соединение было закрыто." : "Произошла неизвестная ошибка при отправке сообщения."),
                             "Ошибка отправки сообщения.", JOptionPane.ERROR_MESSAGE);
-                    if(connection.isClosed()){
+                    if (messageSender.isClosed()) {
 
                     }
+                    System.exit(-1);
                 }
 
             }
@@ -62,48 +96,87 @@ public class MainWindow extends JFrame implements MessagePrinter {
         };
         messageField.addActionListener(sendMessage);
         sendBtn.addActionListener(sendMessage);
-        getContentPane().add(panel1);
+        dialogsTappedPane = new JTabbedPaneWithCloseableTabs(privateDialogs::remove);
+        generalDialogArea = new JTextArea();
+        generalDialogArea.setEditable(false);
+        dialogsTappedPane.addTab("Oбщий", new JScrollPane(generalDialogArea));
+        this.setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.weighty = 1;
+        gbc.weightx = 1;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 2;
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.insets = new Insets(3, 3, 3, 3);
+        this.add(dialogsTappedPane, gbc);
+        gbc.insets = new Insets(0, 3, 3,3);
+        gbc.weighty = 0.05;
+        gbc.weightx = 0.99999;
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.gridwidth = 1;
+        this.add(messageField, gbc);
+        gbc.gridx = 1;
+        gbc.gridy = 1;
+        gbc.weightx = 0.00001;
+        this.add(sendBtn, gbc);
     }
-    public MainWindow(ServerConnection connection){
-        if(connection == null)throw new NullPointerException("connection is null");
-        if(connection.isClosed())throw new RuntimeException("connection is closed");
-        this.connection = connection;
+
+    public MainWindow(ServerConnection connection) {
+        if (connection == null) throw new NullPointerException("connection is null");
+        if (connection.isClosed()) throw new RuntimeException("connection is closed");
+        init();
+        this.messageSender = connection;
+        this.myUserName = connection.getUserName();
+        this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+        this.setTitle(myUserName);
         this.addWindowListener(new WindowAdapter() {
             @Override
-            public void windowClosed(WindowEvent e) {
-                if(connection.isOpen()) {
+            public void windowClosing(WindowEvent e) {
+                if (messageSender.isOpen()) {
                     try {
-                        connection.close();
+                        readerThread.terminate();
+                        messageSender.close();
                     } catch (IOException ex) {
                         ex.printStackTrace();
+                        System.exit(-1);
                     }
                 }
-                super.windowClosed(e);
+                System.exit(0);
             }
         });
-        init();
+        this.setMinimumSize(new Dimension(662, 378));
+        this.setSize(this.getMinimumSize());
+        readerThread = new MessagesReaderThread(connection, this);
     }
+
     private MainWindow() {
         init();
         this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     }
-    public void printMessage(Message msg){
-        if(msg.getReceiver() != null){
-            String sender = msg.getSender();
-            initPrivateDialogWithUser(sender);
-            privateDialogs.get(sender).append(msg.toString()+"\n");
-        }
-        else{
-            generalDialogArea.append(msg.toString() + "\n");
+
+    public void printMessage(Message msg) {
+        if (msg.getReceiver() != null) {
+            String dialogName = msg.getReceiver().equals(myUserName) ?  msg.getSender() : msg.getReceiver();
+            initPrivateDialogWithUser(dialogName);
+            privateDialogs.get(dialogName).append(msg + "\n");
+        } else {
+            generalDialogArea.append(msg + "\n");
         }
     }
-    private int initPrivateDialogWithUser(String username){
-        if(!privateDialogs.containsKey(username)){
+
+    private int initPrivateDialogWithUser(String username) {
+        synchronized (privateDialogs){
+            if (!privateDialogs.containsKey(username)) {
                 JTextArea jTextArea = new JTextArea();
                 jTextArea.setEditable(false);
                 privateDialogs.put(username, jTextArea);
-                ClosableJTabedPane.addTab(dialogsTappedPane, username, new JScrollPane(jTextArea));
+                dialogsTappedPane.addCloseableTab(username, new JScrollPane(jTextArea));
+            }
         }
+
         return 0;
     }
 }
+

@@ -5,46 +5,42 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.util.Objects;
 
-import general.Message;
+import general.message.Message;
 import common.Server;
 public class ClientServerThread extends Thread{
-    private Socket socket;
-    private ObjectInputStream in;
-    private ObjectOutputStream out;
+    private Socket clientSocket;
+    private ObjectInputStream clientObjIn;
+    private ObjectOutputStream clientObjOut;
     private String clientName;
     private boolean termintaed = false,//переменная становится true, если был вызван метод terminate()
             inputAndOutputStreamsCreated = false;//переменная становится true, если были созданы объекты для полей in и out
     static final PrintStream sPs = Server.getsPs();
-    public ClientServerThread(Socket socket, String clientName){
-        this.socket = socket;
+    public ClientServerThread(Socket clientSocket, ObjectOutputStream clientObjOut, ObjectInputStream clientObjIn, String clientName){
+        this.clientSocket = clientSocket;
         this.clientName = clientName;
+        this.clientObjIn = clientObjIn;
+        this.clientObjOut = clientObjOut;
         start();
     }
     synchronized public void sendMessage(Message msg) throws IOException {
-        if(!termintaed && inputAndOutputStreamsCreated){
-            // Возможны проблемы с многопоточностью, не ясно, что будет если два метода вызовут
-            out.writeObject(msg);
+        if(!termintaed){
+            clientObjOut.writeObject(msg);
         }
     }
     public void run(){
         try{
+            clientObjOut.writeUTF("WELCOME TO SERVER!");
+            clientObjOut.flush();
             sPs.printf("Поток для клиента %s запущен\n", clientName);
-            {
-                PrintWriter cPw = new PrintWriter(socket.getOutputStream(), true);
-                cPw.printf("WELCOME TO SERVER, %s!\n", clientName);
-            }
-            in = new ObjectInputStream(socket.getInputStream());
-            out = new ObjectOutputStream(socket.getOutputStream());
-            inputAndOutputStreamsCreated = true;
             while(!termintaed){
                 try{
-                    Message msg = (Message) in.readObject();
+                    Message msg = (Message) clientObjIn.readObject();
                     Server.printMessage(msg);
                     if(msg.getReceiver()!= null){
                         String msgReceiver = msg.getReceiver();
                         if(!Objects.equals(msgReceiver, clientName)){
                             if(Server.IsClientExists(msgReceiver)) Server.getClient(msgReceiver).sendMessage(msg);
-                            else sendMessage(new Message(String.format("Ошибка доставки сообщения, нет такого пользователя %s на сервере!", clientName), "SERVER", clientName));
+                            else sendMessage(new Message(String.format("Ошибка доставки сообщения, нет такого пользователя %s на сервере!", msgReceiver), "SERVER", clientName));
                         }
                     }
                     else{
@@ -77,14 +73,14 @@ public class ClientServerThread extends Thread{
         if(termintaed)return;
         termintaed = true;
         try{
-            socket.close();
+            clientSocket.close();
         }
         catch (IOException e){
             e.printStackTrace();
         }
     }
-    private ObjectOutputStream getOut() {
-        return out;
+    private ObjectOutputStream getClientObjOut() {
+        return clientObjOut;
     }
 
     public String getClientName() {

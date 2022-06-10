@@ -1,7 +1,6 @@
-package user;
+package userdata;
 
 import java.util.HashSet;
-import java.util.Scanner;
 
 public class User {
     public static final int MAX_USERNAME_LENGTH = 30;
@@ -36,15 +35,5 @@ public class User {
     }
     public static boolean checkUserNameLength(String username){
         return checkUserNameLength(username.length());
-    }
-    public static String getReceiverNameFromMessageStr(String msg){
-        String receiverName = null;
-        char [] msgChars = msg.toCharArray();
-        if(msgChars[0] == '@'){
-            int i = 0;
-            for(;(msgChars[i] != ',' || msgChars[i] != ' ') && i < msgChars.length; i++);
-            receiverName = String.valueOf(msgChars, 1, i-1);
-        }
-        return receiverName;
     }
 }

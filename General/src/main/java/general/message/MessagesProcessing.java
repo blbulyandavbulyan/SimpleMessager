@@ -1,4 +1,4 @@
-package general;
+package general.message;
 
 public class MessagesProcessing {
     static String decryptCesar(String s, int k){

@@ -1,6 +1,6 @@
-package common;
+package common.interfaces;
 
-import general.Message;
+import general.message.Message;
 
 public interface MessagePrinter {
     void printMessage(Message msg);

@@ -1,4 +1,4 @@
-package general;
+package general.message;
 
 import messageExceptions.EmptyMessageException;
 

@@ -1,16 +1,17 @@
 package serverconnection;
 
-import common.MessagePrinter;
+import common.interfaces.MessageGetter;
+import common.interfaces.MessagePrinter;
 
 import java.io.*;
 import java.net.SocketException;
 
 public class MessagesReaderThread extends Thread{
-    private ServerConnection server;
+    private MessageGetter messageGetter;
     private MessagePrinter mp;
     private boolean terminated = false;
-    public MessagesReaderThread(ServerConnection server, MessagePrinter mp){
-        this.server = server;
+    public MessagesReaderThread(MessageGetter messageGetter, MessagePrinter mp){
+        this.messageGetter = messageGetter;
         this.mp = mp;
         start();
     }
@@ -20,11 +21,11 @@ public class MessagesReaderThread extends Thread{
         try {
             while (true){
                 if(terminated)return;
-                mp.printMessage(server.getMessage());
+                mp.printMessage(messageGetter.getMessage());
             }
         }
         catch (SocketException e){
-            if(!(server.isClosed() && terminated)){
+            if(!(messageGetter.isClosed() && terminated)){
                 e.printStackTrace();
             }
         }

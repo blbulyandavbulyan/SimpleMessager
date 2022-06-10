@@ -1,4 +1,4 @@
-package user.exceptions;
+package userdata.exceptions;
 
 public class UserNameOutOfRange extends RuntimeException{
     private String parameterName;
