@@ -7,4 +7,8 @@ Client has GUI.
 ## Немного скриншотов
 ![Главное окно](/screenshots/MainWindow.png)
 
-![Окно входа/логина](/screenshots/MainWindow.png "Вкладка входа")
+![Окно входа/логина](/screenshots/LoginOrRegisterWindow1.png "Вкладка входа")
+
+![Окно входа/логина](/screenshots/LoginOrRegisterWindow2.png "Вкладка регистрации")
+
+![Диалог подключения к серверу](/screenshots/ConnectDialog.png "Подключение к серверу)
