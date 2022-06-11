@@ -11,4 +11,4 @@ Client has GUI.
 
 ![Окно входа/логина](/screenshots/LoginOrRegisterWindow2.png "Вкладка регистрации")
 
-![Диалог подключения к серверу](/screenshots/ConnectDialog.png "Подключение к серверу)
+![Диалог подключения к серверу](/screenshots/ConnectDialog.png "Подключение к серверу")
