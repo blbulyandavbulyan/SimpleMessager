@@ -5,7 +5,6 @@ import common.interfaces.MessageSender;
 import general.message.Message;
 import serverconnection.MessagesReaderThread;
 import serverconnection.ServerConnection;
-import ui.closedjtabbedpane.ClosableJTabedPane;
 import common.interfaces.MessagePrinter;
 import ui.closedjtabbedpane.JTabbedPaneWithCloseableTabs;
 
@@ -96,7 +95,7 @@ public class MainWindow extends JFrame implements MessagePrinter {
         };
         messageField.addActionListener(sendMessage);
         sendBtn.addActionListener(sendMessage);
-        dialogsTappedPane = new JTabbedPaneWithCloseableTabs(privateDialogs::remove);
+        dialogsTappedPane = new JTabbedPaneWithCloseableTabs(privateDialogs::remove, "Закрыть диалог");
         generalDialogArea = new JTextArea();
         generalDialogArea.setEditable(false);
         dialogsTappedPane.addTab("Oбщий", new JScrollPane(generalDialogArea));

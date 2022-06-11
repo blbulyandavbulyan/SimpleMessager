@@ -12,7 +12,7 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.Objects;
 
-import serverconnection.exceptions.RegisterUserInterrupted;
+import serverconnection.exceptions.RegisterOrLoginInterrupted;
 import serverconnection.exceptions.ServerHasDBProblemsException;
 import serverconnection.exceptions.WrongAnswerFromServer;
 import userdata.*;
@@ -55,14 +55,14 @@ public class ServerConnection implements MessageGetter, MessageSender {
     private void loginOrRegister(LoginOrRegisterResultGetter loginOrRegisterResultGetter) throws IOException {
         LoginOrRegisterRequest lor = loginOrRegisterResultGetter.getLoginOrRegisterResult(LoginOrRegisterResultGetter.ActionCode.GET);
         if(lor == null)
-            throw new RegisterUserInterrupted("Регистрация прервана пользователем, подключение не будет создано.");
+            throw new RegisterOrLoginInterrupted("Регистрация прервана пользователем, подключение не будет создано.");
         final String readyMessage = "WELCOME TO SERVER!";
         final String userAlreadyExists = "USER ALREADY EXISTS";
         final String invalidLoginOrPassword = "INVALID LOGIN OR PASSWORD";
         final String registrationOrLoginFailed = "SERVER HAS DataBase problem";
         while(true){
             if(lor == null || lor.getOperation() == LoginOrRegisterRequest.OperationType.CANCELLED)
-                throw new RegisterUserInterrupted("Регистрация прервана пользователем, подключение не будет создано.");
+                throw new RegisterOrLoginInterrupted("Процедура регистрации/логина прервана пользователем, подключение не будет создано.");
             statusMessagePrinter.printStatusMessage(String.format(
                     "Ожидание ответа от сервера о успешной процедуре %s...",
                     lor.getOperation() == LoginOrRegisterRequest.OperationType.REGISTER ? "регистрации" : "входа"));

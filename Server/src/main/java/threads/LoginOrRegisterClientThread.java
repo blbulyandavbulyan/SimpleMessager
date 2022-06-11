@@ -6,6 +6,7 @@ import userprocessing.UserManager;
 
 import java.io.*;
 import java.net.Socket;
+import java.net.SocketException;
 import java.sql.SQLException;
 
 public class LoginOrRegisterClientThread extends Thread{
@@ -40,7 +41,6 @@ public class LoginOrRegisterClientThread extends Thread{
                 String userName = lor.getUserName().trim();
                 String password = lor.getPassword().trim();
                 if(lor.getOperation() != LoginOrRegisterRequest.OperationType.CANCELLED){
-                    String perhapsError = null;
                     if(userName == null || userName.isBlank()){
                         objOut.writeUTF("USER NAME IS EMPTY");
                         objOut.flush();
@@ -94,11 +94,15 @@ public class LoginOrRegisterClientThread extends Thread{
 
             }
         }
+        catch (EOFException | SocketException e){
+            if(!clientSocket.isClosed())e.printStackTrace();
+        }
         catch (IOException | SQLException | ClassNotFoundException e){
             e.printStackTrace();
         }
         finally {
             Server.removeUnregisteredClient(this);
+            sPs.printf("Поток для регистрации/логина клиента %d завершён\n", clientSocket.hashCode());
         }
     }
     public void terminate(){

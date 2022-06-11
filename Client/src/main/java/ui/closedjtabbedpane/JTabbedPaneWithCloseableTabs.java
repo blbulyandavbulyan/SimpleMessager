@@ -5,7 +5,8 @@ import javax.swing.*;
 import java.awt.*;
 
 public class JTabbedPaneWithCloseableTabs extends javax.swing.JTabbedPane {
-    private CloseTabAction defaultCloseTabAction;
+    private final CloseTabAction defaultCloseTabAction;
+    private final String defaultCloseButtonToolTipText;
     private static class TabCloseButton extends RoundCloseButton{
         public TabCloseButton(javax.swing.JTabbedPane tabPane, int tabIndex, CloseTabAction closeTabAction){
             super.addActionListener(
@@ -23,17 +24,18 @@ public class JTabbedPaneWithCloseableTabs extends javax.swing.JTabbedPane {
         }
 
     }
-    public JTabbedPaneWithCloseableTabs(CloseTabAction defaultCloseTabAction){
+    public JTabbedPaneWithCloseableTabs(CloseTabAction defaultCloseTabAction, String defaultCloseButtonToolTipText){
         this.defaultCloseTabAction = defaultCloseTabAction;
+        this.defaultCloseButtonToolTipText = defaultCloseButtonToolTipText;
     }
-    public void addCloseableTab(String title, Component component, CloseTabAction closeTabAction) {
+    public void addCloseableTab(String title, Component component, CloseTabAction closeTabAction, String closeButtonToolTipText) {
         this.addTab(title, component);
         int index = this.indexOfTab(title);
         JPanel pnlTab = new JPanel(new GridBagLayout());
         pnlTab.setOpaque(false);
         JLabel lblTitle = new JLabel(title);
         JTabbedPaneWithCloseableTabs.TabCloseButton btnClose = new JTabbedPaneWithCloseableTabs.TabCloseButton(this, index, closeTabAction);
-        btnClose.setToolTipText("Закрыть диалог");
+        btnClose.setToolTipText(closeButtonToolTipText);
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -41,6 +43,7 @@ public class JTabbedPaneWithCloseableTabs extends javax.swing.JTabbedPane {
         pnlTab.add(lblTitle, gbc);
         gbc.gridx++;
         gbc.weightx = 0;
+        gbc.insets = new Insets(2, 2, 2, 0);
         btnClose.setPreferredSize(new Dimension(15, 15));
         btnClose.setBorder(null);
         btnClose.setBorderPainted(false);
@@ -48,6 +51,6 @@ public class JTabbedPaneWithCloseableTabs extends javax.swing.JTabbedPane {
         this.setTabComponentAt(index, pnlTab);
     }
     public void addCloseableTab(String title, Component component){
-        addCloseableTab(title, component, defaultCloseTabAction);
+        addCloseableTab(title, component, defaultCloseTabAction, defaultCloseButtonToolTipText);
     }
 }

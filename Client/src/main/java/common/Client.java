@@ -1,7 +1,7 @@
 package common;
 
-import serverconnection.MessagesReaderThread;
 import serverconnection.ServerConnection;
+import serverconnection.exceptions.RegisterOrLoginInterrupted;
 import ui.ConnectToServerDialog;
 import ui.MainWindow;
 import ui.LoginOrRegisterWindow;
@@ -18,10 +18,15 @@ public class Client {
             if(address != null){
                 final LoginOrRegisterWindow low = new LoginOrRegisterWindow();
                 low.pack();
-                ServerConnection connection = new ServerConnection(address, 2 * 60 * 1000, low, null);
-                MainWindow mw = new MainWindow(connection);
-                mw.pack();
-                mw.setVisible(true);
+                try {
+                    ServerConnection connection = new ServerConnection(address, 2 * 60 * 1000, low, null);
+                    MainWindow mw = new MainWindow(connection);
+                    mw.pack();
+                    mw.setVisible(true);
+                }
+                catch (RegisterOrLoginInterrupted ignored){
+                }
+
             }
             else{
                 System.err.println("address is null, terminating");

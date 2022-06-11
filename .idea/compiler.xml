@@ -19,10 +19,12 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="General" />
-        <module name="TestBots" />
         <module name="Server" />
         <module name="Client" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="TestBots" target="17" />
+    </bytecodeTargetLevel>
   </component>
 </project>

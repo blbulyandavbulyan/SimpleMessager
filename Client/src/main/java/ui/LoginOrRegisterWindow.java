@@ -8,7 +8,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.IOException;
 import java.util.LinkedList;
 
 public class LoginOrRegisterWindow extends JDialog implements LoginOrRegisterResultGetter {
@@ -156,7 +155,6 @@ public class LoginOrRegisterWindow extends JDialog implements LoginOrRegisterRes
     }
 
     private void createUIComponents() {
-        // TODO: place custom component creation code here
         passwordLabel = new Label("Пароль");
         userNameLabel = new Label("Имя пользователя");
         repeatPasswordLabel = new Label("Повторите пароль");
