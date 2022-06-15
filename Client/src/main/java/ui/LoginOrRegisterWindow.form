@@ -4,7 +4,9 @@
     <constraints>
       <xy x="20" y="20" width="534" height="415"/>
     </constraints>
-    <properties/>
+    <properties>
+      <maximumSize width="600" height="600"/>
+    </properties>
     <border type="none"/>
     <children>
       <tabbedpane id="2e283" binding="tabbedPane1" default-binding="true">
@@ -16,11 +18,12 @@
         </constraints>
         <properties>
           <enabled value="true"/>
+          <maximumSize width="600" height="600"/>
         </properties>
         <border type="none"/>
         <children>
           <grid id="b2f4" binding="loginPanel" custom-create="true" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
-            <margin top="5" left="5" bottom="5" right="5"/>
+            <margin top="0" left="0" bottom="0" right="0"/>
             <constraints>
               <tabbedpane title="Войти"/>
             </constraints>
@@ -29,7 +32,7 @@
             <children/>
           </grid>
           <grid id="c0354" binding="registerPanel" custom-create="true" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
-            <margin top="5" left="5" bottom="5" right="5"/>
+            <margin top="0" left="0" bottom="0" right="0"/>
             <constraints>
               <tabbedpane title="Зарегистрироваться"/>
             </constraints>

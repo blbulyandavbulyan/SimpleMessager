@@ -9,12 +9,12 @@ import java.security.NoSuchAlgorithmException;
 import java.sql.*;
 
 public class UserManager implements Closeable {
-    private Connection connection;
-    private Statement statement;
-    private PreparedStatement selectPassHashForUserFromDB;
-    private PreparedStatement selectCountUserWhereUserNameFromDB;
-    private PreparedStatement insertUserToDB;
-    private PreparedStatement deleteUserFromDB;
+    private final Connection connection;
+    private final Statement statement;
+    private final PreparedStatement selectPassHashForUserFromDB;
+    private final PreparedStatement selectCountUserWhereUserNameFromDB;
+    private final PreparedStatement insertUserToDB;
+    private final PreparedStatement deleteUserFromDB;
     private static final MessageDigest digest;
     static {
         try {
@@ -31,6 +31,8 @@ public class UserManager implements Closeable {
     }
     public UserManager(Connection connection) throws SQLException {
         if(connection == null)throw new NullPointerException("connection in class DBConnection is null");
+
+        this.connection = connection;
         statement = connection.createStatement();
         initDB();
         selectPassHashForUserFromDB = connection.prepareStatement("SELECT PassHash FROM users WHERE UserName = ?");
@@ -110,6 +112,11 @@ public class UserManager implements Closeable {
         }
         try {
             deleteUserFromDB.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        try {
+            connection.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }

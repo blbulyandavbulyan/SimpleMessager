@@ -7,6 +7,7 @@ import serverconnection.MessagesReaderThread;
 import serverconnection.ServerConnection;
 import common.interfaces.MessagePrinter;
 import ui.closedjtabbedpane.JTabbedPaneWithCloseableTabs;
+import ui.exceptions.PersonalMessageIsEmpty;
 
 import javax.swing.*;
 import java.awt.*;
@@ -38,22 +39,23 @@ public class MainWindow extends JFrame implements MessagePrinter {
         }
     }
 
-    private static Message getMessageWithReceiverFromMsgStr(String msgStr, String senderName) {
+    private static Message getMessageWithReceiverFromMsgStr(String msgStr, String senderName) throws PersonalMessageIsEmpty{
         String receiverName = null;
+        String newMsgStr = msgStr;
         char[] msgChars = msgStr.toCharArray();
         if (msgChars[0] == '@') {
-            msgChars[0] = ' ';
             StringBuilder receiverNameBuilder = new StringBuilder();
             int i = 1;
             for (; i < msgChars.length && (msgChars[i] != ',' && msgChars[i] != ' '); i++) {
                 receiverNameBuilder.append(msgChars[i]);
-                msgChars[i] = ' ';
             }
-            msgChars[i] = ' ';
             receiverName = receiverNameBuilder.toString();
-
+            i++;
+            if(i >= msgChars.length ||
+                    (newMsgStr = String.valueOf(msgChars, i, msgChars.length - i)).isBlank())
+                throw new PersonalMessageIsEmpty("Вы пытаетесь отправить пустое личное сообщение, после упоминания пользователя обязательно должен быть текст сообщения.");
         }
-        return new Message(String.valueOf(msgChars).trim(), senderName, receiverName);
+        return new Message(newMsgStr, senderName, receiverName);
     }
 
     private void init() {
@@ -64,14 +66,12 @@ public class MainWindow extends JFrame implements MessagePrinter {
             String message = messageField.getText().trim();
             if (!message.isBlank()) {
                 int selectedDialogIndex = dialogsTappedPane.getSelectedIndex();
-                Message msg = null;
-                if (selectedDialogIndex > 0) {
-                    String receiverUserName = dialogsTappedPane.getTitleAt(selectedDialogIndex);
-                    msg = new Message(message, myUserName, receiverUserName);
-                } else if (selectedDialogIndex == 0) {
-                    msg = getMessageWithReceiverFromMsgStr(message, myUserName);
-                }
                 try {
+                    Message msg = null;
+                    if (selectedDialogIndex > 0) {
+                        String receiverUserName = dialogsTappedPane.getTitleAt(selectedDialogIndex);
+                        msg = new Message(message, myUserName, receiverUserName);
+                    } else if (selectedDialogIndex == 0)msg = getMessageWithReceiverFromMsgStr(message, myUserName);
                     if (msg != null) {
                         messageSender.sendMessage(msg);
                         printMessage(msg);
@@ -79,7 +79,13 @@ public class MainWindow extends JFrame implements MessagePrinter {
                     } else
                         JOptionPane.showMessageDialog(((JComponent) e.getSource()).getParent(), "Ошибка отправки сообщения, по каким-то причинам оно null", "Ошибка отправки", JOptionPane.ERROR_MESSAGE);
 
-                } catch (IOException ex) {
+                }
+                catch (PersonalMessageIsEmpty ex){
+                    JOptionPane.showMessageDialog(((JComponent) e.getSource()).getParent(), ex.getMessage(),
+                            "Ошибка отправки сообщения.", JOptionPane.ERROR_MESSAGE);
+                    messageField.requestFocus();
+                }
+                catch (IOException ex) {
                     ex.printStackTrace();
                     JOptionPane.showMessageDialog(((JComponent) e.getSource()).getParent(),
                             (messageSender.isClosed() ? "Произошла ошибка отправки сообщения, соединение было закрыто." : "Произошла неизвестная ошибка при отправке сообщения."),

@@ -11,6 +11,7 @@ import java.net.InetSocketAddress;
 
 public class Client {
     public static void main(String[] args) throws IOException {
+        //TODO add read server address and server ports from command line arguments
         ConnectToServerDialog connectToServerDialog = new ConnectToServerDialog();
         connectToServerDialog.setVisible(true);
         if(!connectToServerDialog.isCancelled()){

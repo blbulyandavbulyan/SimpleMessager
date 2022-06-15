@@ -1,5 +1,7 @@
 package ui;
 import general.LoginOrRegisterRequest;
+import ui.ghosttexttooltip.GhostText;
+import ui.passwordfieldwithshowpasscheckbox.SPPasswordField;
 import userdata.LoginOrRegisterResultGetter;
 
 import javax.swing.*;
@@ -10,7 +12,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.LinkedList;
 
-public class LoginOrRegisterWindow extends JDialog implements LoginOrRegisterResultGetter {
+public class LoginOrRegisterWindow extends JFrame implements LoginOrRegisterResultGetter {
     private JTabbedPane tabbedPane1;
     private JPanel panel1;
     private JTextField userNameField;
@@ -18,11 +20,8 @@ public class LoginOrRegisterWindow extends JDialog implements LoginOrRegisterRes
     private JPasswordField repeatPasswordField;
     private JPanel registerPanel;
     private JPanel loginPanel;
-    private JButton clearPassword;
-    private JButton clearUserName;
-    private JButton clearRepeatPassword;
+    private JPanel userNamePanel, passwordPanel, repeatPasswordPanel;
     private JButton submitBtn;
-    private Label passwordLabel, userNameLabel, repeatPasswordLabel;
     private LoginOrRegisterRequest loginOrRegisterResult;
     private final Object notifyObject;
 
@@ -98,44 +97,33 @@ public class LoginOrRegisterWindow extends JDialog implements LoginOrRegisterRes
         panel1.registerKeyboardAction(submitBtnPress, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
     }
 
-    private void initClearBtns() {
-        clearPassword.addActionListener(e -> passwordField.setText(""));
-        clearUserName.addActionListener(e -> userNameField.setText(""));
-        clearRepeatPassword.addActionListener(e -> repeatPasswordField.setText(""));
+    private void initFields(){
+        userNameField.addActionListener((a)-> passwordField.requestFocus());
+        passwordField.addActionListener((a)->{
+            if(tabbedPane1.getSelectedIndex() == 0)submitBtn.requestFocus();
+            else repeatPasswordField.requestFocus();
+        });
+        repeatPasswordField.addActionListener((a)-> submitBtn.requestFocus());
     }
-
     private void initTabPane() {
         tabbedPane1.addChangeListener(e -> {
             int selectedIndex = tabbedPane1.getSelectedIndex();
             if (selectedIndex == 0) {
                 loginPanel.removeAll();
                 registerPanel.removeAll();
-                loginPanel.add(userNameLabel);
-                loginPanel.add(userNameField);
-                loginPanel.add(clearUserName);
-                loginPanel.add(passwordLabel);
-                loginPanel.add(passwordField);
-                loginPanel.add(clearPassword);
+                loginPanel.add(userNamePanel);
+                loginPanel.add(passwordPanel);
             } else {
                 loginPanel.removeAll();
                 registerPanel.removeAll();
-                registerPanel.add(userNameLabel);
-                registerPanel.add(userNameField);
-                registerPanel.add(clearUserName);
-                registerPanel.add(passwordLabel);
-                registerPanel.add(passwordField);
-                registerPanel.add(clearPassword);
-                registerPanel.add(repeatPasswordLabel);
-                registerPanel.add(repeatPasswordField);
-                registerPanel.add(clearRepeatPassword);
+                registerPanel.add(userNamePanel);
+                registerPanel.add(passwordPanel);
+                registerPanel.add(repeatPasswordPanel);
             }
             submitBtn.setText(tabbedPane1.getTitleAt(selectedIndex));
         });
     }
-
-    public LoginOrRegisterWindow() {
-        this.notifyObject = new Object();
-        this.getContentPane().add(panel1);
+    public void init(){
         this.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
@@ -148,39 +136,83 @@ public class LoginOrRegisterWindow extends JDialog implements LoginOrRegisterRes
             }
         });
         initTabPane();
-        initClearBtns();
         initSubmitBtn();
+        initFields();
+
+    }
+    public LoginOrRegisterWindow() {
+        this.notifyObject = new Object();
+        this.getContentPane().add(panel1);
+
+        init();
         this.setMinimumSize(new Dimension(531, 252));
         this.setSize(this.getMinimumSize());
+        //this.setResizable(false);
     }
 
     private void createUIComponents() {
-        passwordLabel = new Label("Пароль");
-        userNameLabel = new Label("Имя пользователя");
-        repeatPasswordLabel = new Label("Повторите пароль");
         loginPanel = new JPanel();
         registerPanel = new JPanel();
+        userNamePanel = new JPanel();
+        passwordPanel = new JPanel();
+        repeatPasswordPanel = new JPanel();
         userNameField = new JTextField();
-        passwordField = new JPasswordField();
-        clearPassword = new JButton("Очистить");
-        clearUserName = new JButton("Очистить");
-        clearRepeatPassword = new JButton("Очистить");
-        repeatPasswordField = new JPasswordField();
+        SPPasswordField passwordFieldPanel = new SPPasswordField();
+        SPPasswordField repeatPasswordFieldPanel = new SPPasswordField();
+        //
+        //passwordFieldPanel.setPreferredSize(d);
+        //userNameField.setPreferredSize(d);
+        //repeatPasswordPa
+        JButton clearPassword = new JButton("Очистить");
+        JButton clearUserName = new JButton("Очистить");
+        JButton clearRepeatPassword = new JButton("Очистить");
+
+        passwordField = passwordFieldPanel.getPasswordField();
+        repeatPasswordField = repeatPasswordFieldPanel.getPasswordField();
+        GhostText usernameGhostText = new GhostText(userNameField, "Введите имя пользователя...");
+        passwordFieldPanel.setGhostText("Введите пароль...");
+        repeatPasswordFieldPanel.setGhostText("Повторите пароль...");
+        clearUserName.addActionListener(e -> usernameGhostText.clear());
+        clearPassword.addActionListener(e -> passwordFieldPanel.clear());
+        clearRepeatPassword.addActionListener(e -> repeatPasswordFieldPanel.clear());
+        {
+            userNamePanel.setLayout(new GridLayout(1, 2));
+           // userNamePanel.add(userNameLabel);
+            userNamePanel.add(userNameField, BorderLayout.WEST);
+            userNamePanel.add(clearUserName, BorderLayout.EAST);
+            //userNamePanel.setBorder(new EmptyBorder(5, 20, 20, 20));
+        }
+        {
+//            GridLayout gridLayout = new GridLayout();
+//            gridLayout.setColumns(3);
+//            gridLayout.setRows(1);
+            passwordPanel.setLayout(new GridLayout(1, 2));
+            //passwordPanel.add(passwordLabel);
+            passwordPanel.add(passwordFieldPanel);
+            passwordPanel.add(clearPassword);
+            //passwordPanel.setBorder(new EmptyBorder(0, 20, 20, 20));
+        }
+        {
+//            GridLayout gridLayout = new GridLayout();
+//            gridLayout.setColumns(3);
+//            gridLayout.setRows(1);
+            repeatPasswordPanel.setLayout(new GridLayout(1, 2));
+            //repeatPasswordPanel.add(repeatPasswordLabel);
+            repeatPasswordPanel.add(repeatPasswordFieldPanel);
+            repeatPasswordPanel.add(clearRepeatPassword);
+           // repeatPasswordPanel.setBorder(new EmptyBorder(0, 20, 20, 20));
+        }
         {
             GridLayout gridLayout = new GridLayout();
-            gridLayout.setColumns(3);
+            gridLayout.setColumns(1);
             gridLayout.setRows(2);
             loginPanel.setLayout(gridLayout);
         }
-        loginPanel.add(userNameLabel);
-        loginPanel.add(userNameField);
-        loginPanel.add(clearUserName);
-        loginPanel.add(passwordLabel);
-        loginPanel.add(passwordField);
-        loginPanel.add(clearPassword);
+        loginPanel.add(userNamePanel);
+        loginPanel.add(passwordPanel);
         {
             GridLayout gridLayout = new GridLayout();
-            gridLayout.setColumns(3);
+            gridLayout.setColumns(1);
             gridLayout.setRows(3);
             registerPanel.setLayout(gridLayout);
         }
