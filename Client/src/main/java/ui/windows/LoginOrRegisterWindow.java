@@ -1,20 +1,23 @@
-package ui;
+package ui.windows;
 import general.LoginOrRegisterRequest;
 import ui.ghosttexttooltip.GhostText;
 import ui.passwordfieldwithshowpasscheckbox.SPPasswordField;
 import userdata.LoginOrRegisterResultGetter;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.LinkedList;
+import java.util.ResourceBundle;
+
+import static ui.common.DisplayErrors.showErrorMessage;
 
 public class LoginOrRegisterWindow extends JFrame implements LoginOrRegisterResultGetter {
-    private JTabbedPane tabbedPane1;
-    private JPanel panel1;
+    private JTabbedPane loginOrRegisterTabPane;
+    private JPanel contentPanel;
     private JTextField userNameField;
     private JPasswordField passwordField;
     private JPasswordField repeatPasswordField;
@@ -24,6 +27,7 @@ public class LoginOrRegisterWindow extends JFrame implements LoginOrRegisterResu
     private JButton submitBtn;
     private LoginOrRegisterRequest loginOrRegisterResult;
     private final Object notifyObject;
+    private static ResourceBundle rb = ResourceBundle.getBundle("resources/locales/LoginOrRegisterWindow");
 
     public static void main(String[] args) {
         LoginOrRegisterWindow low = new LoginOrRegisterWindow();
@@ -52,7 +56,7 @@ public class LoginOrRegisterWindow extends JFrame implements LoginOrRegisterResu
 
     private void initSubmitBtn() {
         ActionListener submitBtnPress = e -> {
-            int selectedIndex = tabbedPane1.getSelectedIndex();
+            int selectedIndex = loginOrRegisterTabPane.getSelectedIndex();
             String userName = userNameField.getText().trim();
             String password = String.valueOf(passwordField.getPassword()).trim();
             StringBuilder perhapsErrorMessage = new StringBuilder("Вы не заполнили: ");
@@ -94,20 +98,20 @@ public class LoginOrRegisterWindow extends JFrame implements LoginOrRegisterResu
 
         };
         submitBtn.addActionListener(submitBtnPress);
-        panel1.registerKeyboardAction(submitBtnPress, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        //panel1.registerKeyboardAction(submitBtnPress, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
     }
 
     private void initFields(){
         userNameField.addActionListener((a)-> passwordField.requestFocus());
         passwordField.addActionListener((a)->{
-            if(tabbedPane1.getSelectedIndex() == 0)submitBtn.requestFocus();
+            if(loginOrRegisterTabPane.getSelectedIndex() == 0)submitBtn.requestFocus();
             else repeatPasswordField.requestFocus();
         });
         repeatPasswordField.addActionListener((a)-> submitBtn.requestFocus());
     }
     private void initTabPane() {
-        tabbedPane1.addChangeListener(e -> {
-            int selectedIndex = tabbedPane1.getSelectedIndex();
+        loginOrRegisterTabPane.addChangeListener(e -> {
+            int selectedIndex = loginOrRegisterTabPane.getSelectedIndex();
             if (selectedIndex == 0) {
                 loginPanel.removeAll();
                 registerPanel.removeAll();
@@ -120,10 +124,11 @@ public class LoginOrRegisterWindow extends JFrame implements LoginOrRegisterResu
                 registerPanel.add(passwordPanel);
                 registerPanel.add(repeatPasswordPanel);
             }
-            submitBtn.setText(tabbedPane1.getTitleAt(selectedIndex));
+            submitBtn.setText(loginOrRegisterTabPane.getTitleAt(selectedIndex));
         });
     }
     public void init(){
+        createUIComponents();
         this.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
@@ -142,81 +147,67 @@ public class LoginOrRegisterWindow extends JFrame implements LoginOrRegisterResu
     }
     public LoginOrRegisterWindow() {
         this.notifyObject = new Object();
-        this.getContentPane().add(panel1);
 
         init();
-        this.setMinimumSize(new Dimension(531, 252));
+        this.setMinimumSize(new Dimension(500, 200));
         this.setSize(this.getMinimumSize());
         //this.setResizable(false);
     }
 
     private void createUIComponents() {
+        loginOrRegisterTabPane = new JTabbedPane();
+        contentPanel = new JPanel();
         loginPanel = new JPanel();
         registerPanel = new JPanel();
         userNamePanel = new JPanel();
         passwordPanel = new JPanel();
         repeatPasswordPanel = new JPanel();
         userNameField = new JTextField();
+        submitBtn = new JButton(rb.getString("loginTabAndSubmitButtonText"));
         SPPasswordField passwordFieldPanel = new SPPasswordField();
         SPPasswordField repeatPasswordFieldPanel = new SPPasswordField();
-        //
-        //passwordFieldPanel.setPreferredSize(d);
-        //userNameField.setPreferredSize(d);
-        //repeatPasswordPa
-        JButton clearPassword = new JButton("Очистить");
-        JButton clearUserName = new JButton("Очистить");
-        JButton clearRepeatPassword = new JButton("Очистить");
+        String clearButtonText = rb.getString("clearButton");
+        JButton clearPassword = new JButton(clearButtonText);
+        JButton clearUserName = new JButton(clearButtonText);
+        JButton clearRepeatPassword = new JButton(clearButtonText);
 
         passwordField = passwordFieldPanel.getPasswordField();
         repeatPasswordField = repeatPasswordFieldPanel.getPasswordField();
-        GhostText usernameGhostText = new GhostText(userNameField, "Введите имя пользователя...");
-        passwordFieldPanel.setGhostText("Введите пароль...");
-        repeatPasswordFieldPanel.setGhostText("Повторите пароль...");
+        GhostText usernameGhostText = new GhostText(userNameField, rb.getString("usernameFieldGhostText"));
+        passwordFieldPanel.setGhostText(rb.getString("passwordFieldGhostText"));
+        repeatPasswordFieldPanel.setGhostText(rb.getString("repeatPasswordGhostText"));
         clearUserName.addActionListener(e -> usernameGhostText.clear());
         clearPassword.addActionListener(e -> passwordFieldPanel.clear());
         clearRepeatPassword.addActionListener(e -> repeatPasswordFieldPanel.clear());
-        {
-            userNamePanel.setLayout(new GridLayout(1, 2));
-           // userNamePanel.add(userNameLabel);
-            userNamePanel.add(userNameField, BorderLayout.WEST);
-            userNamePanel.add(clearUserName, BorderLayout.EAST);
-            //userNamePanel.setBorder(new EmptyBorder(5, 20, 20, 20));
-        }
-        {
-//            GridLayout gridLayout = new GridLayout();
-//            gridLayout.setColumns(3);
-//            gridLayout.setRows(1);
-            passwordPanel.setLayout(new GridLayout(1, 2));
-            //passwordPanel.add(passwordLabel);
-            passwordPanel.add(passwordFieldPanel);
-            passwordPanel.add(clearPassword);
-            //passwordPanel.setBorder(new EmptyBorder(0, 20, 20, 20));
-        }
-        {
-//            GridLayout gridLayout = new GridLayout();
-//            gridLayout.setColumns(3);
-//            gridLayout.setRows(1);
-            repeatPasswordPanel.setLayout(new GridLayout(1, 2));
-            //repeatPasswordPanel.add(repeatPasswordLabel);
-            repeatPasswordPanel.add(repeatPasswordFieldPanel);
-            repeatPasswordPanel.add(clearRepeatPassword);
-           // repeatPasswordPanel.setBorder(new EmptyBorder(0, 20, 20, 20));
-        }
-        {
-            GridLayout gridLayout = new GridLayout();
-            gridLayout.setColumns(1);
-            gridLayout.setRows(2);
-            loginPanel.setLayout(gridLayout);
-        }
+        EmptyBorder generalBorder = new EmptyBorder(2, 0, 2, 0);
+        userNamePanel.setLayout(new BorderLayout());
+        userNamePanel.add(userNameField, BorderLayout.CENTER);
+        userNamePanel.add(clearUserName, BorderLayout.EAST);
+
+        userNamePanel.setBorder(generalBorder);
+
+        passwordPanel.setLayout(new BorderLayout());
+        passwordPanel.add(passwordFieldPanel, BorderLayout.CENTER);
+        passwordPanel.add(clearPassword, BorderLayout.EAST);
+        passwordPanel.setBorder(generalBorder);
+
+        repeatPasswordPanel.setLayout(new BorderLayout());
+        repeatPasswordPanel.add(repeatPasswordFieldPanel, BorderLayout.CENTER);
+        repeatPasswordPanel.add(clearRepeatPassword, BorderLayout.EAST);
+        repeatPasswordPanel.setBorder(generalBorder);
+        loginPanel.setLayout(new GridLayout(2, 1));
+        registerPanel.setLayout(new GridLayout(3, 1));
+
         loginPanel.add(userNamePanel);
         loginPanel.add(passwordPanel);
-        {
-            GridLayout gridLayout = new GridLayout();
-            gridLayout.setColumns(1);
-            gridLayout.setRows(3);
-            registerPanel.setLayout(gridLayout);
-        }
+        loginOrRegisterTabPane.addTab(rb.getString("loginTabAndSubmitButtonText"), loginPanel);
+        loginOrRegisterTabPane.addTab(rb.getString("registerTabAndSubmitButtonText"), registerPanel);
 
+        contentPanel.setLayout(new BorderLayout());
+        contentPanel.add(loginOrRegisterTabPane, BorderLayout.CENTER);
+        contentPanel.add(submitBtn, BorderLayout.SOUTH);
+        contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
+        this.getContentPane().add(contentPanel);
     }
 
     public LoginOrRegisterRequest getLoginOrRegisterResult() {
@@ -242,8 +233,8 @@ public class LoginOrRegisterWindow extends JFrame implements LoginOrRegisterResu
     @Override
     public LoginOrRegisterRequest getLoginOrRegisterResult(ActionCode actionCode) {
         switch (actionCode) {
-            case GET_NEW_USERNAME_BECAUSE_OLD_IS_ALREADY_REGISTERED -> JOptionPane.showMessageDialog(this, "Пользователь с таким именим уже существует, введите другое.", "Ошибка регистрации", JOptionPane.ERROR_MESSAGE);
-            case GET_BECAUSE_INVALID_LOGIN_OR_PASSWORD -> JOptionPane.showMessageDialog(this, "Неверный логин или пароль", "Ошибка входа", JOptionPane.ERROR_MESSAGE);
+            case GET_NEW_USERNAME_BECAUSE_OLD_IS_ALREADY_REGISTERED -> showErrorMessage(this, "errorMessages.userIsAlreadyExists", "errorCaptions.registrationError", rb);
+            case GET_BECAUSE_INVALID_LOGIN_OR_PASSWORD -> showErrorMessage(this, "errorMessages.invalidLoginOrPassword", "errorCaptions.loginError", rb);
         }
         return getLoginOrRegisterResult();
     }

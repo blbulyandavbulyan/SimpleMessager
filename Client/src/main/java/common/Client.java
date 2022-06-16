@@ -2,9 +2,9 @@ package common;
 
 import serverconnection.ServerConnection;
 import serverconnection.exceptions.RegisterOrLoginInterrupted;
-import ui.ConnectToServerDialog;
-import ui.MainWindow;
-import ui.LoginOrRegisterWindow;
+import ui.windows.ConnectToServerDialog;
+import ui.windows.MainWindow;
+import ui.windows.LoginOrRegisterWindow;
 
 import java.io.*;
 import java.net.InetSocketAddress;

@@ -1,4 +1,4 @@
-package ui;
+package ui.windows;
 
 
 import common.interfaces.MessageSender;
@@ -8,6 +8,7 @@ import serverconnection.ServerConnection;
 import common.interfaces.MessagePrinter;
 import ui.closedjtabbedpane.JTabbedPaneWithCloseableTabs;
 import ui.exceptions.PersonalMessageIsEmpty;
+import ui.ghosttexttooltip.GhostText;
 
 import javax.swing.*;
 import java.awt.*;
@@ -16,6 +17,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.ResourceBundle;
 
 public class MainWindow extends JFrame implements MessagePrinter {
     private JTextField messageField;
@@ -26,6 +28,7 @@ public class MainWindow extends JFrame implements MessagePrinter {
     private MessageSender messageSender;
     private String myUserName;
     private MessagesReaderThread readerThread;
+    private static ResourceBundle rb = ResourceBundle.getBundle("resources/locales/MainWindow");
     public static void main(String[] args) {
         MainWindow mw = new MainWindow();
         mw.pack();
@@ -53,15 +56,15 @@ public class MainWindow extends JFrame implements MessagePrinter {
             i++;
             if(i >= msgChars.length ||
                     (newMsgStr = String.valueOf(msgChars, i, msgChars.length - i)).isBlank())
-                throw new PersonalMessageIsEmpty("Вы пытаетесь отправить пустое личное сообщение, после упоминания пользователя обязательно должен быть текст сообщения.");
+                throw new PersonalMessageIsEmpty(rb.getString("errorMessages.emptyPersonalMessage"));
         }
         return new Message(newMsgStr, senderName, receiverName);
     }
 
     private void init() {
         messageField = new JTextField();
-        sendBtn = new JButton("Отправить");
-
+        sendBtn = new JButton(rb.getString("sendButton"));
+        new GhostText(messageField, rb.getString("messageFieldGhostText"));
         ActionListener sendMessage = (e) -> {
             String message = messageField.getText().trim();
             if (!message.isBlank()) {
@@ -77,19 +80,19 @@ public class MainWindow extends JFrame implements MessagePrinter {
                         printMessage(msg);
                         messageField.setText("");
                     } else
-                        JOptionPane.showMessageDialog(((JComponent) e.getSource()).getParent(), "Ошибка отправки сообщения, по каким-то причинам оно null", "Ошибка отправки", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(((JComponent) e.getSource()).getParent(), rb.getString("errorMessages.messageSendingErrorNullMessage"), rb.getString("errorCaptions.messageSendingError"), JOptionPane.ERROR_MESSAGE);
 
                 }
                 catch (PersonalMessageIsEmpty ex){
                     JOptionPane.showMessageDialog(((JComponent) e.getSource()).getParent(), ex.getMessage(),
-                            "Ошибка отправки сообщения.", JOptionPane.ERROR_MESSAGE);
+                            rb.getString("errorCaptions.messageSendingError"), JOptionPane.ERROR_MESSAGE);
                     messageField.requestFocus();
                 }
                 catch (IOException ex) {
                     ex.printStackTrace();
                     JOptionPane.showMessageDialog(((JComponent) e.getSource()).getParent(),
-                            (messageSender.isClosed() ? "Произошла ошибка отправки сообщения, соединение было закрыто." : "Произошла неизвестная ошибка при отправке сообщения."),
-                            "Ошибка отправки сообщения.", JOptionPane.ERROR_MESSAGE);
+                            (messageSender.isClosed() ? rb.getString("errorMessages.connectionClosed") : rb.getString("errorMessages.messageSendingUnknownError")),
+                            rb.getString("errorCaptions.messageSendingError"), JOptionPane.ERROR_MESSAGE);
                     if (messageSender.isClosed()) {
 
                     }
@@ -101,10 +104,10 @@ public class MainWindow extends JFrame implements MessagePrinter {
         };
         messageField.addActionListener(sendMessage);
         sendBtn.addActionListener(sendMessage);
-        dialogsTappedPane = new JTabbedPaneWithCloseableTabs(privateDialogs::remove, "Закрыть диалог");
+        dialogsTappedPane = new JTabbedPaneWithCloseableTabs(privateDialogs::remove, rb.getString("closeDialogTooltipText"));
         generalDialogArea = new JTextArea();
         generalDialogArea.setEditable(false);
-        dialogsTappedPane.addTab("Oбщий", new JScrollPane(generalDialogArea));
+        dialogsTappedPane.addTab(rb.getString("generalChatTabname"), new JScrollPane(generalDialogArea));
         this.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.weighty = 1;
@@ -171,7 +174,7 @@ public class MainWindow extends JFrame implements MessagePrinter {
         }
     }
 
-    private int initPrivateDialogWithUser(String username) {
+    private void initPrivateDialogWithUser(String username) {
         synchronized (privateDialogs){
             if (!privateDialogs.containsKey(username)) {
                 JTextArea jTextArea = new JTextArea();
@@ -181,7 +184,6 @@ public class MainWindow extends JFrame implements MessagePrinter {
             }
         }
 
-        return 0;
     }
 }
 

@@ -1,27 +1,34 @@
-package ui;
+package ui.windows;
+
+import ui.ghosttexttooltip.GhostText;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.net.InetSocketAddress;
+import java.util.ResourceBundle;
 
 public class ConnectToServerDialog extends JDialog {
     private JPanel contentPane;
     private JButton connectBtn;
-    private JButton buttonCancel;
+    private JButton cancelButton;
     private JTextField serverAddressField;
     private JTextField serverPortField;
     private InetSocketAddress address;
     private boolean cancelled = false;
-
+    private ResourceBundle rb = ResourceBundle.getBundle("resources/locales/ConnectToServerDialog");
     public ConnectToServerDialog() {
+        createUIComponents();
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(connectBtn);
 
         connectBtn.addActionListener(e -> onOK());
 
-        buttonCancel.addActionListener(e -> onCancel());
+        cancelButton.addActionListener(e -> onCancel());
 
         // call onCancel() when cross is clicked
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
@@ -60,7 +67,28 @@ public class ConnectToServerDialog extends JDialog {
         this.cancelled = true;
         dispose();
     }
+    private void createUIComponents(){
+        contentPane = new JPanel();
+        connectBtn = new JButton(rb.getString("connectButton"));
+        cancelButton = new JButton(rb.getString("cancelButton"));
+        serverAddressField = new JTextField();
+        serverPortField = new JTextField();
+        new GhostText(serverAddressField, rb.getString("serverAddressFieldGhostText"));
+        new GhostText(serverPortField, rb.getString("serverPortFieldGhostText"));
+        contentPane.setLayout(new GridLayout(5, 1));
+        JPanel connectAndCancelButtonsPanel = new JPanel();
+        connectAndCancelButtonsPanel.setLayout(new GridLayout(1, 3));
+        connectAndCancelButtonsPanel.add(connectBtn);
+        connectAndCancelButtonsPanel.add(Box.createHorizontalGlue());
+        connectAndCancelButtonsPanel.add(cancelButton);
 
+        contentPane.add(serverAddressField);
+        contentPane.add(Box.createVerticalGlue());
+        contentPane.add(serverPortField);
+        contentPane.add(Box.createVerticalGlue());
+        contentPane.add(connectAndCancelButtonsPanel);
+        contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+    }
     public InetSocketAddress getAddress() {
         return address;
     }
