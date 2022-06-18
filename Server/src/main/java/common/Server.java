@@ -1,6 +1,6 @@
 package common;
 
-import general.message.Message;
+import general.message.textmessage.TextMessage;
 import threads.ClientServerThread;
 import threads.LoginOrRegisterClientThread;
 import userprocessing.UserManager;
@@ -62,8 +62,8 @@ public class Server {
         clients.remove(clientName);
     }
 
-    public static ClientServerThread addClient(ClientServerThread clientThread){
-        return clients.put(clientThread.getClientName(), clientThread);
+    public static void addClient(ClientServerThread clientThread){
+        clients.put(clientThread.getClientName(), clientThread);
     }
 
     public static boolean IsClientExists(String clientName){
@@ -98,7 +98,7 @@ public class Server {
     synchronized public void serverPrint(Object obj){
         sPs.println(obj);
     }
-    public static void printMessage(Message msg){
+    public static void printMessage(TextMessage msg){
         if(showMessagesFromUser)sPs.println(msg);
     }
     public static void setShowMessagesFromUser(boolean showMessagesFromUser){

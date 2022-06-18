@@ -1,6 +1,6 @@
 package serverconnection;
 
-import general.LoginOrRegisterRequest;
+import general.loginorregisterrequest.LoginOrRegisterRequest;
 import common.interfaces.MessageGetter;
 import common.interfaces.MessageSender;
 import common.interfaces.StatusMessagePrinter;
@@ -84,7 +84,7 @@ public class ServerConnection implements MessageGetter, MessageSender {
                 }
                 case registrationOrLoginFailed -> throw new ServerHasDBProblemsException(String.format(
                                 "У сервера проблемы с базой данных. Процедура %s провалена.",
-                                lor.getOperation() == LoginOrRegisterRequest.OperationType.REGISTER ? "Регистрации" : "Входа"
+                                lor.getOperation() == LoginOrRegisterRequest.OperationType.REGISTER ? "регистрации" : "входа"
                         ));
                 default -> throw new WrongAnswerFromServer(String.format("Неожиданный ответ от сервера, от сервера, пришло: %s\n Завершение.\n", answerFromServer));
             }

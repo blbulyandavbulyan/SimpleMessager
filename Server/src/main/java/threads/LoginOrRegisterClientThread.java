@@ -1,7 +1,7 @@
 package threads;
 
 import common.Server;
-import general.LoginOrRegisterRequest;
+import general.loginorregisterrequest.LoginOrRegisterRequest;
 import userprocessing.UserManager;
 
 import java.io.*;

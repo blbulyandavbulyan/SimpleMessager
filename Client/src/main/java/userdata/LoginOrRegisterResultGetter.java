@@ -1,6 +1,6 @@
 package userdata;
 
-import general.LoginOrRegisterRequest;
+import general.loginorregisterrequest.LoginOrRegisterRequest;
 import common.interfaces.StatusMessagePrinter;
 
 import java.io.Closeable;

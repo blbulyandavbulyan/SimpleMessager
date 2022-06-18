@@ -3,12 +3,14 @@ package ui.windows;
 
 import common.interfaces.MessageSender;
 import general.message.Message;
+import general.message.textmessage.TextMessage;
 import serverconnection.MessagesReaderThread;
 import serverconnection.ServerConnection;
 import common.interfaces.MessagePrinter;
 import ui.closedjtabbedpane.JTabbedPaneWithCloseableTabs;
 import ui.exceptions.PersonalMessageIsEmpty;
 import ui.ghosttexttooltip.GhostText;
+import ui.messagedisplaying.MessagePanelGenerator;
 
 import javax.swing.*;
 import java.awt.*;
@@ -28,21 +30,21 @@ public class MainWindow extends JFrame implements MessagePrinter {
     private MessageSender messageSender;
     private String myUserName;
     private MessagesReaderThread readerThread;
-    private static ResourceBundle rb = ResourceBundle.getBundle("resources/locales/MainWindow");
+    private ResourceBundle rb;
     public static void main(String[] args) {
-        MainWindow mw = new MainWindow();
+        MainWindow mw = new MainWindow(ResourceBundle.getBundle("resources/locales/guitext"));
         mw.pack();
         mw.setSize(new Dimension(500, 500));
         mw.setVisible(true);
-        Message msg1 = new Message("Hello, i am johan", "johan", "you"),
-                msg2 = new Message("Hello, i am georgy", "georgy", "you");
+        TextMessage msg1 = new TextMessage("Hello, i am johan", "johan", "you"),
+                msg2 = new TextMessage("Hello, i am georgy", "georgy", "you");
         for (int i = 0; i < 1000; i++) {
             mw.printMessage(msg1);
             mw.printMessage(msg2);
         }
     }
 
-    private static Message getMessageWithReceiverFromMsgStr(String msgStr, String senderName) throws PersonalMessageIsEmpty{
+    private static TextMessage getMessageWithReceiverFromMsgStr(String msgStr, String senderName, ResourceBundle rb) throws PersonalMessageIsEmpty{
         String receiverName = null;
         String newMsgStr = msgStr;
         char[] msgChars = msgStr.toCharArray();
@@ -56,43 +58,43 @@ public class MainWindow extends JFrame implements MessagePrinter {
             i++;
             if(i >= msgChars.length ||
                     (newMsgStr = String.valueOf(msgChars, i, msgChars.length - i)).isBlank())
-                throw new PersonalMessageIsEmpty(rb.getString("errorMessages.emptyPersonalMessage"));
+                throw new PersonalMessageIsEmpty(rb.getString("mainWindow.errorMessages.emptyPersonalMessage"));
         }
-        return new Message(newMsgStr, senderName, receiverName);
+        return new TextMessage(newMsgStr, senderName, receiverName);
     }
 
     private void init() {
         messageField = new JTextField();
-        sendBtn = new JButton(rb.getString("sendButton"));
-        new GhostText(messageField, rb.getString("messageFieldGhostText"));
+        sendBtn = new JButton(rb.getString("mainWindow.sendButton"));
+        new GhostText(messageField, rb.getString("mainWindow.messageFieldGhostText"));
         ActionListener sendMessage = (e) -> {
             String message = messageField.getText().trim();
             if (!message.isBlank()) {
                 int selectedDialogIndex = dialogsTappedPane.getSelectedIndex();
                 try {
-                    Message msg = null;
+                    TextMessage msg = null;
                     if (selectedDialogIndex > 0) {
                         String receiverUserName = dialogsTappedPane.getTitleAt(selectedDialogIndex);
-                        msg = new Message(message, myUserName, receiverUserName);
-                    } else if (selectedDialogIndex == 0)msg = getMessageWithReceiverFromMsgStr(message, myUserName);
+                        msg = new TextMessage(message, myUserName, receiverUserName);
+                    } else if (selectedDialogIndex == 0)msg = getMessageWithReceiverFromMsgStr(message, myUserName, rb);
                     if (msg != null) {
                         messageSender.sendMessage(msg);
                         printMessage(msg);
                         messageField.setText("");
                     } else
-                        JOptionPane.showMessageDialog(((JComponent) e.getSource()).getParent(), rb.getString("errorMessages.messageSendingErrorNullMessage"), rb.getString("errorCaptions.messageSendingError"), JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(((JComponent) e.getSource()).getParent(), rb.getString("mainWindow.errorMessages.messageSendingErrorNullMessage"), rb.getString("mainWindow.errorCaptions.messageSendingError"), JOptionPane.ERROR_MESSAGE);
 
                 }
                 catch (PersonalMessageIsEmpty ex){
                     JOptionPane.showMessageDialog(((JComponent) e.getSource()).getParent(), ex.getMessage(),
-                            rb.getString("errorCaptions.messageSendingError"), JOptionPane.ERROR_MESSAGE);
+                            rb.getString("mainWindow.errorCaptions.messageSendingError"), JOptionPane.ERROR_MESSAGE);
                     messageField.requestFocus();
                 }
                 catch (IOException ex) {
                     ex.printStackTrace();
                     JOptionPane.showMessageDialog(((JComponent) e.getSource()).getParent(),
-                            (messageSender.isClosed() ? rb.getString("errorMessages.connectionClosed") : rb.getString("errorMessages.messageSendingUnknownError")),
-                            rb.getString("errorCaptions.messageSendingError"), JOptionPane.ERROR_MESSAGE);
+                            (messageSender.isClosed() ? rb.getString("mainWindow.errorMessages.connectionClosed") : rb.getString("mainWindow.errorMessages.messageSendingUnknownError")),
+                            rb.getString("mainWindow.errorCaptions.messageSendingError"), JOptionPane.ERROR_MESSAGE);
                     if (messageSender.isClosed()) {
 
                     }
@@ -104,10 +106,10 @@ public class MainWindow extends JFrame implements MessagePrinter {
         };
         messageField.addActionListener(sendMessage);
         sendBtn.addActionListener(sendMessage);
-        dialogsTappedPane = new JTabbedPaneWithCloseableTabs(privateDialogs::remove, rb.getString("closeDialogTooltipText"));
+        dialogsTappedPane = new JTabbedPaneWithCloseableTabs(privateDialogs::remove, rb.getString("mainWindow.closeDialogTooltipText"));
         generalDialogArea = new JTextArea();
         generalDialogArea.setEditable(false);
-        dialogsTappedPane.addTab(rb.getString("generalChatTabname"), new JScrollPane(generalDialogArea));
+        dialogsTappedPane.addTab(rb.getString("mainWindow.generalChatTabname"), new JScrollPane(generalDialogArea));
         this.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.weighty = 1;
@@ -131,7 +133,8 @@ public class MainWindow extends JFrame implements MessagePrinter {
         this.add(sendBtn, gbc);
     }
 
-    public MainWindow(ServerConnection connection) {
+    public MainWindow(ServerConnection connection, ResourceBundle rb) {
+        this.rb = rb;
         if (connection == null) throw new NullPointerException("connection is null");
         if (connection.isClosed()) throw new RuntimeException("connection is closed");
         init();
@@ -159,7 +162,8 @@ public class MainWindow extends JFrame implements MessagePrinter {
         readerThread = new MessagesReaderThread(connection, this);
     }
 
-    private MainWindow() {
+    private MainWindow(ResourceBundle rb) {
+        this.rb = rb;
         init();
         this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     }
@@ -168,6 +172,7 @@ public class MainWindow extends JFrame implements MessagePrinter {
         if (msg.getReceiver() != null) {
             String dialogName = msg.getReceiver().equals(myUserName) ?  msg.getSender() : msg.getReceiver();
             initPrivateDialogWithUser(dialogName);
+            MessagePanelGenerator.getMessagePanel(msg);
             privateDialogs.get(dialogName).append(msg + "\n");
         } else {
             generalDialogArea.append(msg + "\n");

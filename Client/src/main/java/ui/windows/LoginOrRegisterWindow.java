@@ -1,5 +1,5 @@
 package ui.windows;
-import general.LoginOrRegisterRequest;
+import general.loginorregisterrequest.LoginOrRegisterRequest;
 import ui.ghosttexttooltip.GhostText;
 import ui.passwordfieldwithshowpasscheckbox.SPPasswordField;
 import userdata.LoginOrRegisterResultGetter;
@@ -10,6 +10,7 @@ import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.ResourceBundle;
 
@@ -17,7 +18,6 @@ import static ui.common.DisplayErrors.showErrorMessage;
 
 public class LoginOrRegisterWindow extends JFrame implements LoginOrRegisterResultGetter {
     private JTabbedPane loginOrRegisterTabPane;
-    private JPanel contentPanel;
     private JTextField userNameField;
     private JPasswordField passwordField;
     private JPasswordField repeatPasswordField;
@@ -27,10 +27,10 @@ public class LoginOrRegisterWindow extends JFrame implements LoginOrRegisterResu
     private JButton submitBtn;
     private LoginOrRegisterRequest loginOrRegisterResult;
     private final Object notifyObject;
-    private static ResourceBundle rb = ResourceBundle.getBundle("resources/locales/LoginOrRegisterWindow");
+    private ResourceBundle rb;
 
     public static void main(String[] args) {
-        LoginOrRegisterWindow low = new LoginOrRegisterWindow();
+        LoginOrRegisterWindow low = new LoginOrRegisterWindow(ResourceBundle.getBundle("guitext"));
         low.setVisible(true);
         while (true) {
             LoginOrRegisterRequest lor = low.getLoginOrRegisterResult();
@@ -58,8 +58,10 @@ public class LoginOrRegisterWindow extends JFrame implements LoginOrRegisterResu
         ActionListener submitBtnPress = e -> {
             int selectedIndex = loginOrRegisterTabPane.getSelectedIndex();
             String userName = userNameField.getText().trim();
-            String password = String.valueOf(passwordField.getPassword()).trim();
-            StringBuilder perhapsErrorMessage = new StringBuilder("Вы не заполнили: ");
+            char []passwordChars = passwordField.getPassword();
+            String password = String.valueOf(passwordChars).trim();
+            Arrays.fill(passwordChars, (char)0);
+
             LinkedList<String> emptyFieldsNames = new LinkedList<>();
             if (userName.isBlank()) {
                 emptyFieldsNames.add("имя пользователя");
@@ -70,9 +72,11 @@ public class LoginOrRegisterWindow extends JFrame implements LoginOrRegisterResu
             if (emptyFieldsNames.isEmpty()) {
                 try {
                     if (selectedIndex == 1) {
-                        String repeatPassword = String.valueOf(repeatPasswordField.getPassword()).trim();
+                        char []repeatPasswordChars = repeatPasswordField.getPassword();
+                        String repeatPassword = String.valueOf(repeatPasswordChars).trim();
+                        Arrays.fill(repeatPasswordChars, (char)0);
                         if (!repeatPassword.equals(password)) {
-                            JOptionPane.showMessageDialog(((JButton) e.getSource()).getParent(), "Пароли не совпадают.", "Ошибка", JOptionPane.ERROR_MESSAGE);
+                            showErrorMessage(((JButton) e.getSource()).getParent(), "loginOrRegisterWindow.errorMessages.PasswordsIsNotEquals", "errorCaptions.generalErrorCaption", rb);
                             return;
                         }
                     }
@@ -81,7 +85,7 @@ public class LoginOrRegisterWindow extends JFrame implements LoginOrRegisterResu
                         notifyObject.notify();
                     }
                 } catch (NullPointerException ex) {
-                    JOptionPane.showMessageDialog(((JButton) e.getSource()).getParent(), ex.getMessage(), "Ошибка, некоторые данные null", JOptionPane.ERROR_MESSAGE);
+                    showErrorMessage(((JButton) e.getSource()).getParent(), ex.getMessage(), "errorMessages.someDataIsNull", rb);
                 }
 
             } else {
@@ -145,37 +149,39 @@ public class LoginOrRegisterWindow extends JFrame implements LoginOrRegisterResu
         initFields();
 
     }
-    public LoginOrRegisterWindow() {
+    public LoginOrRegisterWindow(ResourceBundle rb) {
+        this.rb = rb;
         this.notifyObject = new Object();
 
         init();
         this.setMinimumSize(new Dimension(500, 200));
         this.setSize(this.getMinimumSize());
         //this.setResizable(false);
+        this.setTitle(rb.getString("logiOrRegisterWindow.windowCaption"));
     }
 
     private void createUIComponents() {
         loginOrRegisterTabPane = new JTabbedPane();
-        contentPanel = new JPanel();
+        JPanel contentPanel = new JPanel();
         loginPanel = new JPanel();
         registerPanel = new JPanel();
         userNamePanel = new JPanel();
         passwordPanel = new JPanel();
         repeatPasswordPanel = new JPanel();
         userNameField = new JTextField();
-        submitBtn = new JButton(rb.getString("loginTabAndSubmitButtonText"));
+        submitBtn = new JButton(rb.getString("loginOrRegisterWindow.loginTabAndSubmitButtonText"));
         SPPasswordField passwordFieldPanel = new SPPasswordField();
         SPPasswordField repeatPasswordFieldPanel = new SPPasswordField();
-        String clearButtonText = rb.getString("clearButton");
+        String clearButtonText = rb.getString("loginOrRegisterWindow.clearButton");
         JButton clearPassword = new JButton(clearButtonText);
         JButton clearUserName = new JButton(clearButtonText);
         JButton clearRepeatPassword = new JButton(clearButtonText);
 
         passwordField = passwordFieldPanel.getPasswordField();
         repeatPasswordField = repeatPasswordFieldPanel.getPasswordField();
-        GhostText usernameGhostText = new GhostText(userNameField, rb.getString("usernameFieldGhostText"));
-        passwordFieldPanel.setGhostText(rb.getString("passwordFieldGhostText"));
-        repeatPasswordFieldPanel.setGhostText(rb.getString("repeatPasswordGhostText"));
+        GhostText usernameGhostText = new GhostText(userNameField, rb.getString("loginOrRegisterWindow.usernameFieldGhostText"));
+        passwordFieldPanel.setGhostText(rb.getString("loginOrRegisterWindow.passwordFieldGhostText"));
+        repeatPasswordFieldPanel.setGhostText(rb.getString("loginOrRegisterWindow.repeatPasswordGhostText"));
         clearUserName.addActionListener(e -> usernameGhostText.clear());
         clearPassword.addActionListener(e -> passwordFieldPanel.clear());
         clearRepeatPassword.addActionListener(e -> repeatPasswordFieldPanel.clear());
@@ -200,8 +206,8 @@ public class LoginOrRegisterWindow extends JFrame implements LoginOrRegisterResu
 
         loginPanel.add(userNamePanel);
         loginPanel.add(passwordPanel);
-        loginOrRegisterTabPane.addTab(rb.getString("loginTabAndSubmitButtonText"), loginPanel);
-        loginOrRegisterTabPane.addTab(rb.getString("registerTabAndSubmitButtonText"), registerPanel);
+        loginOrRegisterTabPane.addTab(rb.getString("loginOrRegisterWindow.loginTabAndSubmitButtonText"), loginPanel);
+        loginOrRegisterTabPane.addTab(rb.getString("loginOrRegisterWindow.registerTabAndSubmitButtonText"), registerPanel);
 
         contentPanel.setLayout(new BorderLayout());
         contentPanel.add(loginOrRegisterTabPane, BorderLayout.CENTER);
@@ -233,8 +239,8 @@ public class LoginOrRegisterWindow extends JFrame implements LoginOrRegisterResu
     @Override
     public LoginOrRegisterRequest getLoginOrRegisterResult(ActionCode actionCode) {
         switch (actionCode) {
-            case GET_NEW_USERNAME_BECAUSE_OLD_IS_ALREADY_REGISTERED -> showErrorMessage(this, "errorMessages.userIsAlreadyExists", "errorCaptions.registrationError", rb);
-            case GET_BECAUSE_INVALID_LOGIN_OR_PASSWORD -> showErrorMessage(this, "errorMessages.invalidLoginOrPassword", "errorCaptions.loginError", rb);
+            case GET_NEW_USERNAME_BECAUSE_OLD_IS_ALREADY_REGISTERED -> showErrorMessage(this, "loginOrRegisterWindow.errorMessages.userIsAlreadyExists", "loginOrRegisterWindow.errorCaptions.registrationError", rb);
+            case GET_BECAUSE_INVALID_LOGIN_OR_PASSWORD -> showErrorMessage(this, "loginOrRegisterWindow.errorMessages.invalidLoginOrPassword", "loginOrRegisterWindow.errorCaptions.loginError", rb);
         }
         return getLoginOrRegisterResult();
     }

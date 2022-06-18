@@ -11,6 +11,8 @@ import java.awt.event.WindowEvent;
 import java.net.InetSocketAddress;
 import java.util.ResourceBundle;
 
+import static ui.common.DisplayErrors.showErrorMessage;
+
 public class ConnectToServerDialog extends JDialog {
     private JPanel contentPane;
     private JButton connectBtn;
@@ -19,8 +21,9 @@ public class ConnectToServerDialog extends JDialog {
     private JTextField serverPortField;
     private InetSocketAddress address;
     private boolean cancelled = false;
-    private ResourceBundle rb = ResourceBundle.getBundle("resources/locales/ConnectToServerDialog");
-    public ConnectToServerDialog() {
+    private ResourceBundle rb;
+    public ConnectToServerDialog(ResourceBundle rb) {
+        this.rb = rb;
         createUIComponents();
         setContentPane(contentPane);
         setModal(true);
@@ -42,6 +45,7 @@ public class ConnectToServerDialog extends JDialog {
         contentPane.registerKeyboardAction(e -> onCancel(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
         this.setMinimumSize(new Dimension(523, 144));
         this.setSize(this.getMinimumSize());
+        this.setTitle(rb.getString("connectToServerDialog.windowCaption"));
     }
 
     private void onOK() {
@@ -49,16 +53,17 @@ public class ConnectToServerDialog extends JDialog {
         try {
             String serverAddress = serverAddressField.getText().trim();
             if (serverAddress.isBlank()) {
-                JOptionPane.showMessageDialog(this, "Ошибка, поле адреса пусто", "Ошибка!", JOptionPane.ERROR_MESSAGE);
+                showErrorMessage(this, "connectToServerDialog.errorMessage.addressFieldIsEmpty", "connectToServerDialog.errorCaptions.connectionError", rb);
                 return;
             }
             int serverPort = Integer.parseInt(serverPortField.getText().trim());
             address = new InetSocketAddress(serverAddress, serverPort);
             dispose();
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "Вы ввели в поле порта не число\n" + e.getMessage(), "Ошибка!", JOptionPane.ERROR_MESSAGE);
+            showErrorMessage(this, "connectToServerDialog.errorMessage.portIsNotANumber", "connectToServerDialog.errorCaptions.connectionError", rb);
+
         } catch (IllegalArgumentException e) {
-            JOptionPane.showMessageDialog(this, "Вы ввели или неправильный порт, или неправильный адрес\n" + e.getMessage(), "Ошибка!", JOptionPane.ERROR_MESSAGE);
+            showErrorMessage(this, "connectToServerDialog.errorMessage.invalidPortOrInvalidAddress", "connectToServerDialog.errorCaptions.connectionError", rb);
         }
     }
 
@@ -69,12 +74,12 @@ public class ConnectToServerDialog extends JDialog {
     }
     private void createUIComponents(){
         contentPane = new JPanel();
-        connectBtn = new JButton(rb.getString("connectButton"));
-        cancelButton = new JButton(rb.getString("cancelButton"));
+        connectBtn = new JButton(rb.getString("connectToServerDialog.connectButton"));
+        cancelButton = new JButton(rb.getString("connectToServerDialog.cancelButton"));
         serverAddressField = new JTextField();
         serverPortField = new JTextField();
-        new GhostText(serverAddressField, rb.getString("serverAddressFieldGhostText"));
-        new GhostText(serverPortField, rb.getString("serverPortFieldGhostText"));
+        new GhostText(serverAddressField, rb.getString("connectToServerDialog.serverAddressFieldGhostText"));
+        new GhostText(serverPortField, rb.getString("connectToServerDialog.serverPortFieldGhostText"));
         contentPane.setLayout(new GridLayout(5, 1));
         JPanel connectAndCancelButtonsPanel = new JPanel();
         connectAndCancelButtonsPanel.setLayout(new GridLayout(1, 3));
@@ -98,7 +103,7 @@ public class ConnectToServerDialog extends JDialog {
     }
 
     public static void main(String[] args) {
-        ConnectToServerDialog dialog = new ConnectToServerDialog();
+        ConnectToServerDialog dialog = new ConnectToServerDialog(ResourceBundle.getBundle("guitext"));
         dialog.pack();
         dialog.setVisible(true);
         InetSocketAddress addr = dialog.getAddress();

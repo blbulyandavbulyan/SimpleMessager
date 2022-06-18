@@ -6,6 +6,7 @@ import java.net.SocketException;
 import java.util.Objects;
 
 import general.message.Message;
+import general.message.textmessage.TextMessage;
 import common.Server;
 public class ClientServerThread extends Thread{
     private Socket clientSocket;
@@ -35,12 +36,12 @@ public class ClientServerThread extends Thread{
             while(!termintaed){
                 try{
                     Message msg = (Message) clientObjIn.readObject();
-                    Server.printMessage(msg);
+                   // Server.printMessage(msg);
                     if(msg.getReceiver()!= null){
                         String msgReceiver = msg.getReceiver();
                         if(!Objects.equals(msgReceiver, clientName)){
                             if(Server.IsClientExists(msgReceiver)) Server.getClient(msgReceiver).sendMessage(msg);
-                            else sendMessage(new Message(String.format("Ошибка доставки сообщения, нет такого пользователя %s на сервере!", msgReceiver), "SERVER", clientName));
+                            else sendMessage(new TextMessage(String.format("Ошибка доставки сообщения, нет такого пользователя %s на сервере!", msgReceiver), "SERVER", clientName));
                         }
                     }
                     else{
@@ -50,6 +51,7 @@ public class ClientServerThread extends Thread{
                     }
                 }
                 catch(ClassNotFoundException | ClassCastException e){
+
                     e.printStackTrace();
                 }
             }

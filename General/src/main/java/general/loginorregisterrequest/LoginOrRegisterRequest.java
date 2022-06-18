@@ -1,4 +1,4 @@
-package general;
+package general.loginorregisterrequest;
 
 import java.io.Serial;
 import java.io.Serializable;

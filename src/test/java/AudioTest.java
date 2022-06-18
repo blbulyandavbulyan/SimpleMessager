@@ -15,13 +15,13 @@ public class AudioTest {
 
     public static void main(String[] args) {
 
+
         AudioFormat format =  new AudioFormat(
                 AudioFormat.Encoding.PCM_SIGNED, 44100, 16, 1, 2, 44100, true);
         TargetDataLine microphone;
         AudioInputStream audioInputStream;
         SourceDataLine sourceDataLine;
         try {
-            microphone = AudioSystem.getTargetDataLine(format);
 
             DataLine.Info info = new DataLine.Info(TargetDataLine.class, format);
             microphone = (TargetDataLine) AudioSystem.getLine(info);
@@ -36,7 +36,7 @@ public class AudioTest {
             int bytesRead = 0;
 
             try {
-                while (bytesRead < 10000000) { // Just so I can test if recording
+                while (bytesRead < 100000) { // Just so I can test if recording
                     // my mic works...
                     numBytesRead = microphone.read(data, 0, CHUNK_SIZE);
                     bytesRead = bytesRead + numBytesRead;
