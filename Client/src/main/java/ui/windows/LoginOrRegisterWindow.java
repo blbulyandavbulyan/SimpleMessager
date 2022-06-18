@@ -1,6 +1,6 @@
 package ui.windows;
 import general.loginorregisterrequest.LoginOrRegisterRequest;
-import ui.ghosttexttooltip.GhostText;
+import ui.ghosttextt.GhostText;
 import ui.passwordfieldwithshowpasscheckbox.SPPasswordField;
 import userdata.LoginOrRegisterResultGetter;
 

@@ -1,7 +1,7 @@
 package ui.passwordfieldwithshowpasscheckbox;
 
-import ui.ghosttexttooltip.GhostText;
-import ui.ghosttexttooltip.SpecificShowUnshowGhostTextActions;
+import ui.ghosttextt.GhostText;
+import ui.ghosttextt.SpecificShowUnshowGhostTextActions;
 
 import javax.swing.*;
 import java.awt.*;

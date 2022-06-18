@@ -1,6 +1,6 @@
 package ui.windows;
 
-import ui.ghosttexttooltip.GhostText;
+import ui.ghosttextt.GhostText;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;

@@ -9,7 +9,9 @@ import serverconnection.ServerConnection;
 import common.interfaces.MessagePrinter;
 import ui.closedjtabbedpane.JTabbedPaneWithCloseableTabs;
 import ui.exceptions.PersonalMessageIsEmpty;
-import ui.ghosttexttooltip.GhostText;
+import ui.ghosttextt.GhostText;
+import ui.ghosttextt.JTextFiledWithGhostText;
+import ui.messagedisplaying.MessagePanel;
 import ui.messagedisplaying.MessagePanelGenerator;
 
 import javax.swing.*;
@@ -22,12 +24,12 @@ import java.util.HashMap;
 import java.util.ResourceBundle;
 
 public class MainWindow extends JFrame implements MessagePrinter {
-    private JTextField messageField;
+    private JTextFiledWithGhostText messageField;
     private JButton sendBtn;
     private JTabbedPaneWithCloseableTabs dialogsTappedPane;
-    private JTextArea generalDialogArea;
-    private final HashMap<String, JTextArea> privateDialogs = new HashMap<>();
+    private final HashMap<String, JPanel> privateDialogs = new HashMap<>();
     private MessageSender messageSender;
+    private JPanel generalDialog;
     private String myUserName;
     private MessagesReaderThread readerThread;
     private ResourceBundle rb;
@@ -64,9 +66,8 @@ public class MainWindow extends JFrame implements MessagePrinter {
     }
 
     private void init() {
-        messageField = new JTextField();
+        messageField = new JTextFiledWithGhostText(rb.getString("mainWindow.messageFieldGhostText"));
         sendBtn = new JButton(rb.getString("mainWindow.sendButton"));
-        new GhostText(messageField, rb.getString("mainWindow.messageFieldGhostText"));
         ActionListener sendMessage = (e) -> {
             String message = messageField.getText().trim();
             if (!message.isBlank()) {
@@ -107,9 +108,9 @@ public class MainWindow extends JFrame implements MessagePrinter {
         messageField.addActionListener(sendMessage);
         sendBtn.addActionListener(sendMessage);
         dialogsTappedPane = new JTabbedPaneWithCloseableTabs(privateDialogs::remove, rb.getString("mainWindow.closeDialogTooltipText"));
-        generalDialogArea = new JTextArea();
-        generalDialogArea.setEditable(false);
-        dialogsTappedPane.addTab(rb.getString("mainWindow.generalChatTabname"), new JScrollPane(generalDialogArea));
+        generalDialog = new JPanel();
+        generalDialog.setLayout(new BoxLayout(generalDialog, BoxLayout.Y_AXIS));
+        dialogsTappedPane.addTab(rb.getString("mainWindow.generalChatTabname"), new JScrollPane(generalDialog));
         this.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.weighty = 1;
@@ -169,24 +170,42 @@ public class MainWindow extends JFrame implements MessagePrinter {
     }
 
     public void printMessage(Message msg) {
+        MessagePanel messagePanel = MessagePanelGenerator.getMessagePanel(msg);
         if (msg.getReceiver() != null) {
             String dialogName = msg.getReceiver().equals(myUserName) ?  msg.getSender() : msg.getReceiver();
-            initPrivateDialogWithUser(dialogName);
-            MessagePanelGenerator.getMessagePanel(msg);
-            privateDialogs.get(dialogName).append(msg + "\n");
+            JPanel privateDialogPanel = initPrivateDialogWithUser(dialogName);
+            privateDialogPanel.add(messagePanel);
+            privateDialogPanel.revalidate();
+
         } else {
-            generalDialogArea.append(msg + "\n");
+            generalDialog.add(messagePanel);
+            messagePanel.addDoUserNameMuseClick(()->{
+                if(messageField.getText().isBlank() ||  messageField.getText().isEmpty()){
+                    String messageFieldStr = "@" + msg.getSender() + ", ";
+                    messageField.setText(messageFieldStr);
+                    messageField.setCaretPosition(messageFieldStr.length());
+                }
+                else{
+                    String messageFieldStr = '@' + msg.getSender() + ", " + messageField.getText().trim();
+                    messageField.setText(messageFieldStr);
+                    messageField.setCaretPosition(messageFieldStr.length());
+                }
+            });
+
+            generalDialog.revalidate();
         }
     }
 
-    private void initPrivateDialogWithUser(String username) {
+    private JPanel initPrivateDialogWithUser(String username) {
         synchronized (privateDialogs){
             if (!privateDialogs.containsKey(username)) {
-                JTextArea jTextArea = new JTextArea();
-                jTextArea.setEditable(false);
-                privateDialogs.put(username, jTextArea);
-                dialogsTappedPane.addCloseableTab(username, new JScrollPane(jTextArea));
+                JPanel privateDialogPanel = new JPanel();
+                privateDialogPanel.setLayout(new BoxLayout(privateDialogPanel, BoxLayout.Y_AXIS));
+                privateDialogs.put(username, privateDialogPanel);
+                dialogsTappedPane.addCloseableTab(username, new JScrollPane(privateDialogPanel));
+                return privateDialogPanel;
             }
+            else return privateDialogs.get(username);
         }
 
     }

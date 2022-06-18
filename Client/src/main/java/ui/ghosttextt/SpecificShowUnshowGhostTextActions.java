@@ -1,4 +1,4 @@
-package ui.ghosttexttooltip;
+package ui.ghosttextt;
 
 public interface SpecificShowUnshowGhostTextActions {
     void focusLost();

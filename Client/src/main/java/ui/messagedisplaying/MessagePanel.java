@@ -3,6 +3,8 @@ package ui.messagedisplaying;
 import general.message.Message;
 
 import javax.swing.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public abstract class MessagePanel extends JPanel {
     protected JLabel senderLabel;
@@ -12,5 +14,16 @@ public abstract class MessagePanel extends JPanel {
         sendTimeLabel = new JLabel(msg.getSendingTimeString());
         this.add(senderLabel);
         this.add(sendTimeLabel);
+    }
+    public void addDoUserNameMuseClick(Runnable r){
+        senderLabel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                r.run();
+            }
+        });
+    }
+    public void setUserNameToolTip(String toolTip){
+        senderLabel.setToolTipText(toolTip);
     }
 }

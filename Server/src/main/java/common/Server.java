@@ -23,16 +23,20 @@ public class Server {
     static UserManager userManager;
     static java.sql.Connection dbConnection;
     static boolean showMessagesFromUser = true;
-    public enum RUN_ERROR_CODES{
-        PORT_IS_NOT_A_NUMBER(-1),
-        PORT_OUT_OF_RANGE(-2),
-        INVALID_ARGUMENT_COUNTS(-3),
-        INVALID_ARGUMENT(-4),
-        BACKLOG_IS_NOT_A_NUMBER(-5),
-        NO_HELP_FOR_ARGUMENT(-6);
-        public final int errorCode;
-        RUN_ERROR_CODES(int errorCode){
-            this.errorCode = errorCode;
+    private static class RunErrorCodes {
+        private static int nextErrorCode = -1;
+        enum RUN_ERROR_CODES {
+            PORT_IS_NOT_A_NUMBER(),
+            PORT_OUT_OF_RANGE(),
+            INVALID_ARGUMENT_COUNTS(),
+            INVALID_ARGUMENT(),
+            BACKLOG_IS_NOT_A_NUMBER(),
+            NO_HELP_FOR_ARGUMENT();
+            public final int errorCode;
+
+            RUN_ERROR_CODES() {
+                this.errorCode = nextErrorCode--;
+            }
         }
     }
     static {
@@ -122,7 +126,7 @@ public class Server {
                             String helpForCommand = helpForArguments.get(argumentForHelp);
                             if(helpForCommand == null){
                                 System.err.printf("Справки для аргумента %s нет\n", argumentForHelp);
-                                System.exit(RUN_ERROR_CODES.NO_HELP_FOR_ARGUMENT.errorCode);
+                                System.exit(RunErrorCodes.RUN_ERROR_CODES.NO_HELP_FOR_ARGUMENT.errorCode);
                             }
                         }
                         catch (ArrayIndexOutOfBoundsException e){
@@ -138,14 +142,14 @@ public class Server {
                             PORT = Integer.parseInt(args[i + 1]);
                             if(PORT < 0 || PORT > 65535){
                                 System.err.println("Введённый номер порта после --listen-port не принадлежит диапазону [0; 665535]");
-                                System.exit(RUN_ERROR_CODES.PORT_OUT_OF_RANGE.errorCode);
+                                System.exit(RunErrorCodes.RUN_ERROR_CODES.PORT_OUT_OF_RANGE.errorCode);
                             }
                             i+=2;
                         }
                         catch (NumberFormatException e){
                             System.err.println("Вы ввели не число после --listen-port");
                             e.printStackTrace();
-                            System.exit(RUN_ERROR_CODES.PORT_IS_NOT_A_NUMBER.errorCode);
+                            System.exit(RunErrorCodes.RUN_ERROR_CODES.PORT_IS_NOT_A_NUMBER.errorCode);
                         }
                     }
                     case "--listen-address" ->{
@@ -158,7 +162,7 @@ public class Server {
                             i+=2;
                         }
                         catch (NumberFormatException e){
-                            System.exit(RUN_ERROR_CODES.BACKLOG_IS_NOT_A_NUMBER.errorCode);
+                            System.exit(RunErrorCodes.RUN_ERROR_CODES.BACKLOG_IS_NOT_A_NUMBER.errorCode);
                         }
                     }
                     case "--db-subname"->{
@@ -171,14 +175,14 @@ public class Server {
                     }
                     default -> {
                         System.err.printf("Неверный аргумент %s", args[i]);
-                        System.exit(RUN_ERROR_CODES.INVALID_ARGUMENT.errorCode);
+                        System.exit(RunErrorCodes.RUN_ERROR_CODES.INVALID_ARGUMENT.errorCode);
                     }
                 }
             }
         }
         catch (ArrayIndexOutOfBoundsException e){
             System.err.println("Кажется вы указали недостаточно аргументов. ");
-            System.exit(RUN_ERROR_CODES.INVALID_ARGUMENT_COUNTS.errorCode);
+            System.exit(RunErrorCodes.RUN_ERROR_CODES.INVALID_ARGUMENT_COUNTS.errorCode);
             return;
         }
         try(ServerSocket sSocket = new ServerSocket(); UserManager userManager = new UserManager(java.sql.DriverManager.getConnection(String.format("jdbc:%s:%s", dbmsName, dbSubname)))){

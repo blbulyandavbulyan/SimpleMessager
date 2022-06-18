@@ -8,16 +8,15 @@ public class JTabbedPaneWithCloseableTabs extends javax.swing.JTabbedPane {
     private final CloseTabAction defaultCloseTabAction;
     private final String defaultCloseButtonToolTipText;
     private static class TabCloseButton extends RoundCloseButton{
-        public TabCloseButton(javax.swing.JTabbedPane tabPane, int tabIndex, CloseTabAction closeTabAction){
+        public TabCloseButton(javax.swing.JTabbedPane tabPane, String titleRemovedTab, CloseTabAction closeTabAction){
             super.addActionListener(
                     (a)-> {
                         if(closeTabAction != null){
-                            String titleRemovedTab = tabPane.getTitleAt(tabIndex);
-                            closeTabAction.closeTab(tabPane, tabIndex);
+                            closeTabAction.closeTab(tabPane, titleRemovedTab);
 
                             closeTabAction.afterRemoveTab(titleRemovedTab);
                         }
-                        else tabPane.removeTabAt(tabIndex);
+                        else tabPane.removeTabAt(tabPane.indexOfTab(titleRemovedTab));
                     }
 
             );
@@ -34,7 +33,7 @@ public class JTabbedPaneWithCloseableTabs extends javax.swing.JTabbedPane {
         JPanel pnlTab = new JPanel(new GridBagLayout());
         pnlTab.setOpaque(false);
         JLabel lblTitle = new JLabel(title);
-        JTabbedPaneWithCloseableTabs.TabCloseButton btnClose = new JTabbedPaneWithCloseableTabs.TabCloseButton(this, index, closeTabAction);
+        JTabbedPaneWithCloseableTabs.TabCloseButton btnClose = new JTabbedPaneWithCloseableTabs.TabCloseButton(this, title, closeTabAction);
         btnClose.setToolTipText(closeButtonToolTipText);
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;

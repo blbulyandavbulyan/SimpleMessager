@@ -12,7 +12,7 @@ public class VoiceMessagePanel extends MessagePanel {
     public VoiceMessagePanel(VoiceMessage voiceMessage) {
         super(voiceMessage);
         playButton = new JButton("Воспроизвести");
-        //fixme
+
         this.add(playButton);
         playVoiceMessage = new PlayVoiceMessage(voiceMessage, ()->playButton.setText("Воспроизвести"));
         if(!playVoiceMessage.isReleased()) {
@@ -21,6 +21,7 @@ public class VoiceMessagePanel extends MessagePanel {
         }
         else {
             //audiMessageInformation = new JLabel("%d:%d".formatted());
+            //fixme
         }
         playButton.addActionListener(l->{
             if(playVoiceMessage.isPlaying()){
