@@ -14,8 +14,10 @@ public class JTextFiledWithGhostText extends JTextField implements GhostTextInte
         else return text;
     }
     @Override public void setText(String text){
-        if(text == null || text.isEmpty())ghostText.clear();
-        else if(ghostText != null)ghostText.setText(text);
+        if(ghostText != null){
+            if(text == null || text.isEmpty())ghostText.clear();
+            else ghostText.setText(text);
+        }
         else super.setText(text);
     }
     @Override

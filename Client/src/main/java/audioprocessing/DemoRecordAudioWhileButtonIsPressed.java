@@ -40,15 +40,15 @@ public class DemoRecordAudioWhileButtonIsPressed {
         jFrame.add(recordButton);
         jFrame.setSize(new Dimension(200, 200));
         jFrame.setVisible(true);
-
+        Mixer mixer = AudioSystem.getMixer(null);
         JFrame jFrame1 = new JFrame();
         JPanel jpanel = new JPanel();
         jpanel.setLayout(new FlowLayout(FlowLayout.LEADING));
         jpanel.setAlignmentY(Component.TOP_ALIGNMENT);
-        jpanel.add(new VoiceMessagePanel(new VoiceMessage("david", null, recordMouseAdapter.getAudio(), audioFormat)));
+        jpanel.add(new VoiceMessagePanel(new VoiceMessage("david", null, recordMouseAdapter.getAudio(), audioFormat), mixer));
 
-        jpanel.add(new VoiceMessagePanel(new VoiceMessage("test", null, recordMouseAdapter.getAudio(), audioFormat)));
-
+        jpanel.add(new VoiceMessagePanel(new VoiceMessage("test", null, recordMouseAdapter.getAudio(), audioFormat), mixer));
+        jpanel.add(new VoiceMessagePanel(new VoiceMessage("test", null, recordMouseAdapter.getAudio(), audioFormat), mixer));
         jFrame1.getContentPane().add(jpanel);
         jFrame1.pack();
         jFrame1.setVisible(true);

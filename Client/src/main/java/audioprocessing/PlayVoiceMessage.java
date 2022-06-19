@@ -2,12 +2,7 @@ package audioprocessing;
 
 import general.message.voicemessage.VoiceMessage;
 
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Clip;
-import javax.sound.sampled.FloatControl;
-import javax.sound.sampled.LineEvent;
-import javax.sound.sampled.LineListener;
-import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.*;
 
 public class PlayVoiceMessage implements AutoCloseable {
     private boolean released = false;
@@ -15,12 +10,13 @@ public class PlayVoiceMessage implements AutoCloseable {
     private FloatControl volumeControl = null;
     private boolean playing = false;
     private final Runnable doAfterPlaying;
-    public PlayVoiceMessage(VoiceMessage voiceMessage, Runnable doAfterPlaying){
+    public PlayVoiceMessage(VoiceMessage voiceMessage, Runnable doAfterPlaying, Mixer mixer){
         try{
-            clip = AudioSystem.getClip();
+
+            clip = (Clip) mixer.getLine(new DataLine.Info(Clip.class, voiceMessage.getAudioFormat()));
             clip.open(voiceMessage.getAudioFormat(), voiceMessage.getAudioData(), 0, voiceMessage.getAudioDataSize());
             clip.addLineListener(new Listener());
-            volumeControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+            //volumeControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
             released = true;
         }
         catch (LineUnavailableException e){
@@ -29,6 +25,12 @@ public class PlayVoiceMessage implements AutoCloseable {
             close();
         }
         this.doAfterPlaying = doAfterPlaying;
+    }
+    public long getMicrosecondLength(){
+        return clip.getMicrosecondLength();
+    }
+    public String getStringLength(){
+        return "%d:%d".formatted(getMicrosecondLength()/(1000000*60), getMicrosecondLength()/1000000);
     }
     public boolean init(VoiceMessage voiceMessage){
         if(released)return true;

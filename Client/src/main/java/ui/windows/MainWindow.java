@@ -9,11 +9,11 @@ import serverconnection.ServerConnection;
 import common.interfaces.MessagePrinter;
 import ui.closedjtabbedpane.JTabbedPaneWithCloseableTabs;
 import ui.exceptions.PersonalMessageIsEmpty;
-import ui.ghosttextt.GhostText;
 import ui.ghosttextt.JTextFiledWithGhostText;
 import ui.messagedisplaying.MessagePanel;
 import ui.messagedisplaying.MessagePanelGenerator;
 
+import javax.sound.sampled.AudioSystem;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
@@ -32,6 +32,7 @@ public class MainWindow extends JFrame implements MessagePrinter {
     private JPanel generalDialog;
     private String myUserName;
     private MessagesReaderThread readerThread;
+    private MessagePanelGenerator messagePanelGenerator;
     private ResourceBundle rb;
     public static void main(String[] args) {
         MainWindow mw = new MainWindow(ResourceBundle.getBundle("resources/locales/guitext"));
@@ -160,6 +161,7 @@ public class MainWindow extends JFrame implements MessagePrinter {
         });
         this.setMinimumSize(new Dimension(662, 378));
         this.setSize(this.getMinimumSize());
+        messagePanelGenerator = new MessagePanelGenerator(()->(AudioSystem.getMixer(AudioSystem.getMixerInfo()[0])));
         readerThread = new MessagesReaderThread(connection, this);
     }
 
@@ -170,30 +172,35 @@ public class MainWindow extends JFrame implements MessagePrinter {
     }
 
     public void printMessage(Message msg) {
-        MessagePanel messagePanel = MessagePanelGenerator.getMessagePanel(msg);
-        if (msg.getReceiver() != null) {
-            String dialogName = msg.getReceiver().equals(myUserName) ?  msg.getSender() : msg.getReceiver();
-            JPanel privateDialogPanel = initPrivateDialogWithUser(dialogName);
-            privateDialogPanel.add(messagePanel);
-            privateDialogPanel.revalidate();
+        try {
+            MessagePanel messagePanel = messagePanelGenerator.getMessagePanel(msg);
+            if (msg.getReceiver() != null) {
+                String dialogName = msg.getReceiver().equals(myUserName) ?  msg.getSender() : msg.getReceiver();
+                JPanel privateDialogPanel = initPrivateDialogWithUser(dialogName);
+                privateDialogPanel.add(messagePanel);
+                privateDialogPanel.revalidate();
 
-        } else {
-            generalDialog.add(messagePanel);
-            messagePanel.addDoUserNameMuseClick(()->{
-                if(messageField.getText().isBlank() ||  messageField.getText().isEmpty()){
-                    String messageFieldStr = "@" + msg.getSender() + ", ";
-                    messageField.setText(messageFieldStr);
-                    messageField.setCaretPosition(messageFieldStr.length());
-                }
-                else{
-                    String messageFieldStr = '@' + msg.getSender() + ", " + messageField.getText().trim();
-                    messageField.setText(messageFieldStr);
-                    messageField.setCaretPosition(messageFieldStr.length());
-                }
-            });
+            } else {
+                generalDialog.add(messagePanel);
+                messagePanel.addDoUserNameMuseClick(()->{
+                    if(messageField.getText().isBlank() ||  messageField.getText().isEmpty()){
+                        String messageFieldStr = "@" + msg.getSender() + ", ";
+                        messageField.setText(messageFieldStr);
+                        messageField.setCaretPosition(messageFieldStr.length());
+                    }
+                    else{
+                        String messageFieldStr = '@' + msg.getSender() + ", " + messageField.getText().trim();
+                        messageField.setText(messageFieldStr);
+                        messageField.setCaretPosition(messageFieldStr.length());
+                    }
+                });
 
-            generalDialog.revalidate();
+                generalDialog.revalidate();
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
+
     }
 
     private JPanel initPrivateDialogWithUser(String username) {

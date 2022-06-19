@@ -1,6 +1,6 @@
 package ui.windows;
 
-import ui.ghosttextt.GhostText;
+import ui.ghosttextt.JTextFiledWithGhostText;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -76,10 +76,8 @@ public class ConnectToServerDialog extends JDialog {
         contentPane = new JPanel();
         connectBtn = new JButton(rb.getString("connectToServerDialog.connectButton"));
         cancelButton = new JButton(rb.getString("connectToServerDialog.cancelButton"));
-        serverAddressField = new JTextField();
-        serverPortField = new JTextField();
-        new GhostText(serverAddressField, rb.getString("connectToServerDialog.serverAddressFieldGhostText"));
-        new GhostText(serverPortField, rb.getString("connectToServerDialog.serverPortFieldGhostText"));
+        serverAddressField = new JTextFiledWithGhostText(rb.getString("connectToServerDialog.serverAddressFieldGhostText"));
+        serverPortField = new JTextFiledWithGhostText(rb.getString("connectToServerDialog.serverPortFieldGhostText"));
         contentPane.setLayout(new GridLayout(5, 1));
         JPanel connectAndCancelButtonsPanel = new JPanel();
         connectAndCancelButtonsPanel.setLayout(new GridLayout(1, 3));

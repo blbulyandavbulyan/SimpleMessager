@@ -12,7 +12,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.function.Consumer;
 
-public class GhostText implements FocusListener, DocumentListener, PropertyChangeListener, GhostTextInterface
+class GhostText implements FocusListener, DocumentListener, PropertyChangeListener, GhostTextInterface
 {
     private final JTextComponent textComp;
     private boolean isEmpty;
@@ -20,16 +20,16 @@ public class GhostText implements FocusListener, DocumentListener, PropertyChang
     private Color ghostColor;
     private Color foregroundColor;
     private String ghostText;
-    private final SpecificShowUnshowGhostTextActions specificShowUnshowGhostTextActions;
+    private SpecificShowUnshowGhostTextActions specificShowUnshowGhostTextActions;
     private final Consumer<String> specialSetText;
-    public GhostText(final JTextComponent textComp, String ghostText, Consumer<String> specialSetText)
+    public GhostText(final JTextComponent textComp, String ghostText, SpecificShowUnshowGhostTextActions specificShowUnshowGhostTextActions, Consumer<String> specialSetText)
     {
         super();
         this.textComp = textComp;
         this.ghostText = ghostText;
         this.ghostColor = Color.LIGHT_GRAY;
         this.foregroundColor = textComp.getForeground();
-        specificShowUnshowGhostTextActions = null;
+        this.specificShowUnshowGhostTextActions = specificShowUnshowGhostTextActions;
         this.specialSetText = specialSetText;
         if(ghostText == null)enabled = false;
 
@@ -46,42 +46,15 @@ public class GhostText implements FocusListener, DocumentListener, PropertyChang
     }
     public GhostText(final JTextComponent textComp, String ghostText)
     {
-        super();
-        this.textComp = textComp;
-        this.ghostText = ghostText;
-        this.ghostColor = Color.LIGHT_GRAY;
-        this.foregroundColor = textComp.getForeground();
-        if(ghostText == null)enabled = false;
-        else{
-            textComp.addFocusListener(this);
-            registerListeners();
-            updateState();
-            if (!this.textComp.hasFocus())
-            {
-                focusLost(null);
-            }
-        }
-        specificShowUnshowGhostTextActions = null;
-        this.specialSetText = null;
+       this(textComp, ghostText, null, null);
     }
     public GhostText(final  JTextComponent textComp, String ghostText, SpecificShowUnshowGhostTextActions specificShowUnshowGhostTextActions){
-        super();
-        this.textComp = textComp;
-        this.ghostText = ghostText;
-        this.ghostColor = Color.LIGHT_GRAY;
-        this.foregroundColor = textComp.getForeground();
-        if(ghostText == null)enabled = false;
-        else{
-            textComp.addFocusListener(this);
-            registerListeners();
-            updateState();
-            if (!this.textComp.hasFocus())
-            {
-                focusLost(null);
-            }
-        }
-        this.specificShowUnshowGhostTextActions = specificShowUnshowGhostTextActions;
-        this.specialSetText = null;
+        this(textComp, ghostText, specificShowUnshowGhostTextActions, null);
+    }
+    public GhostText(final JTextComponent textComp, String ghostText, Consumer<String> specialSetText)
+    {
+        this(textComp, ghostText, null, specialSetText);
+
     }
     public void delete()
     {
@@ -90,6 +63,7 @@ public class GhostText implements FocusListener, DocumentListener, PropertyChang
         textComp.removeFocusListener(this);
     }
     public void setText(String text){
+        //if(text == null || text.isEmpty())text = ghostText;
         if(text != null && text.equals(ghostText))textComp.setForeground(ghostColor);
         else textComp.setForeground(foregroundColor);
         if(specialSetText != null)specialSetText.accept(text);
@@ -226,5 +200,9 @@ public class GhostText implements FocusListener, DocumentListener, PropertyChang
     @Override
     public boolean isEmpty() {
         return isEmpty;
+    }
+
+    public void setSpecificShowUnshowGhostTextActions(SpecificShowUnshowGhostTextActions specificShowUnshowGhostTextActions) {
+        this.specificShowUnshowGhostTextActions = specificShowUnshowGhostTextActions;
     }
 }

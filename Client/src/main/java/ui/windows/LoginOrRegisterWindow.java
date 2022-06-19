@@ -1,7 +1,8 @@
 package ui.windows;
 import general.loginorregisterrequest.LoginOrRegisterRequest;
-import ui.ghosttextt.GhostText;
-import ui.passwordfieldwithshowpasscheckbox.SPPasswordField;
+import ui.ghosttextt.JPasswordFieldWithGhostText;
+import ui.ghosttextt.JTextFiledWithGhostText;
+import ui.passwordfieldwithshowpasscheckbox.ShowUnshowPasswordPanel;
 import userdata.LoginOrRegisterResultGetter;
 
 import javax.swing.*;
@@ -18,7 +19,7 @@ import static ui.common.DisplayErrors.showErrorMessage;
 
 public class LoginOrRegisterWindow extends JFrame implements LoginOrRegisterResultGetter {
     private JTabbedPane loginOrRegisterTabPane;
-    private JTextField userNameField;
+    private JTextFiledWithGhostText userNameField;
     private JPasswordField passwordField;
     private JPasswordField repeatPasswordField;
     private JPanel registerPanel;
@@ -30,7 +31,7 @@ public class LoginOrRegisterWindow extends JFrame implements LoginOrRegisterResu
     private ResourceBundle rb;
 
     public static void main(String[] args) {
-        LoginOrRegisterWindow low = new LoginOrRegisterWindow(ResourceBundle.getBundle("guitext"));
+        LoginOrRegisterWindow low = new LoginOrRegisterWindow(ResourceBundle.getBundle("resources/locales/guitext"));
         low.setVisible(true);
         while (true) {
             LoginOrRegisterRequest lor = low.getLoginOrRegisterResult();
@@ -168,10 +169,10 @@ public class LoginOrRegisterWindow extends JFrame implements LoginOrRegisterResu
         userNamePanel = new JPanel();
         passwordPanel = new JPanel();
         repeatPasswordPanel = new JPanel();
-        userNameField = new JTextField();
+        userNameField = new JTextFiledWithGhostText(rb.getString("loginOrRegisterWindow.usernameFieldGhostText"));
         submitBtn = new JButton(rb.getString("loginOrRegisterWindow.loginTabAndSubmitButtonText"));
-        SPPasswordField passwordFieldPanel = new SPPasswordField();
-        SPPasswordField repeatPasswordFieldPanel = new SPPasswordField();
+        ShowUnshowPasswordPanel passwordFieldPanel = new ShowUnshowPasswordPanel(rb.getString("loginOrRegisterWindow.passwordFieldGhostText"));
+        ShowUnshowPasswordPanel repeatPasswordFieldPanel = new ShowUnshowPasswordPanel(rb.getString("loginOrRegisterWindow.repeatPasswordGhostText"));
         String clearButtonText = rb.getString("loginOrRegisterWindow.clearButton");
         JButton clearPassword = new JButton(clearButtonText);
         JButton clearUserName = new JButton(clearButtonText);
@@ -179,12 +180,9 @@ public class LoginOrRegisterWindow extends JFrame implements LoginOrRegisterResu
 
         passwordField = passwordFieldPanel.getPasswordField();
         repeatPasswordField = repeatPasswordFieldPanel.getPasswordField();
-        GhostText usernameGhostText = new GhostText(userNameField, rb.getString("loginOrRegisterWindow.usernameFieldGhostText"));
-        passwordFieldPanel.setGhostText(rb.getString("loginOrRegisterWindow.passwordFieldGhostText"));
-        repeatPasswordFieldPanel.setGhostText(rb.getString("loginOrRegisterWindow.repeatPasswordGhostText"));
-        clearUserName.addActionListener(e -> usernameGhostText.clear());
-        clearPassword.addActionListener(e -> passwordFieldPanel.clear());
-        clearRepeatPassword.addActionListener(e -> repeatPasswordFieldPanel.clear());
+        clearUserName.addActionListener(e -> userNameField.setText(""));
+        clearPassword.addActionListener(e -> passwordField.setText(""));
+        clearRepeatPassword.addActionListener(e -> repeatPasswordField.setText(""));
         EmptyBorder generalBorder = new EmptyBorder(2, 0, 2, 0);
         userNamePanel.setLayout(new BorderLayout());
         userNamePanel.add(userNameField, BorderLayout.CENTER);
