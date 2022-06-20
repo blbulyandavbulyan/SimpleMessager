@@ -1,25 +1,29 @@
-package ui.closedjtabbedpane;
+package ui.customuicomponents.closedjtabbedpane;
 
 import javax.swing.*;
 
 import java.awt.*;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 import java.awt.geom.*;
 import java.io.*;
 
 import static ui.common.WorkWithSvg.redrawSvgIcon;
 
 public class RoundCloseButton extends JButton {
-    private static String svgIcon;
-    private static String svgPressIcon;
-    private static String svgRollIcon;
+    private static final String svgIcon;
+    private static final String svgPressIcon;
+    private static final String svgRollIcon;
     static{
         try {
             ClassLoader cL = Thread.currentThread().getContextClassLoader();
-            svgIcon = new String(cL.getResourceAsStream("resources/icons/close-icon.svg").readAllBytes());
-            svgPressIcon = new String(cL.getResourceAsStream("resources/icons/close-icon-pressed.svg").readAllBytes());
-            svgRollIcon =  new String(cL.getResourceAsStream("resources/icons/close-icon-focused.svg").readAllBytes());
+            try(InputStream resourceInputStream = cL.getResourceAsStream("resources/icons/close-icon.svg")){
+                svgIcon = new String(resourceInputStream.readAllBytes());
+            }
+            try(InputStream resourceInputStream = cL.getResourceAsStream("resources/icons/close-icon-pressed.svg")){
+                svgPressIcon = new String(resourceInputStream.readAllBytes());
+            }
+            try(InputStream resourceInputStream = cL.getResourceAsStream("resources/icons/close-icon-focused.svg")){
+                svgRollIcon = new String(resourceInputStream.readAllBytes());
+            }
 
         } catch (IOException e) {
             throw new RuntimeException(e);

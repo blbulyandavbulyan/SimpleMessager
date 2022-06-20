@@ -1,4 +1,4 @@
-package ui.closedjtabbedpane;
+package ui.customuicomponents.closedjtabbedpane;
 
 
 import javax.swing.*;

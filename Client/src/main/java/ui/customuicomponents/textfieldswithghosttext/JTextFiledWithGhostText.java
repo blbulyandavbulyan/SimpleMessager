@@ -1,9 +1,12 @@
-package ui.ghosttextt;
+package ui.customuicomponents.textfieldswithghosttext;
+
+import ui.ghosttextt.GhostText;
+import ui.ghosttextt.GhostTextInterface;
 
 import javax.swing.*;
 import java.awt.*;
 
-public class JTextFiledWithGhostText extends JTextField implements GhostTextInterface{
+public class JTextFiledWithGhostText extends JTextField implements GhostTextInterface {
     private GhostText ghostText;
     public JTextFiledWithGhostText(String ghostTextStr){
         this.ghostText = new GhostText(this, ghostTextStr, super::setText);

@@ -9,16 +9,12 @@ import javax.sound.sampled.Mixer;
 import java.util.concurrent.Callable;
 
 public class MessagePanelGenerator {
-    Callable<Mixer> mixerGetter;
-    public MessagePanelGenerator(Callable<Mixer> mixerGetter){
-        this.mixerGetter = mixerGetter;
-    }
-    public MessagePanel getMessagePanel(Message msg) throws Exception {
+    public MessagePanel getMessagePanel(Message msg) {
         if(msg instanceof TextMessage){
             return new TextMessagePanel((TextMessage) msg);
         }
         else if(msg instanceof VoiceMessage){
-            return new VoiceMessagePanel((VoiceMessage) msg, mixerGetter.call());
+            return new VoiceMessagePanel((VoiceMessage) msg);
         }
         else throw new UnknownMessageTypeException();
     }

@@ -1,16 +1,20 @@
-package ui.ghosttextt;
+package ui.customuicomponents.textfieldswithghosttext;
+
+import ui.ghosttextt.GhostText;
+import ui.ghosttextt.GhostTextInterface;
+import ui.ghosttextt.SpecificShowUnshowGhostTextActions;
 
 import javax.swing.*;
 import javax.swing.text.StyledEditorKit;
 import java.awt.*;
 import java.util.concurrent.Callable;
 
-public class JPasswordFieldWithGhostText extends JPasswordField implements GhostTextInterface{
+public class JPasswordFieldWithGhostText extends JPasswordField implements GhostTextInterface {
     private final GhostText ghostText;
 
     private char echoChar;
 
-    private class PasswordFieldSpeciefiecShowUnshowActions implements SpecificShowUnshowGhostTextActions{
+    private class PasswordFieldSpeciefiecShowUnshowActions implements SpecificShowUnshowGhostTextActions {
         Callable<Boolean> isShowGetter;
         public PasswordFieldSpeciefiecShowUnshowActions(Callable<Boolean> isShowGetter){
             this.isShowGetter = isShowGetter;
@@ -32,7 +36,7 @@ public class JPasswordFieldWithGhostText extends JPasswordField implements Ghost
             }
             else setEchoChar(echoChar);
         }
-    };
+    }
     PasswordFieldSpeciefiecShowUnshowActions passwordFieldSpeciefiecShowUnshowActions;
     public JPasswordFieldWithGhostText(String ghostText, Callable<Boolean> isShowGetter){
         this.echoChar = this.getEchoChar();

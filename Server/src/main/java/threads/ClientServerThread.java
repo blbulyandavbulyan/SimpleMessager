@@ -9,13 +9,11 @@ import general.message.Message;
 import general.message.textmessage.TextMessage;
 import common.Server;
 public class ClientServerThread extends Thread{
-    private Socket clientSocket;
-    private ObjectInputStream clientObjIn;
-    private ObjectOutputStream clientObjOut;
-    private String clientName;
-    private boolean termintaed = false,//переменная становится true, если был вызван метод terminate()
-            inputAndOutputStreamsCreated = false;//переменная становится true, если были созданы объекты для полей in и out
-    static final PrintStream sPs = Server.getsPs();
+    private final Socket clientSocket;
+    private final ObjectInputStream clientObjIn;
+    private final ObjectOutputStream clientObjOut;
+    private final String clientName;
+    private boolean termintaed = false;//переменная становится true, если был вызван метод terminate()
     public ClientServerThread(Socket clientSocket, ObjectOutputStream clientObjOut, ObjectInputStream clientObjIn, String clientName){
         this.clientSocket = clientSocket;
         this.clientName = clientName;
@@ -32,7 +30,7 @@ public class ClientServerThread extends Thread{
         try{
             clientObjOut.writeUTF("WELCOME TO SERVER!");
             clientObjOut.flush();
-            sPs.printf("Поток для клиента %s запущен\n", clientName);
+            Server.serverPrint("Поток для клиента %s запущен\n".formatted(clientName));
             while(!termintaed){
                 try{
                     Message msg = (Message) clientObjIn.readObject();
@@ -62,7 +60,7 @@ public class ClientServerThread extends Thread{
             }
         }
         catch(EOFException  e){
-            sPs.printf("Пользователь %s отключился.\n", clientName);
+            Server.serverPrint("Пользователь %s отключился.\n".formatted(clientName));
         }
         catch (IOException e){
             e.printStackTrace();

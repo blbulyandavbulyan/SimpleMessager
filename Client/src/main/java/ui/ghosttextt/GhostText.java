@@ -12,7 +12,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.function.Consumer;
 
-class GhostText implements FocusListener, DocumentListener, PropertyChangeListener, GhostTextInterface
+public class GhostText implements FocusListener, DocumentListener, PropertyChangeListener, GhostTextInterface
 {
     private final JTextComponent textComp;
     private boolean isEmpty;

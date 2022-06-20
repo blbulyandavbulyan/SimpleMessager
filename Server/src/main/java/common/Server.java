@@ -20,8 +20,6 @@ public class Server {
     static final Set<LoginOrRegisterClientThread> unregisteredUsers = new HashSet<>();
     static final Map<String, String> helpForArguments = new HashMap<>();
     static final PrintStream sPs = System.out;
-    static UserManager userManager;
-    static java.sql.Connection dbConnection;
     static boolean showMessagesFromUser = true;
     private static class RunErrorCodes {
         private static int nextErrorCode = -1;
@@ -62,9 +60,7 @@ public class Server {
         );
     }
 
-    public static void removeClient(String clientName){
-        clients.remove(clientName);
-    }
+
 
     public static void addClient(ClientServerThread clientThread){
         clients.put(clientThread.getClientName(), clientThread);
@@ -99,20 +95,17 @@ public class Server {
         }
         Server.unregisteredUsers.clear();
     }
-    synchronized public void serverPrint(Object obj){
+    synchronized static public void serverPrint(Object obj){
         sPs.println(obj);
-    }
-    public static void printMessage(TextMessage msg){
-        if(showMessagesFromUser)sPs.println(msg);
     }
     public static void setShowMessagesFromUser(boolean showMessagesFromUser){
         Server.showMessagesFromUser = showMessagesFromUser;
     }
-    public static PrintStream getsPs() {
-        return sPs;
-    }
     public static void removeUnregisteredClient(LoginOrRegisterClientThread lorClientThread){
         unregisteredUsers.remove(lorClientThread);
+    }
+    public static void removeClient(String clientName){
+        clients.remove(clientName);
     }
     public static void main(String[] args) throws IOException {
         String dbSubname = "server.db";

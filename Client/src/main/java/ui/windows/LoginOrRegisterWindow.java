@@ -1,8 +1,8 @@
 package ui.windows;
 import general.loginorregisterrequest.LoginOrRegisterRequest;
-import ui.ghosttextt.JPasswordFieldWithGhostText;
-import ui.ghosttextt.JTextFiledWithGhostText;
-import ui.passwordfieldwithshowpasscheckbox.ShowUnshowPasswordPanel;
+import ui.customuicomponents.textfieldswithghosttext.JPasswordFieldWithGhostText;
+import ui.customuicomponents.textfieldswithghosttext.JTextFiledWithGhostText;
+import ui.customuicomponents.passwordfieldwithshowpasscheckbox.ShowUnshowPasswordPanel;
 import userdata.LoginOrRegisterResultGetter;
 
 import javax.swing.*;
@@ -171,15 +171,18 @@ public class LoginOrRegisterWindow extends JFrame implements LoginOrRegisterResu
         repeatPasswordPanel = new JPanel();
         userNameField = new JTextFiledWithGhostText(rb.getString("loginOrRegisterWindow.usernameFieldGhostText"));
         submitBtn = new JButton(rb.getString("loginOrRegisterWindow.loginTabAndSubmitButtonText"));
-        ShowUnshowPasswordPanel passwordFieldPanel = new ShowUnshowPasswordPanel(rb.getString("loginOrRegisterWindow.passwordFieldGhostText"));
-        ShowUnshowPasswordPanel repeatPasswordFieldPanel = new ShowUnshowPasswordPanel(rb.getString("loginOrRegisterWindow.repeatPasswordGhostText"));
+        passwordField = new JPasswordFieldWithGhostText(rb.getString("loginOrRegisterWindow.passwordFieldGhostText"));
+        repeatPasswordField = new JPasswordFieldWithGhostText(rb.getString("loginOrRegisterWindow.repeatPasswordGhostText"));
+        ShowUnshowPasswordPanel passwordFieldPanel = new ShowUnshowPasswordPanel(passwordField);
+        ShowUnshowPasswordPanel repeatPasswordFieldPanel = new ShowUnshowPasswordPanel(repeatPasswordField);
+        ((JPasswordFieldWithGhostText)passwordField).setIsShowGetter(passwordFieldPanel::isPasswordShow);
+        ((JPasswordFieldWithGhostText)repeatPasswordField).setIsShowGetter(repeatPasswordFieldPanel::isPasswordShow);
         String clearButtonText = rb.getString("loginOrRegisterWindow.clearButton");
         JButton clearPassword = new JButton(clearButtonText);
         JButton clearUserName = new JButton(clearButtonText);
         JButton clearRepeatPassword = new JButton(clearButtonText);
 
-        passwordField = passwordFieldPanel.getPasswordField();
-        repeatPasswordField = repeatPasswordFieldPanel.getPasswordField();
+
         clearUserName.addActionListener(e -> userNameField.setText(""));
         clearPassword.addActionListener(e -> passwordField.setText(""));
         clearRepeatPassword.addActionListener(e -> repeatPasswordField.setText(""));

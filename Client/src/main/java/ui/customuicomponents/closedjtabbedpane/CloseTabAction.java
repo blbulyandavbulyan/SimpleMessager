@@ -1,4 +1,4 @@
-package ui.closedjtabbedpane;
+package ui.customuicomponents.closedjtabbedpane;
 public interface CloseTabAction {
     default void closeTab(javax.swing.JTabbedPane tabbedPane, String tabForRemoveName){
         tabbedPane.removeTabAt(tabbedPane.indexOfTab(tabForRemoveName));

@@ -1,6 +1,6 @@
 package ui.windows;
 
-import ui.ghosttextt.JTextFiledWithGhostText;
+import ui.customuicomponents.textfieldswithghosttext.JTextFiledWithGhostText;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;

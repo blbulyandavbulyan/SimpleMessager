@@ -1,11 +1,11 @@
 package userprocessing;
 
 public class User {
-    private String userName;
-    private String group;
+    private final String userName;
+    private final String group;
     public User(String userName, String group){
         this.userName = userName;
-
+        this.group = group;
     }
 
     public String getUserName() {

@@ -7,23 +7,13 @@ import javax.sound.sampled.*;
 public class PlayVoiceMessage implements AutoCloseable {
     private boolean released = false;
     private Clip clip = null;
-    private FloatControl volumeControl = null;
     private boolean playing = false;
+    private final Listener lineListener;
     private final Runnable doAfterPlaying;
-    public PlayVoiceMessage(VoiceMessage voiceMessage, Runnable doAfterPlaying, Mixer mixer){
-        try{
-
-            clip = (Clip) mixer.getLine(new DataLine.Info(Clip.class, voiceMessage.getAudioFormat()));
-            clip.open(voiceMessage.getAudioFormat(), voiceMessage.getAudioData(), 0, voiceMessage.getAudioDataSize());
-            clip.addLineListener(new Listener());
-            //volumeControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
-            released = true;
-        }
-        catch (LineUnavailableException e){
-            e.printStackTrace();
-            released = false;
-            close();
-        }
+    public PlayVoiceMessage(VoiceMessage voiceMessage, Runnable doAfterPlaying){
+        //System.out.printf("Размер аудио сообщения %d\n", voiceMessage.getAudioDataSize());
+        lineListener = new Listener();
+        init(voiceMessage);
         this.doAfterPlaying = doAfterPlaying;
     }
     public long getMicrosecondLength(){
@@ -37,13 +27,11 @@ public class PlayVoiceMessage implements AutoCloseable {
         try{
             clip = AudioSystem.getClip();
             clip.open(voiceMessage.getAudioFormat(), voiceMessage.getAudioData(), 0, voiceMessage.getAudioDataSize());
-            clip.addLineListener(new Listener());
-            volumeControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+            clip.addLineListener(lineListener);
             released = true;
         }
         catch (LineUnavailableException e){
             e.printStackTrace();
-            released = false;
             close();
         }
         return released;
@@ -100,32 +88,6 @@ public class PlayVoiceMessage implements AutoCloseable {
 	/*
 	  x долже быть в пределах от 0 до 1 (от самого тихого к самому громкому)
 	*/
-    public void setVolume(float x) {
-        if (x<0) x = 0;
-        if (x>1) x = 1;
-        float min = volumeControl.getMinimum();
-        float max = volumeControl.getMaximum();
-        volumeControl.setValue((max-min)*x+min);
-    }
-
-    // Возвращает текущую громкость (число от 0 до 1)
-    public float getVolume() {
-        float v = volumeControl.getValue();
-        float min = volumeControl.getMinimum();
-        float max = volumeControl.getMaximum();
-        return (v-min)/(max-min);
-    }
-
-    // Дожидается окончания проигрывания звука
-    public void join() {
-        if (!released) return;
-        synchronized(clip) {
-            try {
-                while (playing)
-                    clip.wait();
-            } catch (InterruptedException exc) {}
-        }
-    }
 
     private class Listener implements LineListener {
         public void update(LineEvent ev) {

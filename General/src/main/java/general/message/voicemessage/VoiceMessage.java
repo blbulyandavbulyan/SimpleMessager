@@ -13,7 +13,7 @@ public class VoiceMessage  extends Message implements Serializable {
     @Serial
     private static final long serialVersionUID = -3391271502340731799L;
     private final byte []audioData;
-    private final AudioFormat.Encoding encoding;
+    private final String encodingName;
     private final float sampleRate;
     private final int sampleSizeInBits;
     private final int channels;
@@ -27,7 +27,7 @@ public class VoiceMessage  extends Message implements Serializable {
         if(audioData == null)throw new AudioDataIsNullException();
         if(audioData.length == 0)throw new AudioDataIsEmptyException();
         if(audioFormat == null)throw new AudioFormatIsNullException();
-        encoding = audioFormat.getEncoding();
+        encodingName = audioFormat.getEncoding().toString();
         sampleRate = audioFormat.getSampleRate();
         sampleSizeInBits = audioFormat.getSampleSizeInBits();
         channels = audioFormat.getChannels();
@@ -37,7 +37,7 @@ public class VoiceMessage  extends Message implements Serializable {
         this.audioData = audioData;
     }
     public AudioFormat getAudioFormat(){
-        if(audioFormat == null)audioFormat = new AudioFormat(encoding, sampleRate, sampleSizeInBits, channels, frameSize, frameRate, bigEndian);
+        if(audioFormat == null)audioFormat = new AudioFormat(new AudioFormat.Encoding(encodingName), sampleRate, sampleSizeInBits, channels, frameSize, frameRate, bigEndian);
         return audioFormat;
     }
     public byte[] getAudioData() {
