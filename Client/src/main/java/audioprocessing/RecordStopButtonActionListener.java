@@ -16,9 +16,9 @@ public class RecordStopButtonActionListener implements ActionListener {
     private final long minRecordLengthInSeconds;
     private long recordLengthInSeconds;
     RecordAudioThread recordAudioThread;
-    private Consumer<RECORD_STATES> recordStateChangeAction;
-    private Callable<Boolean> needRecord;
-    private Consumer<byte[]> audioDataConsumer;
+    private final Consumer<RECORD_STATES> recordStateChangeAction;
+    private final Callable<Boolean> needRecord;
+    private final Consumer<byte[]> audioDataConsumer;
 
     public RecordStopButtonActionListener(AudioFormat audioFormat, long minRecordLengthInSeconds, Consumer<RECORD_STATES> recordStateChangeAction, Callable<Boolean> needRecord, Consumer<byte[]> audioDataConsumer) throws LineUnavailableException {
         recordAudioThread = new RecordAudioThread(audioFormat, true);
@@ -36,13 +36,13 @@ public class RecordStopButtonActionListener implements ActionListener {
                     recordLengthInSeconds = (System.currentTimeMillis() - recordLengthInSeconds) / 1000;
                     if (recordLengthInSeconds > minRecordLengthInSeconds) {
                         recordStarted = false;
-                        byte [] audioData = recordAudioThread.finishRecord();
+                        byte [] audioData = recordAudioThread.stopRecord();
                         if(audioDataConsumer != null)audioDataConsumer.accept(audioData);
                         if (recordStateChangeAction != null) recordStateChangeAction.accept(RECORD_STATES.RECORD_STOPPED);
                     }
                 } else {
                     recordStarted = true;
-                    recordAudioThread.resumeRecord();
+                    recordAudioThread.startRecord();
                     recordLengthInSeconds = System.currentTimeMillis();
                     if (recordStateChangeAction != null) {
                         recordStateChangeAction.accept(RECORD_STATES.RECORD_STARTED);

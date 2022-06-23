@@ -1,15 +1,14 @@
-package ui.messagedisplaying;
+package ui.messagedisplaying.messagepanels;
 
 import general.message.textmessage.TextMessage;
 
 import javax.swing.*;
 
 public class TextMessagePanel extends MessagePanel{
-    private JLabel textMessageLabel;
 
     public TextMessagePanel(TextMessage msg) {
         super(msg);
-        textMessageLabel = new JLabel(msg.getMessageString());
+        JLabel textMessageLabel = new JLabel(msg.getMessageString());
         this.add(textMessageLabel);
 
     }

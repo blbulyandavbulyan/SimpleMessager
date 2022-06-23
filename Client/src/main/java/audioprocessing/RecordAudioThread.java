@@ -12,8 +12,10 @@ public class RecordAudioThread extends Thread implements Closeable {
     private final Object recordFinishedMonitor;
     private final ByteArrayOutputStream out;
     private final TargetDataLine microphone;
+    private boolean recordStarted = false;
     public RecordAudioThread(AudioFormat audioFormat, boolean recordPaused) throws LineUnavailableException {
         this.recordPaused = recordPaused;
+
         pauseAndResumeMonitor = new Object();
         recordFinishedMonitor = new Object();
         int requiredBuffsize = (int) (audioFormat.getFrameSize()*audioFormat.getFrameRate()*audioFormat.getChannels())*120;
@@ -21,6 +23,12 @@ public class RecordAudioThread extends Thread implements Closeable {
         DataLine.Info info = new DataLine.Info(TargetDataLine.class, audioFormat);
         microphone = (TargetDataLine) AudioSystem.getLine(info);
         microphone.open(audioFormat);
+        microphone.addLineListener(event -> {
+            LineEvent.Type type = event.getType();
+            if(type == LineEvent.Type.START)recordStarted = true;
+            else if(type == LineEvent.Type.STOP)recordStarted = false;
+        });
+        if(!recordPaused)microphone.start();
         start();
     }
 
@@ -31,10 +39,12 @@ public class RecordAudioThread extends Thread implements Closeable {
             int bytesRead = 0;
             while (!threadStopped){
                 if(recordPaused){
+                    if(recordStarted)microphone.stop();
                     synchronized (pauseAndResumeMonitor){
                         try {
                             pauseAndResumeMonitor.wait();
                             if(threadStopped)return;
+                            recordPaused = false;
                             microphone.start();
 
                         } catch (InterruptedException e) {
@@ -69,19 +79,6 @@ public class RecordAudioThread extends Thread implements Closeable {
         }
 
     }
-    private void clear(){
-        out.reset();
-        microphone.flush();
-    }
-    public byte[] finishRecord(){
-        synchronized (recordFinishedMonitor){
-            recordFinishedMonitor.notify();
-        }
-        pauseRecord();
-        byte[] result = out.toByteArray();
-        clear();
-        return result;
-    }
     public void stopThread(){
         threadStopped = true;
         synchronized (pauseAndResumeMonitor) {
@@ -91,12 +88,10 @@ public class RecordAudioThread extends Thread implements Closeable {
     }
     public void pauseRecord() {
         recordPaused = true;
-        microphone.stop();
     }
     public void resumeRecord(){
         synchronized (pauseAndResumeMonitor) {
             recordPaused = false;
-            microphone.start();
             pauseAndResumeMonitor.notify();
         }
 
@@ -110,5 +105,19 @@ public class RecordAudioThread extends Thread implements Closeable {
     }
     public void close() {
         stopThread();
+    }
+    public void startRecord() {
+        out.reset();
+        microphone.flush();
+        resumeRecord();
+    }
+
+    public byte[] stopRecord() {
+        pauseRecord();
+        synchronized (recordFinishedMonitor){
+            recordFinishedMonitor.notify();
+        }
+
+        return out.toByteArray();
     }
 }

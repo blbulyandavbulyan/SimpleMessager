@@ -1,16 +1,11 @@
 package audioprocessing;
 
 import general.message.voicemessage.VoiceMessage;
-import ui.messagedisplaying.VoiceMessagePanel;
+import ui.messagedisplaying.messagepanels.VoiceMessagePanel;
 
 import javax.sound.sampled.*;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.util.function.Consumer;
 
 public class DemoRecordAudioWhileButtonIsPressed {
 

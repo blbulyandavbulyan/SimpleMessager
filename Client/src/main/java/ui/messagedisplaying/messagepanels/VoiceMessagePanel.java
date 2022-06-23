@@ -1,4 +1,4 @@
-package ui.messagedisplaying;
+package ui.messagedisplaying.messagepanels;
 
 import audioprocessing.PlayVoiceMessage;
 import general.message.voicemessage.VoiceMessage;

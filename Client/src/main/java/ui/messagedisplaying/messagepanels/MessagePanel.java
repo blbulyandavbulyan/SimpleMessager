@@ -1,4 +1,4 @@
-package ui.messagedisplaying;
+package ui.messagedisplaying.messagepanels;
 
 import general.message.Message;
 

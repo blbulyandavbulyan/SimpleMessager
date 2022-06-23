@@ -4,12 +4,12 @@ import general.message.Message;
 import general.message.textmessage.TextMessage;
 import general.message.voicemessage.VoiceMessage;
 import ui.messagedisplaying.exceptions.UnknownMessageTypeException;
-
-import javax.sound.sampled.Mixer;
-import java.util.concurrent.Callable;
+import ui.messagedisplaying.messagepanels.MessagePanel;
+import ui.messagedisplaying.messagepanels.TextMessagePanel;
+import ui.messagedisplaying.messagepanels.VoiceMessagePanel;
 
 public class MessagePanelGenerator {
-    public MessagePanel getMessagePanel(Message msg) {
+    public static MessagePanel getMessagePanel(Message msg) {
         if(msg instanceof TextMessage){
             return new TextMessagePanel((TextMessage) msg);
         }

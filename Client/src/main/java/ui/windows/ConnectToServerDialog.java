@@ -21,7 +21,7 @@ public class ConnectToServerDialog extends JDialog {
     private JTextField serverPortField;
     private InetSocketAddress address;
     private boolean cancelled = false;
-    private ResourceBundle rb;
+    private final ResourceBundle rb;
     public ConnectToServerDialog(ResourceBundle rb) {
         this.rb = rb;
         createUIComponents();
@@ -101,7 +101,7 @@ public class ConnectToServerDialog extends JDialog {
     }
 
     public static void main(String[] args) {
-        ConnectToServerDialog dialog = new ConnectToServerDialog(ResourceBundle.getBundle("guitext"));
+        ConnectToServerDialog dialog = new ConnectToServerDialog(ResourceBundle.getBundle("resources/locales/guitext"));
         dialog.pack();
         dialog.setVisible(true);
         InetSocketAddress addr = dialog.getAddress();
