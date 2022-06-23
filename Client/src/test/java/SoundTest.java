@@ -1,5 +1,3 @@
-package audioprocessing;
-
 import javax.sound.sampled.*;
 
 public class SoundTest {
