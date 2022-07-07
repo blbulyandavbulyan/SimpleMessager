@@ -1,5 +1,6 @@
 package common;
 
+import common.enumerationtostream.ConvertEnumerationToStream;
 import serverconnection.ServerConnection;
 import serverconnection.exceptions.RegisterOrLoginInterrupted;
 import ui.windows.ConnectToServerDialog;
@@ -13,8 +14,6 @@ import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
-
-import static ui.common.DisplayErrors.showErrorMessage;
 
 public class Client {
     static ResourceBundle guiRb = ResourceBundle.getBundle("resources/locales/guitext");

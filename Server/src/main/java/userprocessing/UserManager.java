@@ -73,14 +73,14 @@ public class UserManager implements Closeable {
         }
         else return false;
     }
-     synchronized public int registerUser(String userName, String password) throws SQLException {
+     synchronized public void registerUser(String userName, String password) throws SQLException, UserIsAlreadyExistsException {
         if(!userIsExist(userName)){
             insertUserToDB.setObject(1, userName);
             insertUserToDB.setObject(2, getPasswordHash(password));
             insertUserToDB.execute();
-            return insertUserToDB.getUpdateCount();
+            insertUserToDB.getUpdateCount();
         }
-        else throw new UserIsAlreadyExistsException("Ошибка регистрации пользователя, пользователь уже сущетсвует.");
+        else throw new UserIsAlreadyExistsException();
     }
     synchronized public int removeUser(String userName) throws SQLException {
         deleteUserFromDB.setObject(1, userName);

@@ -6,6 +6,7 @@ import java.io.Closeable;
 import java.io.IOException;
 
 public class RecordAudioThread extends Thread implements Closeable {
+    //это поток для записи аудио
     private boolean threadStopped = false;
     private boolean recordPaused;
     private final Object pauseAndResumeMonitor;
@@ -108,6 +109,7 @@ public class RecordAudioThread extends Thread implements Closeable {
     }
     public void startRecord() {
         out.reset();
+        microphone.drain();
         microphone.flush();
         resumeRecord();
     }

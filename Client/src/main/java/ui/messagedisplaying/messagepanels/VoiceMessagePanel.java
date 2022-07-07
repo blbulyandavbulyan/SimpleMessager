@@ -31,7 +31,7 @@ public class VoiceMessagePanel extends MessagePanel {
         });
     }
     private void tryToInitPlayVoiceMessage(final VoiceMessage voiceMessage){
-        boolean result = playVoiceMessage.init(voiceMessage);
+        boolean result = playVoiceMessage.init(voiceMessage.getAudioData(), voiceMessage.getAudioFormat());
         if(result){
             playButton.setEnabled(true);
             audioMessageInformation.setText(playVoiceMessage.getStringLength());

@@ -20,9 +20,7 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
-import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.event.*;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.ResourceBundle;
@@ -33,7 +31,7 @@ import static ui.common.DisplayErrors.showErrorMessage;
 
 public class MainWindow extends JFrame implements MessagePrinter {
     private JTextFiledWithGhostText messageField;
-    private JButton sendBtn;
+    //private JButton sendBtn;
     private JTabbedPaneWithCloseableTabs dialogsTappedPane;
     private final HashMap<String, JPanel> privateDialogs = new HashMap<>();
     private MessageSender messageSender;
@@ -84,7 +82,8 @@ public class MainWindow extends JFrame implements MessagePrinter {
 
     private void init() {
         messageField = new JTextFiledWithGhostText(rb.getString("mainWindow.messageFieldGhostText"));
-        sendBtn = new JButton(rb.getString("mainWindow.startRecordVoiceMessage"));
+        JComponent sendComponent = null;
+        JButton sendBtn = new JButton(rb.getString("mainWindow.sendButton"));
         ActionListener sendMessage = (e) -> {
             String message = messageField.getText().trim();
             if (!(message.isBlank() && message.isEmpty())) {
@@ -115,21 +114,20 @@ public class MainWindow extends JFrame implements MessagePrinter {
 
         try {
             AudioFormat audioFormat =  new AudioFormat(AudioFormat.Encoding.PCM_SIGNED, 44100, 16, 1, 2, 44100, true);
+            JButton recordButton = new JButton(rb.getString("mainWindow.startRecordVoiceMessage"));
             RecordStopButtonActionListener recordStopActionListener = new RecordStopButtonActionListener(audioFormat, 3,
                 (record_state)->{
                     switch (record_state){
                         case RECORD_STARTED -> {
-                            sendBtn.setText(rb.getString("mainWindow.stopRecordVoiceMessageAndSend"));
+                            recordButton.setText(rb.getString("mainWindow.stopRecordVoiceMessageAndSend"));
                             messageField.setEnabled(false);
                         }
                         case RECORD_STOPPED -> {
-                            if(messageField.isEmpty())sendBtn.setText(rb.getString("mainWindow.startRecordVoiceMessage"));
-                            else sendBtn.setText(rb.getString("mainWindow.sendButton"));
+                            recordButton.setText(rb.getString("mainWindow.startRecordVoiceMessage"));
                             messageField.setEnabled(true);
                         }
                     }
                 },
-                messageField::isEmpty,
                 (audioData)->{
                     int selectedIndex = dialogsTappedPane.getSelectedIndex();
                     VoiceMessage voiceMessage = new VoiceMessage(
@@ -143,15 +141,20 @@ public class MainWindow extends JFrame implements MessagePrinter {
                     }
                 }
             );
+            recordButton.addActionListener(recordStopActionListener);
+            CardLayout cardLayout = new CardLayout();
+            JPanel sendMessageAndRecordVoiceMessagePanel = new JPanel(cardLayout);
+            sendMessageAndRecordVoiceMessagePanel.add("sendButton", sendBtn);
+            sendMessageAndRecordVoiceMessagePanel.add("recordButton", recordButton);
             messageField.getDocument().addDocumentListener(new DocumentListener() {
                 @Override
                 public void insertUpdate(DocumentEvent e) {
-                    if(!messageField.isEmpty())sendBtn.setText(rb.getString("mainWindow.sendButton"));
+                    if(!messageField.isEmpty())cardLayout.show(sendMessageAndRecordVoiceMessagePanel, "sendButton");
                 }
 
                 @Override
                 public void removeUpdate(DocumentEvent e) {
-                    if(messageField.isEmpty())sendBtn.setText(rb.getString("mainWindow.startRecordVoiceMessage"));
+                    if(messageField.isEmpty()) cardLayout.show(sendMessageAndRecordVoiceMessagePanel, "recordButton");
                 }
 
                 @Override
@@ -159,13 +162,22 @@ public class MainWindow extends JFrame implements MessagePrinter {
 
                 }
             });
-            sendBtn.addActionListener(recordStopActionListener);
+            messageField.addComponentListener(new ComponentAdapter() {
+                @Override
+                public void componentResized(ComponentEvent e) {
+                    float fontSize = ((float)messageField.getHeight()*40)/100;
+                    messageField.setFont(messageField.getFont().deriveFont(fontSize));
+                    super.componentResized(e);
+                }
+            });
+            cardLayout.show(sendMessageAndRecordVoiceMessagePanel, "recordButton");
+            sendComponent = sendMessageAndRecordVoiceMessagePanel;
         } catch (LineUnavailableException | IllegalArgumentException e) {
             e.printStackTrace();
             sendBtn.setText(rb.getString("mainWindow.sendButton"));
             showErrorMessage(null, "mainWindow.errorMessage.VoiceMessageIsNotSupported", "errorCaptions.generalErrorCaption", rb);
         }
-
+        if(sendComponent == null)sendComponent = sendBtn;
         messageField.addActionListener(sendMessage);
         sendBtn.addActionListener(sendMessage);
         dialogsTappedPane = new JTabbedPaneWithCloseableTabs(privateDialogs::remove, rb.getString("mainWindow.closeDialogTooltipText"));
@@ -192,7 +204,7 @@ public class MainWindow extends JFrame implements MessagePrinter {
         gbc.gridx = 1;
         gbc.gridy = 1;
         gbc.weightx = 0.00001;
-        this.add(sendBtn, gbc);
+        this.add(sendComponent, gbc);
     }
 
     public MainWindow(ServerConnection connection, ResourceBundle rb) {

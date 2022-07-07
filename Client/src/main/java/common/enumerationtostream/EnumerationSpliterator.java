@@ -1,4 +1,4 @@
-package common;
+package common.enumerationtostream;
 
 import java.util.Enumeration;
 import java.util.Spliterators;

@@ -2,18 +2,17 @@ package threads;
 
 import common.Server;
 import java.io.InputStream;
-import java.io.PrintStream;
 import java.util.Collection;
 import java.util.Scanner;
 public class ServerCommandReaderThread extends Thread{
-    private Scanner commandInput;
-    private boolean termintaed = false;
+    private final Scanner commandInput;
+    private boolean terminated = false;
     public ServerCommandReaderThread(InputStream commandInput){
         this.commandInput = new Scanner(commandInput);
     }
     @Override
     public void run() {
-        while(!termintaed){
+        while(!terminated){
             String command = commandInput.nextLine();
             switch(command){
                 case "!DISCONNECT ALL" -> {
@@ -33,9 +32,9 @@ public class ServerCommandReaderThread extends Thread{
                 case "!SHOW CHAT", "!ENABLE CHAT SHOWING"->Server.setShowMessagesFromUser(true);
                 case "!LIST AUTHORIZED CLIENTS"->{
                     //Server.setShowMessagesFromUser(false);
-                    Collection<ClientServerThread> clients = Server.getClients();
+                    Collection<ClientProcessingServerThread> clients = Server.getClients();
                     Server.serverPrint("Подключено авторизованных клиентов в количестве: %d\n".formatted(clients.size()));
-                    for (ClientServerThread client : clients) {
+                    for (ClientProcessingServerThread client : clients) {
 
                     }
 
@@ -50,6 +49,6 @@ public class ServerCommandReaderThread extends Thread{
         }
     }
     public void terminate(){
-        termintaed = true;
+        terminated = true;
     }
 }

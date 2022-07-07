@@ -18,12 +18,13 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="General" />
         <module name="Server" />
         <module name="Client" />
-        <module name="General" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="AndroidClient" target="1.8" />
       <module name="TestBots" target="17" />
     </bytecodeTargetLevel>
   </component>
