@@ -1,16 +1,13 @@
-package audioprocessing;
-
+import audioprocessing.RecordStopButtonActionListener;
 import general.message.voicemessage.VoiceMessage;
 import ui.messagedisplaying.messagepanels.VoiceMessagePanel;
 
 import javax.sound.sampled.*;
 import javax.swing.*;
 import java.awt.*;
+import java.util.ResourceBundle;
 
 public class DemoRecordAudio {
-    static class SimplePlayButton extends JButton{
-
-    }
     public static void main(String[] args) throws LineUnavailableException, InterruptedException {
         JFrame jFrame = new JFrame();
         JButton recordButton = new JButton("Записать");
@@ -30,7 +27,7 @@ public class DemoRecordAudio {
         JPanel jpanel = new JPanel();
         jpanel.setLayout(new FlowLayout(FlowLayout.LEADING));
         jpanel.setAlignmentY(Component.TOP_ALIGNMENT);
-        jpanel.add(new VoiceMessagePanel(new VoiceMessage("david", null, recordStopActionListener.getAudio(), audioFormat)));
+        jpanel.add(new VoiceMessagePanel(new VoiceMessage("david", null, recordStopActionListener.getAudio(), audioFormat), ResourceBundle.getBundle("resources/locales/guitext")));
         jFrame1.getContentPane().add(jpanel);
         jFrame1.pack();
         jFrame1.setVisible(true);

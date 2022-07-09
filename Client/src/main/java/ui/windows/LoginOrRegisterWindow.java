@@ -28,32 +28,32 @@ public class LoginOrRegisterWindow extends JFrame implements LoginOrRegisterResu
     private JButton submitBtn;
     private LoginOrRegisterRequest loginOrRegisterResult;
     private final Object notifyObject;
-    private ResourceBundle rb;
+    private final ResourceBundle rb;
 
-    public static void main(String[] args) {
-        LoginOrRegisterWindow low = new LoginOrRegisterWindow(ResourceBundle.getBundle("resources/locales/guitext"));
-        low.setVisible(true);
-        while (true) {
-            LoginOrRegisterRequest lor = low.getLoginOrRegisterResult();
-            switch (lor.getOperation()) {
-                case LOGIN -> {
-                    System.out.println("Вы собрались входить.");
-                    System.out.printf("Имя пользователя: %s\n", lor.getUserName());
-                    System.out.printf("Пароль: %s\n", lor.getPassword());
-                }
-                case REGISTER -> {
-                    System.out.println("Вы собрались регистрироваться.");
-                    System.out.printf("Имя пользователя: %s\n", lor.getUserName());
-                    System.out.printf("Пароль: %s\n", lor.getPassword());
-                }
-                case CANCELLED -> {
-                    System.out.println("Операция отменена.");
-                    return;
-                }
-            }
-        }
-
-    }
+//    public static void main(String[] args) {
+//        LoginOrRegisterWindow low = new LoginOrRegisterWindow(ResourceBundle.getBundle("resources/locales/guitext"));
+//        low.setVisible(true);
+//        while (true) {
+//            LoginOrRegisterRequest lor = low.getLoginOrRegisterResult();
+//            switch (lor.getOperation()) {
+//                case LOGIN -> {
+//                    System.out.println("Вы собрались входить.");
+//                    System.out.printf("Имя пользователя: %s\n", lor.getUserName());
+//                    System.out.printf("Пароль: %s\n", lor.getPassword());
+//                }
+//                case REGISTER -> {
+//                    System.out.println("Вы собрались регистрироваться.");
+//                    System.out.printf("Имя пользователя: %s\n", lor.getUserName());
+//                    System.out.printf("Пароль: %s\n", lor.getPassword());
+//                }
+//                case CANCELLED -> {
+//                    System.out.println("Операция отменена.");
+//                    return;
+//                }
+//            }
+//        }
+//
+//    }
 
     private void initSubmitBtn() {
         ActionListener submitBtnPress = e -> {

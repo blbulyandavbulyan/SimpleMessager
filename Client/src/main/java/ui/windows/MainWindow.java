@@ -12,6 +12,7 @@ import common.interfaces.MessagePrinter;
 import ui.customuicomponents.closedjtabbedpane.JTabbedPaneWithCloseableTabs;
 import ui.exceptions.PersonalMessageIsEmpty;
 import ui.customuicomponents.textfieldswithghosttext.JTextFiledWithGhostText;
+import ui.messagedisplaying.exceptions.UnknownMessageTypeException;
 import ui.messagedisplaying.messagepanels.MessagePanel;
 import ui.messagedisplaying.MessagePanelGenerator;
 
@@ -38,19 +39,20 @@ public class MainWindow extends JFrame implements MessagePrinter {
     private JPanel generalDialog;
     private String myUserName;
     private MessagesReaderThread readerThread;
+    private final MessagePanelGenerator messagePanelGenerator;
     private final ResourceBundle rb;
-    public static void main(String[] args) {
-        MainWindow mw = new MainWindow(ResourceBundle.getBundle("resources/locales/guitext"));
-        mw.pack();
-        mw.setSize(new Dimension(500, 500));
-        mw.setVisible(true);
-        TextMessage msg1 = new TextMessage("Hello, i am johan", "johan", "you"),
-                msg2 = new TextMessage("Hello, i am georgy", "georgy", "you");
-        for (int i = 0; i < 1000; i++) {
-            mw.printMessage(msg1);
-            mw.printMessage(msg2);
-        }
-    }
+//    public static void main(String[] args) {
+//        MainWindow mw = new MainWindow(ResourceBundle.getBundle("resources/locales/guitext"));
+//        mw.pack();
+//        mw.setSize(new Dimension(500, 500));
+//        mw.setVisible(true);
+//        TextMessage msg1 = new TextMessage("Hello, i am johan", "johan", "you"),
+//                msg2 = new TextMessage("Hello, i am georgy", "georgy", "you");
+//        for (int i = 0; i < 1000; i++) {
+//            mw.printMessage(msg1);
+//            mw.printMessage(msg2);
+//        }
+//    }
     private String[] getReceiversFromMessage(String msgStr){
         final String regex = "@([\\w\\d]+)\b";
         final Pattern pattern = Pattern.compile(regex, Pattern.MULTILINE);
@@ -209,6 +211,7 @@ public class MainWindow extends JFrame implements MessagePrinter {
 
     public MainWindow(ServerConnection connection, ResourceBundle rb) {
         this.rb = rb;
+        messagePanelGenerator = new MessagePanelGenerator(rb);
         if (connection == null) throw new NullPointerException("connection is null");
         if (connection.isClosed()) throw new RuntimeException("connection is closed");
         init();
@@ -238,13 +241,14 @@ public class MainWindow extends JFrame implements MessagePrinter {
 
     private MainWindow(ResourceBundle rb) {
         this.rb = rb;
+        messagePanelGenerator = new MessagePanelGenerator(rb);
         init();
         this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     }
 
     synchronized public void printMessage(Message msg) {
         try {
-            MessagePanel messagePanel = MessagePanelGenerator.getMessagePanel(msg);
+            MessagePanel messagePanel = messagePanelGenerator.getMessagePanel(msg);
             if (msg.getReceiver() != null) {
                 String dialogName = msg.getReceiver().equals(myUserName) ?  msg.getSender() : msg.getReceiver();
                 JPanel privateDialogPanel = initPrivateDialogWithUser(dialogName);
@@ -268,7 +272,11 @@ public class MainWindow extends JFrame implements MessagePrinter {
 
                 generalDialog.revalidate();
             }
-        } catch (Exception e) {
+        }
+        catch (UnknownMessageTypeException e){
+            showErrorMessage(this, "mainWindow.errorMessages.UnknownMessageType", "mainWindow.errorCaptions.messageDisplayingError", rb);
+        }
+        catch (Exception e) {
             throw new RuntimeException(e);
         }
 

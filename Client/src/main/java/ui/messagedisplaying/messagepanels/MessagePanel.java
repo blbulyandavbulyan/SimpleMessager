@@ -5,13 +5,18 @@ import general.message.Message;
 import javax.swing.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ResourceBundle;
 
 public abstract class MessagePanel extends JPanel {
     protected JLabel senderLabel;
     protected JLabel sendTimeLabel;
-    protected MessagePanel(Message msg){
+    protected ResourceBundle rb;
+    protected MessagePanel(Message msg, ResourceBundle rb){
+        if(rb == null)throw new NullPointerException();
+        this.rb = rb;
         senderLabel = new JLabel(msg.getSender());
         sendTimeLabel = new JLabel(msg.getSendingTimeString());
+        if(rb.containsKey("messagePanel.SenderLabelTooltip"))senderLabel.setToolTipText(rb.getString("messagePanel.SenderLabelTooltip"));
         this.add(senderLabel);
         this.add(sendTimeLabel);
     }

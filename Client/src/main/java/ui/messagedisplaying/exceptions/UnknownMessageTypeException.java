@@ -1,6 +1,4 @@
 package ui.messagedisplaying.exceptions;
 
-public class UnknownMessageTypeException extends RuntimeException{
-    public UnknownMessageTypeException(){
-    }
+public class UnknownMessageTypeException extends MessageDisplayingException{
 }

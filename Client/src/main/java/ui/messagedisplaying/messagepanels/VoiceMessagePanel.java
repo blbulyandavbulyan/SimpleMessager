@@ -4,29 +4,30 @@ import audioprocessing.PlayVoiceMessage;
 import general.message.voicemessage.VoiceMessage;
 
 import javax.swing.*;
+import java.util.ResourceBundle;
 
 public class VoiceMessagePanel extends MessagePanel {
     private final JButton playButton;
     private final JLabel audioMessageInformation;
     private final PlayVoiceMessage playVoiceMessage;
-    public VoiceMessagePanel(VoiceMessage voiceMessage) {
-        super(voiceMessage);
-        playButton = new JButton("Воспроизвести");
+    public VoiceMessagePanel(VoiceMessage voiceMessage, ResourceBundle rb) {
+        super(voiceMessage, rb);
+        playButton = new JButton(rb.getString("voiceMessagePanel.Play"));
         audioMessageInformation = new JLabel();
         this.add(audioMessageInformation);
         this.add(playButton);
         audioMessageInformation.setVisible(false);
         playButton.setEnabled(false);
-        playVoiceMessage = new PlayVoiceMessage(voiceMessage, ()->playButton.setText("Воспроизвести"));
+        playVoiceMessage = new PlayVoiceMessage(voiceMessage, ()->playButton.setText(rb.getString("voiceMessagePanel.Play")));
         tryToInitPlayVoiceMessage(voiceMessage);
         playButton.addActionListener(l->{
             if(playVoiceMessage.isPlaying()){
                 playVoiceMessage.stop();
-                playButton.setText("Воспроизвести");
+                playButton.setText(rb.getString("voiceMessagePanel.Play"));
             }
             else {
                 playVoiceMessage.play();
-                playButton.setText("Остановить");
+                playButton.setText(rb.getString("voiceMessagePanel.Stop"));
             }
         });
     }
@@ -38,8 +39,5 @@ public class VoiceMessagePanel extends MessagePanel {
             audioMessageInformation.setVisible(true);
         }
         else SwingUtilities.invokeLater(()->tryToInitPlayVoiceMessage(voiceMessage));
-    }
-    public static void main(String[] args) {
-
     }
 }

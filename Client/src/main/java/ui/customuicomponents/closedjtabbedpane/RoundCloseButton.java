@@ -99,18 +99,5 @@ public class RoundCloseButton extends JButton {
     }
 
     // Test routine.
-    public static void main(String[] args){
-// Create a button with the label "Jackpot".
-        JButton button = new RoundCloseButton();
-
-        JFrame frame = new JFrame();
-        frame.getContentPane().setBackground(Color.yellow);
-        frame.setLayout(new FlowLayout());
-        frame.add(button);
-        button.setPreferredSize(new Dimension(500, 500));
-
-        frame.setSize(150, 150);
-        frame.setVisible(true);
-    }
 }
 

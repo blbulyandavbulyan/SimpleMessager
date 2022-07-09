@@ -100,13 +100,13 @@ public class ConnectToServerDialog extends JDialog {
         return cancelled;
     }
 
-    public static void main(String[] args) {
-        ConnectToServerDialog dialog = new ConnectToServerDialog(ResourceBundle.getBundle("resources/locales/guitext"));
-        dialog.pack();
-        dialog.setVisible(true);
-        InetSocketAddress addr = dialog.getAddress();
-        System.out.printf("адресс: %s\nпорт: %d", addr.getHostName(), addr.getPort());
-        System.exit(0);
-    }
+//    public static void main(String[] args) {
+//        ConnectToServerDialog dialog = new ConnectToServerDialog(ResourceBundle.getBundle("resources/locales/guitext"));
+//        dialog.pack();
+//        dialog.setVisible(true);
+//        InetSocketAddress addr = dialog.getAddress();
+//        System.out.printf("адресс: %s\nпорт: %d", addr.getHostName(), addr.getPort());
+//        System.exit(0);
+//    }
 
 }
