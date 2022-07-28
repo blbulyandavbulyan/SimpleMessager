@@ -1,7 +1,7 @@
 package serverconnection;
 
-import common.interfaces.MessageGetter;
-import common.interfaces.MessagePrinter;
+import serverconnection.interfaces.MessageGetter;
+import serverconnection.interfaces.MessagePrinter;
 
 import java.io.*;
 import java.net.SocketException;

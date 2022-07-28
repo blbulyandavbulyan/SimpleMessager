@@ -1,7 +1,7 @@
 package userdata;
 
 import general.loginorregisterrequest.LoginOrRegisterRequest;
-import common.interfaces.StatusMessagePrinter;
+import serverconnection.interfaces.StatusMessagePrinter;
 
 import java.io.Closeable;
 public interface LoginOrRegisterResultGetter extends StatusMessagePrinter, Closeable {

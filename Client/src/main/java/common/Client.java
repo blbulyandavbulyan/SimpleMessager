@@ -3,6 +3,7 @@ package common;
 import common.enumerationtostream.ConvertEnumerationToStream;
 import serverconnection.ServerConnection;
 import serverconnection.exceptions.RegisterOrLoginInterrupted;
+import serverconnection.exceptions.ServerHasDBProblemsException;
 import ui.windows.ConnectToServerDialog;
 import ui.windows.MainWindow;
 import ui.windows.LoginOrRegisterWindow;
@@ -115,6 +116,9 @@ public class Client {
                     mw.pack();
                     mw.setVisible(true);
                     repeat = false;
+                }
+                catch (ServerHasDBProblemsException e){
+
                 }
                 catch (RegisterOrLoginInterrupted ignored){
                     repeat = false;

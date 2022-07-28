@@ -3,7 +3,7 @@
     <option name="myName" value="Project Default" />
     <inspection_tool class="SerialVersionUIDNotStaticFinal" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="SerializableHasSerialVersionUIDField" enabled="true" level="WARNING" enabled_by_default="true">
-      <option name="superClassString" value="java.awt.Component,general.exceptions.GeneralLibException,java.lang.RuntimeException,javax.swing.text.PlainDocument" />
+      <option name="superClassString" value="java.awt.Component,general.exceptions.GeneralLibException,java.lang.RuntimeException,javax.swing.text.PlainDocument,java.util.EventListener" />
     </inspection_tool>
   </profile>
 </component>

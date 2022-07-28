@@ -1,20 +1,21 @@
 package ui.windows;
 
 
-import audioprocessing.RecordStopButtonActionListener;
-import common.interfaces.MessageSender;
+import processings.audioprocessing.record.RecordStopButtonActionListener;
+import serverconnection.exceptions.ConnectionClosed;
+import serverconnection.interfaces.MessageSender;
 import general.message.Message;
 import general.message.textmessage.TextMessage;
 import general.message.voicemessage.VoiceMessage;
 import serverconnection.MessagesReaderThread;
 import serverconnection.ServerConnection;
-import common.interfaces.MessagePrinter;
-import ui.customuicomponents.closedjtabbedpane.JTabbedPaneWithCloseableTabs;
-import ui.exceptions.PersonalMessageIsEmpty;
-import ui.customuicomponents.textfieldswithghosttext.JTextFiledWithGhostText;
-import ui.messagedisplaying.exceptions.UnknownMessageTypeException;
-import ui.messagedisplaying.messagepanels.MessagePanel;
-import ui.messagedisplaying.MessagePanelGenerator;
+import serverconnection.interfaces.MessagePrinter;
+import ui.components.custom.closedjtabbedpane.JTabbedPaneWithCloseableTabs;
+import ui.windows.exceptions.PersonalMessageIsEmpty;
+import ui.components.custom.textfieldswithghosttext.JTextFiledWithGhostText;
+import ui.components.displayers.messagedisplaying.exceptions.UnknownMessageTypeException;
+import ui.components.displayers.messagedisplaying.messagepanels.MessagePanel;
+import ui.components.displayers.generators.MessagePanelGenerator;
 
 import javax.sound.sampled.*;
 import javax.swing.*;
@@ -100,8 +101,7 @@ public class MainWindow extends JFrame implements MessagePrinter {
                             "mainWindow.errorCaptions.messageSendingError", rb);
                     messageField.requestFocus();
                 }
-                catch (IOException ex) {
-                    ex.printStackTrace();
+                catch (ConnectionClosed ex) {
                     showErrorMessage(((JComponent) e.getSource()).getParent(),
                             (messageSender.isClosed() ? "mainWindow.errorMessages.connectionClosed" : "mainWindow.errorMessages.messageSendingUnknownError"),
                             "mainWindow.errorCaptions.messageSendingError", rb);
@@ -110,6 +110,8 @@ public class MainWindow extends JFrame implements MessagePrinter {
 
                     }
                     System.exit(-1);
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
                 }
             }
         };

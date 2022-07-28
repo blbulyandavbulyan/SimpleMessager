@@ -1,8 +1,8 @@
 package ui.windows;
 import general.loginorregisterrequest.LoginOrRegisterRequest;
-import ui.customuicomponents.textfieldswithghosttext.JPasswordFieldWithGhostText;
-import ui.customuicomponents.textfieldswithghosttext.JTextFiledWithGhostText;
-import ui.customuicomponents.passwordfieldwithshowpasscheckbox.ShowUnshowPasswordPanel;
+import ui.components.custom.textfieldswithghosttext.JPasswordFieldWithGhostText;
+import ui.components.custom.textfieldswithghosttext.JTextFiledWithGhostText;
+import ui.components.custom.passwordfieldwithshowpasscheckbox.ShowUnshowPasswordPanel;
 import userdata.LoginOrRegisterResultGetter;
 
 import javax.swing.*;

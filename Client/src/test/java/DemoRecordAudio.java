@@ -1,6 +1,6 @@
-import audioprocessing.RecordStopButtonActionListener;
+import processings.audioprocessing.record.RecordStopButtonActionListener;
 import general.message.voicemessage.VoiceMessage;
-import ui.messagedisplaying.messagepanels.VoiceMessagePanel;
+import ui.components.displayers.messagedisplaying.messagepanels.standartmessagepanels.VoiceMessagePanel;
 
 import javax.sound.sampled.*;
 import javax.swing.*;
