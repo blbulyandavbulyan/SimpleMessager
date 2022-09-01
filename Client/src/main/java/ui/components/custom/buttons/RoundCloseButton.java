@@ -1,4 +1,4 @@
-package ui.components.custom.closedjtabbedpane;
+package ui.components.custom.buttons;
 
 import javax.swing.*;
 
@@ -35,17 +35,20 @@ public class RoundCloseButton extends JButton {
 
 
         Dimension size = getPreferredSize();
-        size.width = size.height = Math.max(size.width,size.height);
-        setPreferredSize(size);
-        setRolloverEnabled(true);
-        setIcon(redrawSvgIcon(svgIcon, size.width, size.height));
-        setPressedIcon(redrawSvgIcon(svgPressIcon, size.width, size.height));
-        setRolloverIcon(redrawSvgIcon(svgRollIcon, size.width, size.height));
+        if(size.width != 0 && size.height != 0){
+            size.width = size.height = Math.max(size.width,size.height);
+            setPreferredSize(size);
+            setIcon(redrawSvgIcon(svgIcon, size.width, size.height));
+            setPressedIcon(redrawSvgIcon(svgPressIcon, size.width, size.height));
+            setRolloverIcon(redrawSvgIcon(svgRollIcon, size.width, size.height));
+        }
+
 
 
         // This call causes the JButton not to paint
         // the background.
         // This allows us to paint a round background.
+        setRolloverEnabled(true);
         setContentAreaFilled(false);
         setFocusPainted(false);
     }
@@ -54,9 +57,12 @@ public class RoundCloseButton extends JButton {
     }
     private void redrawSvgIcons(int width, int height){
         width = height = Math.max(width, height);
-        setIcon(redrawSvgIcon(svgIcon, width, height));
-        setPressedIcon(redrawSvgIcon(svgPressIcon, width, height));
-        setRolloverIcon(redrawSvgIcon(svgRollIcon, width, height));
+        if(width > 0){
+            setIcon(redrawSvgIcon(svgIcon, width, height));
+            setPressedIcon(redrawSvgIcon(svgPressIcon, width, height));
+            setRolloverIcon(redrawSvgIcon(svgRollIcon, width, height));
+        }
+
     }
     public void setPreferredSize(Dimension d){
         super.setPreferredSize(d);

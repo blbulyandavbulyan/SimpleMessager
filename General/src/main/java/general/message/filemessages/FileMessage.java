@@ -3,12 +3,10 @@ package general.message.filemessages;
 import general.message.Message;
 import general.message.filemessages.exceptions.FileHasInvalidFormatException;
 import general.message.filemessages.exceptions.FileMessageCreatingException;
-import general.message.filemessages.imagefilesmessages.ImageFileMessage;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.Serial;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
 import java.util.HashMap;
@@ -52,8 +50,8 @@ public abstract class FileMessage extends Message {
         String fileMIMEType = Files.probeContentType(file.toPath());
         Class<? extends FileMessage> fileMessageClass = mimeToClassMap.get(fileMIMEType);
         if(fileMessageClass != null){
-            return fileMessageClass.getConstructor(String.class, String.class, String.class, String.class, byte[].class)
-                    .newInstance(sender, receiver, file.getName(), fileMIMEType, Files.readAllBytes(file.toPath()));
+            return fileMessageClass.getConstructor(String.class, String.class, File.class)
+                    .newInstance(sender, receiver, file);
         }
         else throw new FileHasInvalidFormatException();
     }

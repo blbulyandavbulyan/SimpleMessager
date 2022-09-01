@@ -1,4 +1,4 @@
-package general.message.filemessages.imagefilesmessages;
+package general.message.filemessages;
 
 import general.message.filemessages.FileMessage;
 import general.message.filemessages.exceptions.FileMessageCreatingException;
@@ -12,8 +12,8 @@ public class ImageFileMessage extends FileMessage {
     @Serial
     private static final long serialVersionUID = -8488066645843643537L;
 
-    protected ImageFileMessage(String sender, String receiver, File file) throws IOException, FileMessageCreatingException {
-        super(sender, receiver, file, (mimeType)-> mimeType.equals("image/png") || mimeType.equals("image/jpeg"));
+    public ImageFileMessage(String sender, String receiver, File imageFile) throws IOException, FileMessageCreatingException {
+        super(sender, receiver, imageFile, (mimeType)-> mimeType.equals("image/png") || mimeType.equals("image/jpeg"));
     }
     public ImageIcon getImageIcon(){
         return new ImageIcon(fileData);

@@ -1,12 +1,7 @@
 package ui.components.draganddroppanel;
 
-import general.message.Message;
-import general.message.filemessages.FileMessage;
-import serverconnection.ServerConnection;
-import serverconnection.interfaces.MessageSender;
 import ui.components.displayers.filedisplayers.FileDisplayer;
 import ui.components.displayers.generators.FileDisplayerGenerator;
-import ui.components.draganddroppanel.exceptions.MessageSenderIsNullException;
 
 import javax.swing.*;
 import java.awt.*;
@@ -15,6 +10,8 @@ import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DropTarget;
 import java.awt.dnd.DropTargetDropEvent;
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.*;
 import java.util.List;
 
@@ -23,6 +20,7 @@ public class DragAndDropPanel extends JPanel {
     private final Set<File> droppedFilesSet = new HashSet<>();
     private final JPanel droppedFilesPanel;
     private final DragAndDropPanel me;
+    private final Set<DroppedFilesListener> droppedFilesListeners = new HashSet<>();
     public DragAndDropPanel(JComponent whenNoDropComponent){
         me = this;
         droppedFilesPanel = new JPanel();
@@ -36,18 +34,33 @@ public class DragAndDropPanel extends JPanel {
                     for(File droppedFile : (List<File>)( evt.getTransferable().getTransferData(DataFlavor.javaFileListFlavor)) ){
                         if(FileDisplayerGenerator.isThisFileHasValidFormat(droppedFile)){
                             FileDisplayer fileDisplayer = FileDisplayerGenerator.getFileDsiplayer(droppedFile);
-                            JButton removeButton = new JButton("X");
-                            fileDisplayer.add(removeButton);
+                            fileDisplayer.setDropTarget(this);
                             droppedFilesPanel.add(fileDisplayer);
                             droppedFilesSet.add(droppedFile);
-                            removeButton.addActionListener((ae)->{
+                            fileDisplayer.setRemoveFromDragAndDropPanelAction(()->{
                                 droppedFilesSet.remove(droppedFile);
                                 droppedFilesPanel.remove(fileDisplayer);
+                                droppedFilesPanel.invalidate();
                                 droppedFilesPanel.revalidate();
                                 if(droppedFilesSet.isEmpty()){
                                     cardLayout.show(me, "whenNoDropComponent");
+                                    try {
+                                        notifyAllDroppedFilesSetListeners("droppedFilesSetCleared");
+                                    } catch (InvocationTargetException | IllegalAccessException |
+                                             NoSuchMethodException e) {
+                                        throw new RuntimeException(e);
+                                    }
+                                }
+                                else {
+                                    try {
+                                        notifyAllDroppedFilesSetListeners("droppedFileDeleted", droppedFile);
+                                    } catch (InvocationTargetException | IllegalAccessException |
+                                             NoSuchMethodException e) {
+                                        throw new RuntimeException(e);
+                                    }
                                 }
                             });
+                            notifyAllDroppedFilesSetListeners("droppedFileAdded", droppedFile);
                         }
 
                     }
@@ -73,10 +86,36 @@ public class DragAndDropPanel extends JPanel {
     public Set<File> getDroppedFiles(){
         return droppedFilesSet;
     }
-    public Collection<FileMessage> getFileMessages(){
-        LinkedList<FileMessage> fileMessages = new LinkedList<>();
 
-        return fileMessages;
+    public boolean hasDroppedFiles(){
+        return !droppedFilesSet.isEmpty();
+    }
+    public void addDroppedFilesSetListener(DroppedFilesListener droppedFilesListener){
+        if(droppedFilesListener != null) droppedFilesListeners.add(droppedFilesListener);
+    }
+    public void removeDroppedFilesSetListener(DroppedFilesListener droppedFilesListener){
+        droppedFilesListeners.remove(droppedFilesListener);
+    }
+    private void notifyAllDroppedFilesSetListeners(String droppedFilesListenerMethodName, Object ... args) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+        Method droppedFileListenerMethod = null;
+        if(args != null){
+            Class[] argClasses = new Class[args.length];
+            for(int i = 0; i < argClasses.length; i++){
+                argClasses[i] = args[i].getClass();
+            }
+            droppedFileListenerMethod = DroppedFilesListener.class.getMethod(droppedFilesListenerMethodName, argClasses);
+        }
+        else droppedFileListenerMethod = DroppedFilesListener.class.getMethod(droppedFilesListenerMethodName);
+        for (DroppedFilesListener droppedFilesListener : droppedFilesListeners) {
+            if(args != null)droppedFileListenerMethod.invoke(droppedFilesListener, args);
+            else droppedFileListenerMethod.invoke(droppedFilesListener);
+        }
+    }
+    public void clearDroppedFiles(){
+        droppedFilesPanel.removeAll();
+        droppedFilesPanel.revalidate();
+        droppedFilesSet.clear();
+        cardLayout.show(this, "whenNoDropComponent");
     }
     public static void main(String[] args) {
         JFrame jFrame = new JFrame();

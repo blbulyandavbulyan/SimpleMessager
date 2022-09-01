@@ -1,9 +1,11 @@
 package ui.components.displayers.generators;
 
 import general.message.Message;
+import general.message.filemessages.ImageFileMessage;
 import general.message.textmessage.TextMessage;
 import general.message.voicemessage.VoiceMessage;
 import ui.components.displayers.messagedisplaying.messagepanels.MessagePanel;
+import ui.components.displayers.messagedisplaying.messagepanels.filemessagespanels.ImageFileMessagePanel;
 import ui.components.displayers.messagedisplaying.messagepanels.standartmessagepanels.TextMessagePanel;
 import ui.components.displayers.messagedisplaying.messagepanels.standartmessagepanels.VoiceMessagePanel;
 import ui.components.displayers.messagedisplaying.exceptions.UnknownMessageTypeException;
@@ -20,7 +22,7 @@ public class MessagePanelGenerator {
     static {
         messageMapper.put(VoiceMessage.class, VoiceMessagePanel.class);
         messageMapper.put(TextMessage.class, TextMessagePanel.class);
-
+        messageMapper.put(ImageFileMessage.class, ImageFileMessagePanel.class);
     }
     public MessagePanelGenerator(ResourceBundle rb){
         if(rb == null)throw new NullPointerException();

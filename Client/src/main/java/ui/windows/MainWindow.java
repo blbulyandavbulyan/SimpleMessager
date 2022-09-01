@@ -1,6 +1,7 @@
 package ui.windows;
 
 
+import general.message.filemessages.FileMessage;
 import processings.audioprocessing.record.RecordStopButtonActionListener;
 import serverconnection.exceptions.ConnectionClosed;
 import serverconnection.interfaces.MessageSender;
@@ -10,7 +11,9 @@ import general.message.voicemessage.VoiceMessage;
 import serverconnection.MessagesReaderThread;
 import serverconnection.ServerConnection;
 import serverconnection.interfaces.MessagePrinter;
-import ui.components.custom.closedjtabbedpane.JTabbedPaneWithCloseableTabs;
+import ui.components.custom.jtabbedpanewithcloseabletabs.JTabbedPaneWithCloseableTabs;
+import ui.components.draganddroppanel.DragAndDropPanel;
+import ui.components.draganddroppanel.DroppedFilesAdapter;
 import ui.windows.exceptions.PersonalMessageIsEmpty;
 import ui.components.custom.textfieldswithghosttext.JTextFiledWithGhostText;
 import ui.components.displayers.messagedisplaying.exceptions.UnknownMessageTypeException;
@@ -23,9 +26,12 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -85,6 +91,7 @@ public class MainWindow extends JFrame implements MessagePrinter {
 
     private void init() {
         messageField = new JTextFiledWithGhostText(rb.getString("mainWindow.messageFieldGhostText"));
+        DragAndDropPanel dragAndDropPanel = new DragAndDropPanel(messageField);
         JComponent sendComponent = null;
         JButton sendBtn = new JButton(rb.getString("mainWindow.sendButton"));
         ActionListener sendMessage = (e) -> {
@@ -113,6 +120,20 @@ public class MainWindow extends JFrame implements MessagePrinter {
                 } catch (IOException ex) {
                     throw new RuntimeException(ex);
                 }
+            }
+            else if(dragAndDropPanel.hasDroppedFiles()){
+                Set<File> droppedFiles = dragAndDropPanel.getDroppedFiles();
+                for (File droppedFile : droppedFiles) {
+                    try {
+                        FileMessage fileMessage = FileMessage.create(myUserName, null, droppedFile);
+                        messageSender.sendMessage(fileMessage);
+                        printMessage(fileMessage);
+                    } catch (IOException | NoSuchMethodException | InvocationTargetException | InstantiationException |
+                             IllegalAccessException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                }
+                dragAndDropPanel.clearDroppedFiles();
             }
         };
 
@@ -176,6 +197,16 @@ public class MainWindow extends JFrame implements MessagePrinter {
             });
             cardLayout.show(sendMessageAndRecordVoiceMessagePanel, "recordButton");
             sendComponent = sendMessageAndRecordVoiceMessagePanel;
+            dragAndDropPanel.addDroppedFilesSetListener(new DroppedFilesAdapter() {
+                @Override
+                public void droppedFileAdded(File file) {
+                    cardLayout.show(sendMessageAndRecordVoiceMessagePanel, "sendButton");
+                }
+                @Override
+                public void droppedFilesSetCleared() {
+                    cardLayout.show(sendMessageAndRecordVoiceMessagePanel, "recordButton");
+                }
+            });
         } catch (LineUnavailableException | IllegalArgumentException e) {
             e.printStackTrace();
             sendBtn.setText(rb.getString("mainWindow.sendButton"));
@@ -204,7 +235,7 @@ public class MainWindow extends JFrame implements MessagePrinter {
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.gridwidth = 1;
-        this.add(messageField, gbc);
+        this.add(dragAndDropPanel, gbc);
         gbc.gridx = 1;
         gbc.gridy = 1;
         gbc.weightx = 0.00001;

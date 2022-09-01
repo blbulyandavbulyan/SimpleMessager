@@ -2,14 +2,15 @@ package ui.components.displayers.filedisplayers;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.event.*;
 import java.io.File;
 
 public abstract class FileDisplayer extends JPanel {
     protected boolean detailsWindowIsShow;
+    protected boolean isFileSelected;
     protected final JFrame detailsWindow;
     protected final JLabel fileNameLabel;
+    protected FileDisplayerMouseProcessor fileDisplayerMouseProcessor;
     protected FileDisplayer(File f, JFrame detailsWindow){
         fileNameLabel = new JLabel(f.getName());
         this.detailsWindow = detailsWindow;
@@ -23,8 +24,25 @@ public abstract class FileDisplayer extends JPanel {
             });
         }
         this.setLayout(new FlowLayout());
+        fileDisplayerMouseProcessor = new FileDisplayerMouseProcessor();
+        fileDisplayerMouseProcessor.setShowDetailsWindowAction(this::showOrHideDetailsWindow);
+        fileDisplayerMouseProcessor.setHighlightAction(this::selectOrDeselectFile);
     }
+    public void setRemoveFromDragAndDropPanelAction(Runnable removeAction){
+        fileDisplayerMouseProcessor.setRemoveFromDragAndDropPanelAction(removeAction);
+    }
+    protected void showOrHideDetailsWindow(){
+        detailsWindow.setVisible(detailsWindowIsShow = !detailsWindowIsShow);
+    }
+    protected abstract void selectOrDeselectFile();
     public void dispose(){
         if(detailsWindow != null)detailsWindow.dispose();
+    }
+    public boolean isDetailsWindowIsShow() {
+        return detailsWindowIsShow;
+    }
+
+    public boolean isFileSelected() {
+        return isFileSelected;
     }
 }

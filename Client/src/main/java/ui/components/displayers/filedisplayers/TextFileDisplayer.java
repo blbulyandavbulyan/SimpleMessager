@@ -3,6 +3,7 @@ package ui.components.displayers.filedisplayers;
 import ui.components.displayers.general.viewwindows.ViewTextWindow;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
@@ -26,5 +27,12 @@ public class TextFileDisplayer extends FileDisplayer {
         jFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         jFrame.pack();
         jFrame.setVisible(true);
+    }
+
+    @Override
+    protected void selectOrDeselectFile() {
+        isFileSelected = !isFileSelected;
+        if(isFileSelected)fileNameLabel.setForeground(Color.BLUE);
+        else fileNameLabel.setForeground(Color.BLUE);
     }
 }

@@ -1,5 +1,7 @@
-package ui.components.custom.closedjtabbedpane;
+package ui.components.custom.jtabbedpanewithcloseabletabs;
 
+
+import ui.components.custom.buttons.RoundCloseButton;
 
 import javax.swing.*;
 import java.awt.*;
@@ -7,7 +9,7 @@ import java.awt.*;
 public class JTabbedPaneWithCloseableTabs extends javax.swing.JTabbedPane {
     private final CloseTabAction defaultCloseTabAction;
     private final String defaultCloseButtonToolTipText;
-    private static class TabCloseButton extends RoundCloseButton{
+    private static class TabCloseButton extends RoundCloseButton {
         public TabCloseButton(javax.swing.JTabbedPane tabPane, String titleRemovedTab, CloseTabAction closeTabAction){
             super.addActionListener(
                     (a)-> {
