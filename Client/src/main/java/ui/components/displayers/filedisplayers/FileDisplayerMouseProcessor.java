@@ -24,7 +24,6 @@ public class FileDisplayerMouseProcessor extends MouseAdapter {
         else if(e.getClickCount() == 2 && SwingUtilities.isLeftMouseButton(e) && showDetailsWindowAction != null)showDetailsWindowAction.run();
         else if(SwingUtilities.isMiddleMouseButton(e) && removeFromDragAndDropPanelAction != null)removeFromDragAndDropPanelAction.run();
         else if(e.getClickCount() == 1 && SwingUtilities.isRightMouseButton(e)){
-            //todo add showing context menu here
             if(rightClickContextMenu != null)
                 rightClickContextMenu.show(e.getComponent(), e.getX(), e.getY());
         }

@@ -45,4 +45,7 @@ public abstract class FileDisplayer extends JPanel {
     public boolean isFileSelected() {
         return isFileSelected;
     }
+    public void setPreferredHeight(int preferredHeight){
+        //this.preferredHeight = preferredHeight;
+    }
 }

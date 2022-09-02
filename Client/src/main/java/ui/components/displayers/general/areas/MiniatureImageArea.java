@@ -7,20 +7,24 @@ import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 
-public class MiniatureImageArea extends ImageArea {
-    protected MiniatureImageArea(ImageIcon imageIcon, Dimension miniatureSize) {
-        super(ImageProcessing.scaleImage(imageIcon, miniatureSize, Image.SCALE_AREA_AVERAGING));
-        this.addComponentListener(new ComponentAdapter() {
+public class MiniatureImageArea extends AbstractImageArea {
+    protected int preferredHeight;
+    protected MiniatureImageArea(ImageIcon imageIcon, Dimension miniatureSize, boolean enableImageAutoScale) {
+        super(imageIcon);
+        displayedImage = ImageProcessing.scaleImage(originalImage, miniatureSize, Image.SCALE_AREA_AVERAGING);
+        if(enableImageAutoScale)this.addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {
-                displayedImage = ImageProcessing.scaleImage(originalImage, e.getComponent().getSize(), Image.SCALE_AREA_AVERAGING);
-                e.getComponent().revalidate();
                 super.componentResized(e);
+                displayedImage = ImageProcessing.scaleImage(originalImage, calculatePreferredScaledSize(originalImage, e.getComponent().getHeight()), Image.SCALE_AREA_AVERAGING);
+                e.getComponent().revalidate();
+                e.getComponent().invalidate();
+                //System.out.printf("Component resized:\n\tParam String: %s\n\tHeight: %d\n\tWidth: %d\n", e.paramString(), e.getComponent().getHeight(), e.getComponent().getWidth());
             }
         });
     }
-    public MiniatureImageArea(ImageIcon imageIcon, int preferredHeight){
-        this(imageIcon, calculatePreferredScaledSize(imageIcon, preferredHeight));
+    public MiniatureImageArea(ImageIcon imageIcon, int preferredHeight, boolean enableImageAutoScale){
+        this(imageIcon, calculatePreferredScaledSize(imageIcon, preferredHeight), enableImageAutoScale);
     }
 
     public static Dimension calculatePreferredScaledSize(ImageIcon imageIcon, int preferredHeight){
@@ -31,10 +35,11 @@ public class MiniatureImageArea extends ImageArea {
         return preferredScaledSize;
     }
 
-    public static void main(String[] args) {
-        JFrame jFrame = new JFrame();
-        jFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        jFrame.getContentPane().add(new MiniatureImageArea(new ImageIcon("/media/share/ds1/Фото и Видео/Фотографии/20211111_141124.jpg"), new Dimension(400, 300)));
-        jFrame.setVisible(true);
+
+    public void setPreferredHeight(int preferredHeight) {
+        Dimension preferredScaledSize = calculatePreferredScaledSize(originalImage, preferredHeight);
+        setPreferredSize(preferredScaledSize);
+        displayedImage = ImageProcessing.scaleImage(originalImage, preferredScaledSize, Image.SCALE_AREA_AVERAGING);
+        this.revalidate();
     }
 }

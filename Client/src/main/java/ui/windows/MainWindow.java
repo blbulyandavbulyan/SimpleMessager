@@ -12,6 +12,7 @@ import serverconnection.MessagesReaderThread;
 import serverconnection.ServerConnection;
 import serverconnection.interfaces.MessagePrinter;
 import ui.components.custom.jtabbedpanewithcloseabletabs.JTabbedPaneWithCloseableTabs;
+import ui.components.displayers.messagedisplaying.messagepanels.filemessagespanels.ImageFileMessagePanel;
 import ui.components.draganddroppanel.DragAndDropPanel;
 import ui.components.draganddroppanel.DroppedFilesAdapter;
 import ui.windows.exceptions.PersonalMessageIsEmpty;
@@ -48,18 +49,12 @@ public class MainWindow extends JFrame implements MessagePrinter {
     private MessagesReaderThread readerThread;
     private final MessagePanelGenerator messagePanelGenerator;
     private final ResourceBundle rb;
-//    public static void main(String[] args) {
-//        MainWindow mw = new MainWindow(ResourceBundle.getBundle("resources/locales/guitext"));
-//        mw.pack();
-//        mw.setSize(new Dimension(500, 500));
-//        mw.setVisible(true);
-//        TextMessage msg1 = new TextMessage("Hello, i am johan", "johan", "you"),
-//                msg2 = new TextMessage("Hello, i am georgy", "georgy", "you");
-//        for (int i = 0; i < 1000; i++) {
-//            mw.printMessage(msg1);
-//            mw.printMessage(msg2);
-//        }
-//    }
+    public static void main(String[] args) {
+        MainWindow mw = new MainWindow(ResourceBundle.getBundle("resources/locales/guitext"));
+        mw.pack();
+        mw.setSize(new Dimension(500, 500));
+        mw.setVisible(true);
+    }
     private String[] getReceiversFromMessage(String msgStr){
         final String regex = "@([\\w\\d]+)\b";
         final Pattern pattern = Pattern.compile(regex, Pattern.MULTILINE);
@@ -240,6 +235,19 @@ public class MainWindow extends JFrame implements MessagePrinter {
         gbc.gridy = 1;
         gbc.weightx = 0.00001;
         this.add(sendComponent, gbc);
+
+        generalDialog.addComponentListener(new ComponentAdapter() {
+            //fixme incorrect ImageFileMessageShowing cause this code fragment
+            @Override
+            public void componentResized(ComponentEvent e) {
+                super.componentResized(e);
+                for (Component component : generalDialog.getComponents()) {
+                    if(component instanceof ImageFileMessagePanel){
+                        ((ImageFileMessagePanel)component).setPreferredHeight(e.getComponent().getHeight()/4);
+                    }
+                }
+            }
+        });
     }
 
     public MainWindow(ServerConnection connection, ResourceBundle rb) {
@@ -277,6 +285,29 @@ public class MainWindow extends JFrame implements MessagePrinter {
         messagePanelGenerator = new MessagePanelGenerator(rb);
         init();
         this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        messageSender = new MessageSender() {
+            //empty message sender for debuging UI
+            @Override
+            public void sendMessage(Message msg) throws IOException {
+
+            }
+
+            @Override
+            public boolean isClosed() {
+                return false;
+            }
+
+            @Override
+            public boolean isOpen() {
+                return false;
+            }
+
+            @Override
+            public void close() throws IOException {
+
+            }
+        };
+        this.myUserName = "TestUserName";
     }
 
     synchronized public void printMessage(Message msg) {
@@ -319,6 +350,18 @@ public class MainWindow extends JFrame implements MessagePrinter {
         synchronized (privateDialogs){
             if (!privateDialogs.containsKey(username)) {
                 JPanel privateDialogPanel = new JPanel();
+                privateDialogPanel.addComponentListener(new ComponentAdapter() {
+                    //fixme incorrect ImageFileMessageShowing cause this code fragment
+                    @Override
+                    public void componentResized(ComponentEvent e) {
+                        super.componentResized(e);
+                        for (Component component : privateDialogPanel.getComponents()) {
+                            if(component instanceof ImageFileMessagePanel){
+                                ((ImageFileMessagePanel)component).setPreferredHeight(e.getComponent().getHeight()/4);
+                            }
+                        }
+                    }
+                });
                 privateDialogPanel.setLayout(new BoxLayout(privateDialogPanel, BoxLayout.Y_AXIS));
                 privateDialogs.put(username, privateDialogPanel);
                 dialogsTappedPane.addCloseableTab(username, new JScrollPane(privateDialogPanel));

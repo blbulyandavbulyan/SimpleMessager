@@ -35,7 +35,6 @@ public class Client {
         }
     }
     public static void main(String[] args) throws IOException {
-        //TODO add read server address and server ports from command line arguments
         Integer serverPort = null;
         String serverAddress = null;
         ResourceBundle commandLineRb = ResourceBundle.getBundle("resources/locales/command_line_interface");

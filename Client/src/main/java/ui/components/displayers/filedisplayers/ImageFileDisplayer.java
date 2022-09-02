@@ -16,11 +16,16 @@ public class ImageFileDisplayer extends FileDisplayer {
     public ImageFileDisplayer(File f) {
         super(f, new ViewImageWindow(f));
         ImageIcon imageIcon = ((ViewImageWindow)this.detailsWindow).getImageIcon();
-        miniatureArea = new MiniatureImageArea(imageIcon, 50);
+        miniatureArea = new MiniatureImageArea(imageIcon, 50, false);
         miniatureArea.addMouseListener(fileDisplayerMouseProcessor);
         this.add(miniatureArea);
         highlightBorder = new LineBorder(Color.BLUE, 5);
+    }
 
+    @Override
+    public void setPreferredHeight(int preferredHeight) {
+        super.setPreferredHeight(preferredHeight);
+        miniatureArea.setPreferredHeight(preferredHeight);
     }
 
     @Override

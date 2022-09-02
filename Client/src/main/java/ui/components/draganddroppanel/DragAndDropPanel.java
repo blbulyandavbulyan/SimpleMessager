@@ -9,6 +9,8 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DropTarget;
 import java.awt.dnd.DropTargetDropEvent;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -23,8 +25,24 @@ public class DragAndDropPanel extends JPanel {
     private final Set<DroppedFilesListener> droppedFilesListeners = new HashSet<>();
     public DragAndDropPanel(JComponent whenNoDropComponent){
         me = this;
+
         droppedFilesPanel = new JPanel();
-        droppedFilesPanel.setLayout(new FlowLayout());
+        droppedFilesPanel.setLayout(new WrapLayout());
+        JScrollPane jScrollPane = new JScrollPane(droppedFilesPanel);
+        jScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        jScrollPane.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                for (Component component :  droppedFilesPanel.getComponents()) {
+                    if(component instanceof FileDisplayer)
+                        ((FileDisplayer)component).setPreferredHeight(e.getComponent().getHeight() - 5);
+                }
+                droppedFilesPanel.setMaximumSize(new Dimension(e.getComponent().getWidth() - 5, -1));
+                droppedFilesPanel.revalidate();
+
+            }
+        });
+
         this.setLayout(cardLayout);
         DropTarget dropTarget = new DropTarget(){
             @Override
@@ -34,7 +52,7 @@ public class DragAndDropPanel extends JPanel {
                     for(File droppedFile : (List<File>)( evt.getTransferable().getTransferData(DataFlavor.javaFileListFlavor)) ){
                         if(FileDisplayerGenerator.isThisFileHasValidFormat(droppedFile)){
                             FileDisplayer fileDisplayer = FileDisplayerGenerator.getFileDsiplayer(droppedFile);
-                            fileDisplayer.setDropTarget(this);
+
                             droppedFilesPanel.add(fileDisplayer);
                             droppedFilesSet.add(droppedFile);
                             fileDisplayer.setRemoveFromDragAndDropPanelAction(()->{
@@ -78,8 +96,9 @@ public class DragAndDropPanel extends JPanel {
             }
         };
         this.setDropTarget(dropTarget);
+        jScrollPane.setDropTarget(dropTarget);
         whenNoDropComponent.setDropTarget(dropTarget);
-        this.add("droppedFilesPanel", droppedFilesPanel);
+        this.add("droppedFilesPanel", jScrollPane);
         this.add("whenNoDropComponent", whenNoDropComponent);
         cardLayout.show(this, "whenNoDropComponent");
     }
