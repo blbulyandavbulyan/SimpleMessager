@@ -44,7 +44,7 @@ public class Server {
         );
         helpForArguments.put(
                 "--listen-address",
-                "Использование: --listen-address %address%, где %address% - ip адресс, на котором будет принимать соединения сервер."
+                "Использование: --listen-address %address%, где %address% - ip адрес, на котором будет принимать соединения сервер."
         );
         helpForArguments.put(
                 "--backlog",

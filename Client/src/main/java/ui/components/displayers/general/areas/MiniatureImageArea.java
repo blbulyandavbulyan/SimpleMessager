@@ -8,6 +8,8 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 
 public class MiniatureImageArea extends AbstractImageArea {
+    //fixme MiniatureImageArea is larger than imageIcon, it shows in the main window in messages
+
     protected int preferredHeight;
     protected MiniatureImageArea(ImageIcon imageIcon, Dimension miniatureSize, boolean enableImageAutoScale) {
         super(imageIcon);

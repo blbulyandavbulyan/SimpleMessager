@@ -3,6 +3,7 @@ package ui.components.displayers.filedisplayers;
 import javax.swing.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ResourceBundle;
 
 public class FileDisplayerMouseProcessor extends MouseAdapter {
     private Runnable removeFromDragAndDropPanelAction;
@@ -10,9 +11,9 @@ public class FileDisplayerMouseProcessor extends MouseAdapter {
     private Runnable showDetailsWindowAction;
     private JPopupMenu rightClickContextMenu;
     public FileDisplayerMouseProcessor(){
-        rightClickContextMenu = new JPopupMenu();
-        //todo insert here text from properties for menu item
+        //todo add loading text from properties file (resource bundle)
         JMenuItem removeFileMenuItem = new JMenuItem("Удалить");
+        rightClickContextMenu = new JPopupMenu();
         removeFileMenuItem.addActionListener(e -> {
             if(removeFromDragAndDropPanelAction!=null)removeFromDragAndDropPanelAction.run();
         });

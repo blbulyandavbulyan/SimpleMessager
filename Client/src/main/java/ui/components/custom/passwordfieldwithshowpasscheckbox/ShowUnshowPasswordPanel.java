@@ -14,10 +14,24 @@ public class ShowUnshowPasswordPanel extends JPanel {
     }
     public ShowUnshowPasswordPanel(JPasswordField jPasswordField){
         passwordField = jPasswordField;
-        this.setLayout(new BorderLayout());
         showPassword = new ShowUnshowCheckBox();
-        this.add(passwordField, BorderLayout.CENTER);
-        this.add(showPassword, BorderLayout.EAST);
+        this.setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.weighty = 1;
+        gbc.weightx = 1;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 2;
+        gbc.fill = GridBagConstraints.BOTH;
+        //gbc.insets = new Insets(3, 3, 3, 3);
+        this.add(passwordField, gbc);
+        //gbc.insets = new Insets(0, 3, 3,3);
+        gbc.weighty = 1;
+        gbc.weightx = 0.005;
+        gbc.gridx = 3;
+        gbc.gridy = 0;
+        gbc.gridwidth = 1;
+        this.add(showPassword, gbc);
         showPassword.setBackground(passwordField.getBackground());
         this.setBorder(passwordField.getBorder());
         passwordField.setBorder(null);

@@ -1,4 +1,4 @@
-package ui.windows;
+package ui.windows.connecting;
 
 import ui.components.custom.textfieldswithghosttext.JTextFiledWithGhostText;
 

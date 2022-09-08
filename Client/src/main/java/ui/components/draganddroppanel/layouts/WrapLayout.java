@@ -1,4 +1,4 @@
-package ui.components.draganddroppanel;
+package ui.components.draganddroppanel.layouts;
 
 import java.awt.*;
 import javax.swing.JScrollPane;
@@ -93,7 +93,6 @@ public class WrapLayout extends FlowLayout
 		//  When the container width = 0, the preferred width of the container
 		//  has not yet been calculated so lets ask for the maximum.
 
-		int targetWidth = target.getSize().width;
 		Container container = target;
 
 		while (container.getSize().width == 0 && container.getParent() != null)
@@ -101,7 +100,7 @@ public class WrapLayout extends FlowLayout
 			container = container.getParent();
 		}
 
-		targetWidth = container.getSize().width;
+		int targetWidth = container.getSize().width;
 
 		if (targetWidth == 0)
 			targetWidth = Integer.MAX_VALUE;

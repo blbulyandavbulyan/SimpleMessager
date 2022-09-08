@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
+import java.util.ResourceBundle;
 
 public abstract class FileDisplayer extends JPanel {
     protected boolean detailsWindowIsShow;
@@ -11,7 +12,9 @@ public abstract class FileDisplayer extends JPanel {
     protected final JFrame detailsWindow;
     protected final JLabel fileNameLabel;
     protected FileDisplayerMouseProcessor fileDisplayerMouseProcessor;
+//    protected final ResourceBundle rb;
     protected FileDisplayer(File f, JFrame detailsWindow){
+//        this.rb = rb;
         fileNameLabel = new JLabel(f.getName());
         this.detailsWindow = detailsWindow;
         if(detailsWindow != null){

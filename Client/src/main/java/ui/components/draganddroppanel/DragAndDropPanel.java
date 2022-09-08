@@ -2,6 +2,8 @@ package ui.components.draganddroppanel;
 
 import ui.components.displayers.filedisplayers.FileDisplayer;
 import ui.components.displayers.generators.FileDisplayerGenerator;
+import ui.components.draganddroppanel.interfaces.DroppedFilesListener;
+import ui.components.draganddroppanel.layouts.WrapLayout;
 
 import javax.swing.*;
 import java.awt.*;
@@ -116,7 +118,7 @@ public class DragAndDropPanel extends JPanel {
         droppedFilesListeners.remove(droppedFilesListener);
     }
     private void notifyAllDroppedFilesSetListeners(String droppedFilesListenerMethodName, Object ... args) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-        Method droppedFileListenerMethod = null;
+        Method droppedFileListenerMethod;
         if(args != null){
             Class[] argClasses = new Class[args.length];
             for(int i = 0; i < argClasses.length; i++){

@@ -1,4 +1,4 @@
-package ui.windows;
+package ui.windows.main;
 
 
 import general.message.filemessages.FileMessage;
@@ -14,7 +14,7 @@ import serverconnection.interfaces.MessagePrinter;
 import ui.components.custom.jtabbedpanewithcloseabletabs.JTabbedPaneWithCloseableTabs;
 import ui.components.displayers.messagedisplaying.messagepanels.filemessagespanels.ImageFileMessagePanel;
 import ui.components.draganddroppanel.DragAndDropPanel;
-import ui.components.draganddroppanel.DroppedFilesAdapter;
+import ui.components.draganddroppanel.interfaces.DroppedFilesAdapter;
 import ui.windows.exceptions.PersonalMessageIsEmpty;
 import ui.components.custom.textfieldswithghosttext.JTextFiledWithGhostText;
 import ui.components.displayers.messagedisplaying.exceptions.UnknownMessageTypeException;
@@ -43,9 +43,9 @@ public class MainWindow extends JFrame implements MessagePrinter {
     //private JButton sendBtn;
     private JTabbedPaneWithCloseableTabs dialogsTappedPane;
     private final HashMap<String, JPanel> privateDialogs = new HashMap<>();
-    private MessageSender messageSender;
+    private final MessageSender messageSender;
     private JPanel generalDialog;
-    private String myUserName;
+    private final String myUserName;
     private MessagesReaderThread readerThread;
     private final MessagePanelGenerator messagePanelGenerator;
     private final ResourceBundle rb;
@@ -213,7 +213,22 @@ public class MainWindow extends JFrame implements MessagePrinter {
         dialogsTappedPane = new JTabbedPaneWithCloseableTabs(privateDialogs::remove, rb.getString("mainWindow.closeDialogTooltipText"));
         generalDialog = new JPanel();
         generalDialog.setLayout(new BoxLayout(generalDialog, BoxLayout.Y_AXIS));
-        dialogsTappedPane.addTab(rb.getString("mainWindow.generalChatTabname"), new JScrollPane(generalDialog));
+
+        JScrollPane generalDialogScrollPane = new JScrollPane(generalDialog);
+        generalDialogScrollPane.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                super.componentResized(e);
+                for (Component component : generalDialog.getComponents()) {
+                    if(component instanceof ImageFileMessagePanel){
+                        ((ImageFileMessagePanel)component).setPreferredHeight(e.getComponent().getHeight()/4);
+                    }
+                }
+            }
+        });
+        String generalChatTabName = rb.getString("mainWindow.generalChatTabname");
+        this.setTitle("%s@%s".formatted(myUserName, generalChatTabName));
+        dialogsTappedPane.addTab(generalChatTabName, generalDialogScrollPane);
         this.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.weighty = 1;
@@ -236,18 +251,6 @@ public class MainWindow extends JFrame implements MessagePrinter {
         gbc.weightx = 0.00001;
         this.add(sendComponent, gbc);
 
-        generalDialog.addComponentListener(new ComponentAdapter() {
-            //fixme incorrect ImageFileMessageShowing cause this code fragment
-            @Override
-            public void componentResized(ComponentEvent e) {
-                super.componentResized(e);
-                for (Component component : generalDialog.getComponents()) {
-                    if(component instanceof ImageFileMessagePanel){
-                        ((ImageFileMessagePanel)component).setPreferredHeight(e.getComponent().getHeight()/4);
-                    }
-                }
-            }
-        });
     }
 
     public MainWindow(ServerConnection connection, ResourceBundle rb) {
@@ -288,7 +291,7 @@ public class MainWindow extends JFrame implements MessagePrinter {
         messageSender = new MessageSender() {
             //empty message sender for debuging UI
             @Override
-            public void sendMessage(Message msg) throws IOException {
+            public void sendMessage(Message msg) {
 
             }
 
@@ -350,8 +353,11 @@ public class MainWindow extends JFrame implements MessagePrinter {
         synchronized (privateDialogs){
             if (!privateDialogs.containsKey(username)) {
                 JPanel privateDialogPanel = new JPanel();
-                privateDialogPanel.addComponentListener(new ComponentAdapter() {
-                    //fixme incorrect ImageFileMessageShowing cause this code fragment
+
+                privateDialogPanel.setLayout(new BoxLayout(privateDialogPanel, BoxLayout.Y_AXIS));
+                privateDialogs.put(username, privateDialogPanel);
+                JScrollPane privateDialogScrollPane = new JScrollPane(privateDialogPanel);
+                privateDialogScrollPane.addComponentListener(new ComponentAdapter() {
                     @Override
                     public void componentResized(ComponentEvent e) {
                         super.componentResized(e);
@@ -362,9 +368,8 @@ public class MainWindow extends JFrame implements MessagePrinter {
                         }
                     }
                 });
-                privateDialogPanel.setLayout(new BoxLayout(privateDialogPanel, BoxLayout.Y_AXIS));
-                privateDialogs.put(username, privateDialogPanel);
-                dialogsTappedPane.addCloseableTab(username, new JScrollPane(privateDialogPanel));
+                dialogsTappedPane.addCloseableTab(username, privateDialogScrollPane);
+
                 return privateDialogPanel;
             }
             else return privateDialogs.get(username);

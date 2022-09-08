@@ -5,7 +5,7 @@ import general.loginorregisterrequest.LoginOrRegisterRequest;
 import threads.exceptions.ServerThreadException;
 import threads.exceptions.loginorregisterexceptions.UserManagerIsNullException;
 import userprocessing.UserManager;
-import userprocessing.exceptions.UserIsAlreadyExistsException;
+import userprocessing.exceptions.UserAlreadyExistsException;
 
 import java.io.*;
 import java.net.Socket;
@@ -83,7 +83,7 @@ public class LoginOrRegisterClientThread extends ClientServerThread{
                     terminate();
                     throw e;
                 }
-                catch (UserIsAlreadyExistsException e){
+                catch (UserAlreadyExistsException e){
                     clientObjOut.writeUTF("USER ALREADY EXISTS");
                     clientObjOut.flush();
                     triesCounter++;

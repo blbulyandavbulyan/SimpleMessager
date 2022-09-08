@@ -9,6 +9,7 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.util.ResourceBundle;
 
 public class ImageFileDisplayer extends FileDisplayer {
     private final MiniatureImageArea miniatureArea;

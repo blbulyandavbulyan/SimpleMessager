@@ -1,4 +1,4 @@
-package ui.windows;
+package ui.windows.connecting;
 import general.loginorregisterrequest.LoginOrRegisterRequest;
 import ui.components.custom.textfieldswithghosttext.JPasswordFieldWithGhostText;
 import ui.components.custom.textfieldswithghosttext.JTextFiledWithGhostText;
@@ -30,30 +30,30 @@ public class LoginOrRegisterWindow extends JFrame implements LoginOrRegisterResu
     private final Object notifyObject;
     private final ResourceBundle rb;
 
-//    public static void main(String[] args) {
-//        LoginOrRegisterWindow low = new LoginOrRegisterWindow(ResourceBundle.getBundle("resources/locales/guitext"));
-//        low.setVisible(true);
-//        while (true) {
-//            LoginOrRegisterRequest lor = low.getLoginOrRegisterResult();
-//            switch (lor.getOperation()) {
-//                case LOGIN -> {
-//                    System.out.println("Вы собрались входить.");
-//                    System.out.printf("Имя пользователя: %s\n", lor.getUserName());
-//                    System.out.printf("Пароль: %s\n", lor.getPassword());
-//                }
-//                case REGISTER -> {
-//                    System.out.println("Вы собрались регистрироваться.");
-//                    System.out.printf("Имя пользователя: %s\n", lor.getUserName());
-//                    System.out.printf("Пароль: %s\n", lor.getPassword());
-//                }
-//                case CANCELLED -> {
-//                    System.out.println("Операция отменена.");
-//                    return;
-//                }
-//            }
-//        }
-//
-//    }
+    public static void main(String[] args) {
+        LoginOrRegisterWindow low = new LoginOrRegisterWindow(ResourceBundle.getBundle("resources/locales/guitext"));
+        low.setVisible(true);
+        while (true) {
+            LoginOrRegisterRequest lor = low.getLoginOrRegisterResult();
+            switch (lor.getOperation()) {
+                case LOGIN -> {
+                    System.out.println("Вы собрались входить.");
+                    System.out.printf("Имя пользователя: %s\n", lor.getUserName());
+                    System.out.printf("Пароль: %s\n", lor.getPassword());
+                }
+                case REGISTER -> {
+                    System.out.println("Вы собрались регистрироваться.");
+                    System.out.printf("Имя пользователя: %s\n", lor.getUserName());
+                    System.out.printf("Пароль: %s\n", lor.getPassword());
+                }
+                case CANCELLED -> {
+                    System.out.println("Операция отменена.");
+                    return;
+                }
+            }
+        }
+
+    }
 
     private void initSubmitBtn() {
         ActionListener submitBtnPress = e -> {
@@ -158,7 +158,7 @@ public class LoginOrRegisterWindow extends JFrame implements LoginOrRegisterResu
         this.setMinimumSize(new Dimension(500, 200));
         this.setSize(this.getMinimumSize());
         //this.setResizable(false);
-        this.setTitle(rb.getString("logiOrRegisterWindow.windowCaption"));
+        this.setTitle(rb.getString("loginOrRegisterWindow.windowCaption"));
     }
 
     private void createUIComponents() {

@@ -4,9 +4,10 @@ import common.enumerationtostream.ConvertEnumerationToStream;
 import serverconnection.ServerConnection;
 import serverconnection.exceptions.RegisterOrLoginInterrupted;
 import serverconnection.exceptions.ServerHasDBProblemsException;
-import ui.windows.ConnectToServerDialog;
-import ui.windows.MainWindow;
-import ui.windows.LoginOrRegisterWindow;
+import ui.common.DisplayErrors;
+import ui.windows.connecting.ConnectToServerDialog;
+import ui.windows.main.MainWindow;
+import ui.windows.connecting.LoginOrRegisterWindow;
 
 import javax.swing.*;
 import java.io.*;
@@ -117,12 +118,15 @@ public class Client {
                     repeat = false;
                 }
                 catch (ServerHasDBProblemsException e){
-
+                    e.printStackTrace();
+                    DisplayErrors.showErrorMessage(null, "connectionErrors.serverHasDbProblem", "errorMessages.connectionErrors.serverHasDbProblem", guiRb);
+                    
                 }
                 catch (RegisterOrLoginInterrupted ignored){
                     repeat = false;
                 }
                 catch(ConnectException | UnknownHostException e){
+                    e.printStackTrace();
                     JOptionPane.showMessageDialog(null, e instanceof UnknownHostException ? guiRb.getString("errorMessages.UnknownHost") + ' ' + e.getMessage() : e.getMessage(), guiRb.getString("errorCaptions.ConnectionError"), JOptionPane.ERROR_MESSAGE);
                     ConnectToServerDialog connectToServerDialog = new ConnectToServerDialog(guiRb);
                     connectToServerDialog.setVisible(true);

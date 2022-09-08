@@ -1,4 +1,4 @@
-package ui.components.draganddroppanel;
+package ui.components.draganddroppanel.interfaces;
 
 import java.io.File;
 

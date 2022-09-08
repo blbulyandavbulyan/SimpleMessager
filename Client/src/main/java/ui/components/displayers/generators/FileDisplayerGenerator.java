@@ -14,14 +14,26 @@ import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
 
 public class FileDisplayerGenerator {
+//    private final ResourceBundle rb;
     private static final Map<String, Class<? extends FileDisplayer>> mimeToClassMap = new HashMap<>();
     static {
         mimeToClassMap.put("image/png", ImageFileDisplayer.class);
         mimeToClassMap.put("image/jpeg", ImageFileDisplayer.class);
         mimeToClassMap.put("text/plain", TextFileDisplayer.class);
     }
+
+//    public FileDisplayerGenerator(ResourceBundle rb) {
+//        this.rb = rb;
+//        if(rb == null)throw new NullPointerException();
+//        //fixme
+//        if(!rb.containsKey("menu.delete"))
+//            throw new MissingResourceException("Error creation FileDisplayerGenerator", rb.getBaseBundleName() , "menu.delete");
+//    }
+
     public static boolean isThisFormatValid(DataFlavor dataFlavor){
         return mimeToClassMap.containsKey(dataFlavor.getMimeType());
     }
@@ -45,10 +57,10 @@ public class FileDisplayerGenerator {
     }
 
     public static void main(String[] args) throws IOException {
-        JFrame jFrame = new JFrame();
-        jFrame.getContentPane().add(getFileDsiplayer(new File("/home/david/solution.txt")));
-        jFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        jFrame.pack();
-        jFrame.setVisible(true);
+//        JFrame jFrame = new JFrame();
+//        jFrame.getContentPane().add(getFileDsiplayer(new File("/home/david/solution.txt")));
+//        jFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+//        jFrame.pack();
+//        jFrame.setVisible(true);
     }
 }
