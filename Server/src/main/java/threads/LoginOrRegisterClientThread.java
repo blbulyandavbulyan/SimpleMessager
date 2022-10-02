@@ -2,23 +2,23 @@ package threads;
 
 import common.Server;
 import general.loginorregisterrequest.LoginOrRegisterRequest;
+import threads.exceptions.ServerThreadException;
+import threads.exceptions.loginorregisterexceptions.UserManagerIsNullException;
 import userprocessing.UserManager;
+import userprocessing.exceptions.UserAlreadyExistsException;
 
 import java.io.*;
 import java.net.Socket;
 import java.net.SocketException;
 import java.sql.SQLException;
 
-public class LoginOrRegisterClientThread extends Thread{
-    private final Socket clientSocket;
-    private boolean terminated = false;
+public class LoginOrRegisterClientThread extends ClientServerThread{
     private static UserManager userManager;
     public static final int TRIES_LIMIT = 10;
-    public LoginOrRegisterClientThread(Socket clientSocket, UserManager userManager)throws NullPointerException{
+    public LoginOrRegisterClientThread(Socket clientSocket, UserManager userManager)throws ServerThreadException {
+        super((clientSocket));
+        if(userManager == null)throw new UserManagerIsNullException();
         LoginOrRegisterClientThread.userManager = userManager;
-        if(clientSocket == null)throw new NullPointerException("client is null");
-        if(clientSocket.isClosed())throw new RuntimeException("client is closed");
-        this.clientSocket = clientSocket;
         start();
     }
 
@@ -26,29 +26,28 @@ public class LoginOrRegisterClientThread extends Thread{
     public void run() {
         try{
             Server.serverPrint("Поток для регистрации/логина клиента %d запущен\n".formatted( clientSocket.hashCode()));
-            ObjectOutputStream objOut = new ObjectOutputStream(clientSocket.getOutputStream());
-            ObjectInputStream objIn = new ObjectInputStream(clientSocket.getInputStream());
+            initObjStreams();
             int triesCounter = 0;
-            while (!terminated){
+            while (!isTerminated()){
                 if(triesCounter > TRIES_LIMIT){
-                    objOut.writeUTF("TRIES LIMIT EXCEEDED");
-                    objOut.flush();
+                    clientObjOut.writeUTF("TRIES LIMIT EXCEEDED");
+                    clientObjOut.flush();
                     terminate();
                     break;
                 }
-                LoginOrRegisterRequest lor = (LoginOrRegisterRequest)objIn.readObject();
+                LoginOrRegisterRequest lor = (LoginOrRegisterRequest)clientObjIn.readObject();
                 String userName = lor.getUserName().trim();
                 String password = lor.getPassword().trim();
                 if(lor.getOperation() != LoginOrRegisterRequest.OperationType.CANCELLED){
                     if(userName.isBlank() || userName.isEmpty()){
-                        objOut.writeUTF("USER NAME IS EMPTY");
-                        objOut.flush();
+                        clientObjOut.writeUTF("USER NAME IS EMPTY");
+                        clientObjOut.flush();
                         terminate();
                         break;
                     }
                     if(password.isBlank() || password.isEmpty()){
-                        objOut.writeUTF("PASSWORD IS EMPTY");
-                        objOut.flush();
+                        clientObjOut.writeUTF("PASSWORD IS EMPTY");
+                        clientObjOut.flush();
                         terminate();
                         break;
                     }
@@ -56,25 +55,19 @@ public class LoginOrRegisterClientThread extends Thread{
                 try{
                     switch (lor.getOperation()){
                         case REGISTER -> {
-                            if (!userManager.userIsExist(userName)) {
-                                userManager.registerUser(userName, password);
-                                Server.addClient(new ClientServerThread(clientSocket, objOut, objIn, userName));
-                                Server.serverPrint("Клиент %s зарегистрировался\n".formatted(userName));
-                                return;
-                            } else {
-                                objOut.writeUTF("USER ALREADY EXISTS");
-                                objOut.flush();
-                                triesCounter++;
-                            }
+                            userManager.registerUser(userName, password);
+                            Server.addClient(new ClientProcessingServerThread(this, userName));
+                            Server.serverPrint("Клиент %s зарегистрировался\n".formatted(userName));
+                            return;
                         }
                         case LOGIN -> {
                             if (userManager.login(userName, password)) {
-                                Server.addClient(new ClientServerThread(clientSocket, objOut, objIn, userName));
+                                Server.addClient(new ClientProcessingServerThread(this, userName));
                                 Server.serverPrint("Клиент %s вошёл\n".formatted(userName));
                                 return;
                             } else {
-                                objOut.writeUTF("INVALID LOGIN OR PASSWORD");
-                                objOut.flush();
+                                clientObjOut.writeUTF("INVALID LOGIN OR PASSWORD");
+                                clientObjOut.flush();
                                 triesCounter++;
                             }
                         }
@@ -85,10 +78,15 @@ public class LoginOrRegisterClientThread extends Thread{
                     }
                 }
                 catch (SQLException e){
-                    objOut.writeUTF("SERVER HAS DataBase problem");
-                    objOut.flush();
+                    clientObjOut.writeUTF("SERVER HAS DataBase problem");
+                    clientObjOut.flush();
                     terminate();
                     throw e;
+                }
+                catch (UserAlreadyExistsException e){
+                    clientObjOut.writeUTF("USER ALREADY EXISTS");
+                    clientObjOut.flush();
+                    triesCounter++;
                 }
 
             }
@@ -97,21 +95,16 @@ public class LoginOrRegisterClientThread extends Thread{
             if(!clientSocket.isClosed())e.printStackTrace();
         }
         catch (IOException | SQLException | ClassNotFoundException e){
+            try {
+                clientSocket.close();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
             e.printStackTrace();
         }
         finally {
             Server.removeUnregisteredClient(this);
             Server.serverPrint("Поток для регистрации/логина клиента %d завершён\n".formatted( clientSocket.hashCode()));
-        }
-    }
-    public void terminate(){
-        terminated = true;
-        if(!clientSocket.isClosed()) {
-            try {
-                clientSocket.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
     }
 }

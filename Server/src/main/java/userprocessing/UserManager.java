@@ -1,6 +1,7 @@
 package userprocessing;
 
-import userprocessing.exceptions.UserIsAlreadyExistsException;
+import userprocessing.exceptions.UserAlreadyExistsException;
+import userprocessing.exceptions.UserDoesNotExistsException;
 
 import java.io.Closeable;
 import java.nio.charset.StandardCharsets;
@@ -24,6 +25,8 @@ public class UserManager implements Closeable {
         }
     }
 
+    private final PreparedStatement selectUserRankFromDB;
+
     public static void main(String[] args) throws SQLException {
         Connection conn = DriverManager.getConnection("jdbc:sqlite:server.db");
         UserManager userManager = new UserManager(conn);
@@ -39,9 +42,10 @@ public class UserManager implements Closeable {
         selectCountUserWhereUserNameFromDB = connection.prepareStatement("SELECT COUNT(*) FROM users WHERE UserName = ?");
         insertUserToDB = connection.prepareStatement("INSERT INTO users(UserName, PassHash) VALUES(?, ?)");
         deleteUserFromDB = connection.prepareStatement("DELETE FROM users WHERE UserName = ?");
+        selectUserRankFromDB = connection.prepareStatement("SELECT UserRank FROM users WHERE UserName = ?");
     }
     private void initDB() throws SQLException {
-        statement.execute("CREATE TABLE IF NOT EXISTS users (UserID INTEGER, UserName TEXT NOT NULL UNIQUE, PassHash TEXT NOT NULL, PRIMARY KEY(UserID AUTOINCREMENT));");
+        statement.execute("CREATE TABLE IF NOT EXISTS users (UserID INTEGER, UserName TEXT NOT NULL UNIQUE, PassHash TEXT NOT NULL, UserRank INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(UserID AUTOINCREMENT));");
     }
     static private String getPasswordHash(String password){
         byte []hash;
@@ -73,21 +77,39 @@ public class UserManager implements Closeable {
         }
         else return false;
     }
-     synchronized public int registerUser(String userName, String password) throws SQLException {
+     synchronized public void registerUser(String userName, String password) throws SQLException, UserAlreadyExistsException {
         if(!userIsExist(userName)){
             insertUserToDB.setObject(1, userName);
             insertUserToDB.setObject(2, getPasswordHash(password));
             insertUserToDB.execute();
-            return insertUserToDB.getUpdateCount();
+            //return insertUserToDB.getUpdateCount();
         }
-        else throw new UserIsAlreadyExistsException("Ошибка регистрации пользователя, пользователь уже сущетсвует.");
+        else throw new UserAlreadyExistsException();
     }
     synchronized public int removeUser(String userName) throws SQLException {
         deleteUserFromDB.setObject(1, userName);
         deleteUserFromDB.execute();
         return deleteUserFromDB.getUpdateCount();
     }
+    synchronized public int getUserRank(String userName) throws SQLException {
+        if(userIsExist(userName)){
+            selectUserRankFromDB.setObject(1, userName);
+            ResultSet resultSet = selectUserRankFromDB.executeQuery();
+            if(resultSet.next()){
+                int userRank = resultSet.getInt(1);
+                resultSet.close();
+                return userRank;
+            }
+            else throw new UnknownError();
+        }
+        else throw new UserDoesNotExistsException();
+    }
+    synchronized public void banUser(String userName){
 
+    }
+    synchronized public void unbanUser(String userName){
+
+    }
     @Override
     public void close() {
         try {
@@ -120,5 +142,9 @@ public class UserManager implements Closeable {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    public void changePassword(String userName, String password) {
+
     }
 }

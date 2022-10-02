@@ -24,6 +24,7 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="AndroidClient" target="1.8" />
       <module name="TestBots" target="17" />
     </bytecodeTargetLevel>
   </component>
