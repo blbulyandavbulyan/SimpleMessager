@@ -1,4 +1,4 @@
-package general.servermessages;
+package general.message.servermessages;
 
 import general.message.Message;
 

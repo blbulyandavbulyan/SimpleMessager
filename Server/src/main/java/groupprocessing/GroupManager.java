@@ -1,6 +1,6 @@
 package groupprocessing;
 
-import userprocessing.Privilege;
+import general.privileges.Privilege;
 
 public class GroupManager {
     public GroupManager(){

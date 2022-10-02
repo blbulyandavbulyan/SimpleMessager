@@ -31,7 +31,7 @@ public class TextFileDisplayer extends FileDisplayer {
 //    }
 
     @Override
-    protected void selectOrDeselectFile() {
+    public void selectOrDeselectFile() {
         isFileSelected = !isFileSelected;
         if(isFileSelected)fileNameLabel.setForeground(Color.BLUE);
         else fileNameLabel.setForeground(Color.BLUE);

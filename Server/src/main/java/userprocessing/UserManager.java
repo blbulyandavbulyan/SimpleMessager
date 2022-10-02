@@ -45,7 +45,7 @@ public class UserManager implements Closeable {
         selectUserRankFromDB = connection.prepareStatement("SELECT UserRank FROM users WHERE UserName = ?");
     }
     private void initDB() throws SQLException {
-        statement.execute("CREATE TABLE IF NOT EXISTS users (UserID INTEGER, UserName TEXT NOT NULL UNIQUE, PassHash TEXT NOT NULL, UserRank INTEGER NOT NULL, PRIMARY KEY(UserID AUTOINCREMENT));");
+        statement.execute("CREATE TABLE IF NOT EXISTS users (UserID INTEGER, UserName TEXT NOT NULL UNIQUE, PassHash TEXT NOT NULL, UserRank INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(UserID AUTOINCREMENT));");
     }
     static private String getPasswordHash(String password){
         byte []hash;
@@ -142,5 +142,9 @@ public class UserManager implements Closeable {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    public void changePassword(String userName, String password) {
+
     }
 }

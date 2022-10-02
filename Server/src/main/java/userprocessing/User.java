@@ -1,5 +1,6 @@
 package userprocessing;
 
+import general.privileges.Privilege;
 import groupprocessing.Group;
 
 import java.util.HashSet;
@@ -27,8 +28,8 @@ public class User {
     public int getRank(){
         return rank + (group != null ? group.getRank() : 0);
     }
-    public boolean hasPrivelege(Privilege privilege){
-        return privileges.contains(privilege) || (group == null || group.hasPrivilege(privilege));
+    public boolean hasPrivilege(Privilege privilege){
+        return privileges.contains(privilege) || privileges.contains(Privilege.ALL) || (group == null || group.hasPrivilege(privilege) || group.hasPrivilege(Privilege.ALL));
     }
 
     public void setRank(int rank) {

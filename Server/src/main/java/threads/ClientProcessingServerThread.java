@@ -1,13 +1,13 @@
 package threads;
 
 import java.io.*;
-import java.net.Socket;
 import java.net.SocketException;
 import java.util.Objects;
 
 import general.message.Message;
-import general.message.textmessage.TextMessage;
 import common.Server;
+import general.message.servermessages.ServerErrorMessage;
+
 public class ClientProcessingServerThread extends ClientServerThread{
     private final String clientName;
 
@@ -29,12 +29,18 @@ public class ClientProcessingServerThread extends ClientServerThread{
             while(!isTerminated()){
                 try{
                     Message msg = (Message) clientObjIn.readObject();
-                   // Server.printMessage(msg);
-                    if(msg.getReceiver()!= null){
+                    if(!msg.getSender().equals(clientName)){
+                        sendMessage(new ServerErrorMessage(clientName, msg.getSender(), ServerErrorMessage.ServerErrorCode.YOUR_USERNAME_ON_SERVER_AND_IN_YOUR_MESSAGE_ARE_NOT_EQUAL));
+                    }
+                    else if(msg.getReceiver()!= null){
                         String msgReceiver = msg.getReceiver();
-                        if(!Objects.equals(msgReceiver, clientName)){
+                        if(msgReceiver.equalsIgnoreCase("SERVER")){
+                            //todo проверить является ли msg экземпляром ServerCommand, если да, то приступить к её обработке
+                            //if()
+                        }
+                        else if(!Objects.equals(msgReceiver, clientName)){
                             if(Server.IsClientExists(msgReceiver)) Server.getClient(msgReceiver).sendMessage(msg);
-                            else sendMessage(new TextMessage(String.format("Ошибка доставки сообщения, нет такого пользователя %s на сервере!", msgReceiver), "SERVER", clientName));
+                            else sendMessage(new ServerErrorMessage(clientName, msgReceiver, ServerErrorMessage.ServerErrorCode.MESSAGE_DELIVERY_ERROR_NO_USER_WITH_THIS_NAME));
                         }
                     }
                     else{

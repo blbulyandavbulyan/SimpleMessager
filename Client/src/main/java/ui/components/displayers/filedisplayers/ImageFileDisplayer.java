@@ -18,7 +18,6 @@ public class ImageFileDisplayer extends FileDisplayer {
         super(f, new ViewImageWindow(f));
         ImageIcon imageIcon = ((ViewImageWindow)this.detailsWindow).getImageIcon();
         miniatureArea = new MiniatureImageArea(imageIcon, 50, false);
-        miniatureArea.addMouseListener(fileDisplayerMouseProcessor);
         this.add(miniatureArea);
         highlightBorder = new LineBorder(Color.BLUE, 5);
     }
@@ -30,7 +29,7 @@ public class ImageFileDisplayer extends FileDisplayer {
     }
 
     @Override
-    protected void selectOrDeselectFile() {
+    public void selectOrDeselectFile() {
         isFileSelected = !isFileSelected;
         if(isFileSelected)miniatureArea.setBorder(highlightBorder);
         else miniatureArea.setBorder(null);

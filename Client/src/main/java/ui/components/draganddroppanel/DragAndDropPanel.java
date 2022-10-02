@@ -1,5 +1,7 @@
 package ui.components.draganddroppanel;
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import ui.components.displayers.filedisplayers.FileDisplayer;
 import ui.components.displayers.generators.FileDisplayerGenerator;
 import ui.components.draganddroppanel.interfaces.DroppedFilesListener;
@@ -19,13 +21,13 @@ import java.lang.reflect.Method;
 import java.util.*;
 import java.util.List;
 
-public class DragAndDropPanel extends JPanel {
+public class DragAndDropPanel extends JPanel implements DroppedFileControllerInterface {
     private final CardLayout cardLayout = new CardLayout();
-    private final Set<File> droppedFilesSet = new HashSet<>();
+    private final Map<File, FileDisplayer> droppedFilesMap = new HashMap<>();
     private final JPanel droppedFilesPanel;
     private final DragAndDropPanel me;
     private final Set<DroppedFilesListener> droppedFilesListeners = new HashSet<>();
-    public DragAndDropPanel(JComponent whenNoDropComponent){
+    public DragAndDropPanel(JComponent whenNoDropComponent, ResourceBundle resourceBundle){
         me = this;
 
         droppedFilesPanel = new JPanel();
@@ -46,6 +48,7 @@ public class DragAndDropPanel extends JPanel {
         });
 
         this.setLayout(cardLayout);
+        FileDisplayersMouseProcessor fileDisplayersMouseProcessor = new FileDisplayersMouseProcessor(this, resourceBundle);
         DropTarget dropTarget = new DropTarget(){
             @Override
             public synchronized void drop(DropTargetDropEvent evt) {
@@ -54,37 +57,18 @@ public class DragAndDropPanel extends JPanel {
                     for(File droppedFile : (List<File>)( evt.getTransferable().getTransferData(DataFlavor.javaFileListFlavor)) ){
                         if(FileDisplayerGenerator.isThisFileHasValidFormat(droppedFile)){
                             FileDisplayer fileDisplayer = FileDisplayerGenerator.getFileDsiplayer(droppedFile);
-
+                            JMenuItem removeFileMenuItem = new JMenuItem(resourceBundle.getString("menu.delete"));
+                            JPopupMenu rightClickContextMenu = new JPopupMenu();
+                            rightClickContextMenu.add(removeFileMenuItem);
+                            fileDisplayer.setComponentPopupMenu(rightClickContextMenu);
                             droppedFilesPanel.add(fileDisplayer);
-                            droppedFilesSet.add(droppedFile);
-                            fileDisplayer.setRemoveFromDragAndDropPanelAction(()->{
-                                droppedFilesSet.remove(droppedFile);
-                                droppedFilesPanel.remove(fileDisplayer);
-                                droppedFilesPanel.invalidate();
-                                droppedFilesPanel.revalidate();
-                                if(droppedFilesSet.isEmpty()){
-                                    cardLayout.show(me, "whenNoDropComponent");
-                                    try {
-                                        notifyAllDroppedFilesSetListeners("droppedFilesSetCleared");
-                                    } catch (InvocationTargetException | IllegalAccessException |
-                                             NoSuchMethodException e) {
-                                        throw new RuntimeException(e);
-                                    }
-                                }
-                                else {
-                                    try {
-                                        notifyAllDroppedFilesSetListeners("droppedFileDeleted", droppedFile);
-                                    } catch (InvocationTargetException | IllegalAccessException |
-                                             NoSuchMethodException e) {
-                                        throw new RuntimeException(e);
-                                    }
-                                }
-                            });
+                            droppedFilesMap.put(droppedFile, fileDisplayer);
+                            fileDisplayer.addMouseListener(fileDisplayersMouseProcessor);
                             notifyAllDroppedFilesSetListeners("droppedFileAdded", droppedFile);
                         }
 
                     }
-                    if(!droppedFilesSet.isEmpty()){
+                    if(!droppedFilesMap.isEmpty()){
                         evt.dropComplete(true);
                         droppedFilesPanel.revalidate();
                         cardLayout.show(me, "droppedFilesPanel");
@@ -105,11 +89,11 @@ public class DragAndDropPanel extends JPanel {
         cardLayout.show(this, "whenNoDropComponent");
     }
     public Set<File> getDroppedFiles(){
-        return droppedFilesSet;
+        return droppedFilesMap.keySet();
     }
 
     public boolean hasDroppedFiles(){
-        return !droppedFilesSet.isEmpty();
+        return !droppedFilesMap.isEmpty();
     }
     public void addDroppedFilesSetListener(DroppedFilesListener droppedFilesListener){
         if(droppedFilesListener != null) droppedFilesListeners.add(droppedFilesListener);
@@ -132,18 +116,47 @@ public class DragAndDropPanel extends JPanel {
             else droppedFileListenerMethod.invoke(droppedFilesListener);
         }
     }
+    public void removeFileDisplayerFromDragAndDropPanel(FileDisplayer fileDisplayerForRemove){
+        File fileForRemove = fileDisplayerForRemove.getDisplayedFile();
+        droppedFilesPanel.remove(fileDisplayerForRemove);
+        droppedFilesMap.remove(fileForRemove);
+        droppedFilesPanel.invalidate();
+        droppedFilesPanel.revalidate();
+        if(droppedFilesMap.isEmpty()){
+            cardLayout.show(me, "whenNoDropComponent");
+            try {
+                notifyAllDroppedFilesSetListeners("droppedFilesSetCleared");
+            } catch (InvocationTargetException | IllegalAccessException |
+                     NoSuchMethodException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        else {
+            try {
+                notifyAllDroppedFilesSetListeners("droppedFileDeleted", fileForRemove);
+            } catch (InvocationTargetException | IllegalAccessException |
+                     NoSuchMethodException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+    @Override
+    public Collection<FileDisplayer> getFileDisplayers() {
+        return droppedFilesMap.values();
+    }
+
     public void clearDroppedFiles(){
         droppedFilesPanel.removeAll();
         droppedFilesPanel.revalidate();
-        droppedFilesSet.clear();
+        droppedFilesMap.clear();
         cardLayout.show(this, "whenNoDropComponent");
     }
-    public static void main(String[] args) {
-        JFrame jFrame = new JFrame();
-        jFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        DragAndDropPanel dragAndDropPanel = new DragAndDropPanel(new JLabel("Перетащите файлы сюда"));
-        jFrame.getContentPane().add(dragAndDropPanel);
-        jFrame.pack();
-        jFrame.setVisible(true);
-    }
+//    public static void main(String[] args) {
+//        JFrame jFrame = new JFrame();
+//        jFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+//        DragAndDropPanel dragAndDropPanel = new DragAndDropPanel(new JLabel("Перетащите файлы сюда"));
+//        jFrame.getContentPane().add(dragAndDropPanel);
+//        jFrame.pack();
+//        jFrame.setVisible(true);
+//    }
 }

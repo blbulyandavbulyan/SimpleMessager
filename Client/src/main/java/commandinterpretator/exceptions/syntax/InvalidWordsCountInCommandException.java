@@ -1,13 +1,14 @@
 package commandinterpretator.exceptions.syntax;
 
-public class InvalidArgumentsCountException extends SyntaxErrorException{
-    private final int requireArgumentsCount;
+public class InvalidWordsCountInCommandException extends SyntaxErrorException{
+    private final int requireWordsCount;
 
-    public InvalidArgumentsCountException(int requireArgumentsCount) {
-        this.requireArgumentsCount = requireArgumentsCount;
+    public InvalidWordsCountInCommandException(int requireWordsCount) {
+        super(numberOfInvalidWord);
+        this.requireWordsCount = requireWordsCount;
     }
 
-    public int getRequireArgumentsCount() {
-        return requireArgumentsCount;
+    public int getRequireWordsCount() {
+        return requireWordsCount;
     }
 }

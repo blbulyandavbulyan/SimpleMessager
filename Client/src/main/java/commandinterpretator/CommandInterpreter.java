@@ -1,17 +1,9 @@
 package commandinterpretator;
 
-import commandinterpretator.exceptions.permissions.PermissionsDeniedException;
-import commandinterpretator.exceptions.permissions.TargetGroupHasRankMoreThanExecutor;
-import commandinterpretator.exceptions.permissions.TargetUserHasRankMoreThanExecutorException;
-import commandinterpretator.exceptions.syntax.InvalidArgumentsCountException;
+import commandinterpretator.exceptions.syntax.InvalidWordsCountInCommandException;
 import commandinterpretator.exceptions.syntax.InvalidCommandException;
 import commandinterpretator.exceptions.syntax.SyntaxErrorException;
-import groupprocessing.GroupManager;
-import userprocessing.Privilege;
-import userprocessing.User;
-import userprocessing.UserManager;
-
-import java.sql.SQLException;
+import general.message.servercommand.ServerCommand;
 
 public class CommandInterpreter {
     /*
@@ -31,21 +23,16 @@ public class CommandInterpreter {
     * add user %username% %password% - добавляет пользователя с именем %username% и паролем %password%
     * add group %groupname% - добавляет группу с именем %groupname%
     * add user %username% to group %groupname% - добавляет пользователя с именем %username% в группу с именем %groupname%
-    *
-    *
+    *Команда grant
+    * grant all privileges for user %username%
+    * grant all privileges for group %groupname%
+    * grant privileges DELETE_USER ADD_USER ... for user %username%
     */
-    private final UserManager userManager;
-    private final GroupManager groupManager;
-    public CommandInterpreter(UserManager userManager, GroupManager groupManager){
-        if(userManager == null)
-            throw new NullPointerException("userManager is null!");
-        if(groupManager == null)
-            throw new NullPointerException("groupManager is null!");
-        this.userManager = userManager;
-        this.groupManager = groupManager;
+    public CommandInterpreter(){
+
     }
     // todo add command processing
-    public void interpretCommand(String command, User executor, boolean checkPrivileges, boolean checkRank) throws SQLException, PermissionsDeniedException, SyntaxErrorException {
+    public ServerCommand interpretCommand(String command, String executorName) throws SyntaxErrorException {
         String[] splittingCommand = command.split(" ");
         int processedArgumentNumber = 0;
         switch (splittingCommand[processedArgumentNumber]){
@@ -53,60 +40,31 @@ public class CommandInterpreter {
                 splittingCommand[processedArgumentNumber] = splittingCommand[processedArgumentNumber].toLowerCase();
                 boolean isBanCommand = splittingCommand[processedArgumentNumber].equals("ban");
                 if(splittingCommand.length != 3)
-                    throw new InvalidArgumentsCountException(3);
+                    throw new InvalidWordsCountInCommandException(3);
                 switch (splittingCommand[++processedArgumentNumber]){
-                    case "user", "USER"->{
-                        if(!checkPrivileges || executor.hasPrivilege(isBanCommand ? Privilege.BAN_USER : Privilege.UNBAN_USER)){
-                            String targetUserName = splittingCommand[++processedArgumentNumber];
-                            if (!checkRank || executor.getRank() > userManager.getUserRank(targetUserName)) {
-                                if (isBanCommand) userManager.banUser(targetUserName);
-                                else userManager.unbanUser(targetUserName);
-                            }
-                            throw new TargetUserHasRankMoreThanExecutorException();
-                        }
-                        else throw new PermissionsDeniedException();
+                    case "user", "USER", "group", "GROUP"->{
+                        ServerCommand.CommandID commandID =
+                                splittingCommand[processedArgumentNumber].equalsIgnoreCase("user") ? ServerCommand.CommandID.BAN_USER : ServerCommand.CommandID.BAN_GROUP;
+
+                        String target = splittingCommand[++processedArgumentNumber];
+                        return new ServerCommand(executorName, target, commandID, null);
                     }
-                    case "group", "GROUP" ->{
-                        if(!checkPrivileges || executor.hasPrivilege(isBanCommand ? Privilege.BAN_GROUP : Privilege.UNBAN_GROUP)){
-                            String targetGroupName = splittingCommand[++processedArgumentNumber];
-                            if (!checkRank || executor.getRank() > groupManager.getGroupRank(targetGroupName)) {
-                                if(isBanCommand)groupManager.banGroup(targetGroupName);
-                                else groupManager.unbanGroup(targetGroupName);
-                            }
-                            throw new TargetGroupHasRankMoreThanExecutor();
-                        }
-                        else throw new PermissionsDeniedException();
-                    }
-                    default -> throw new SyntaxErrorException();
+                    default -> throw new SyntaxErrorException(processedArgumentNumber);
                 }
 
             }
             case "delete", "DELETE"->{
-
                 if(splittingCommand.length != 3)
-                    throw new InvalidArgumentsCountException(3);
+                    throw new InvalidWordsCountInCommandException(3);
                 switch (splittingCommand[++processedArgumentNumber]){
-                    case "user", "USER"->{
-                        if(!checkPrivileges || executor.hasPrivilege(Privilege.DELETE_USER)){
-                            String targetUserName = splittingCommand[++processedArgumentNumber];
-                            if (!checkRank || executor.getRank() > userManager.getUserRank(targetUserName)) {
-                                userManager.removeUser(targetUserName);
-                            }
-                            throw new TargetUserHasRankMoreThanExecutorException();
-                        }
-                        else throw new PermissionsDeniedException();
+                    case "user", "USER", "group", "GROUP"->{
+                        ServerCommand.CommandID commandID =
+                                splittingCommand[processedArgumentNumber].equalsIgnoreCase("user") ? ServerCommand.CommandID.DELETE_USER : ServerCommand.CommandID.DELETE_GROUP;
+
+                        String target = splittingCommand[++processedArgumentNumber];
+                        return new ServerCommand(executorName, target, commandID, null);
                     }
-                    case "group", "GROUP" ->{
-                        if(!checkPrivileges || executor.hasPrivilege(Privilege.DELETE_GROUP)){
-                            String targetGroupName = splittingCommand[++processedArgumentNumber];
-                            if (!checkRank || executor.getRank() > groupManager.getGroupRank(targetGroupName)) {
-                                groupManager.removeGroup(targetGroupName);
-                            }
-                            throw new TargetGroupHasRankMoreThanExecutor();
-                        }
-                        else throw new PermissionsDeniedException();
-                    }
-                    default -> throw new SyntaxErrorException();
+                    default -> throw new SyntaxErrorException(processedArgumentNumber);
                 }
             }
             /*
@@ -116,47 +74,51 @@ public class CommandInterpreter {
             */
             case "change", "CHANGE"->{
                 if(splittingCommand.length < 3)
-                    throw new InvalidArgumentsCountException(3);
+                    throw new InvalidWordsCountInCommandException(3);
                 switch (splittingCommand[++processedArgumentNumber]){
                     case "user", "USER"->{
                         if(splittingCommand.length != 7)
-                            throw new InvalidArgumentsCountException(7);
+                            throw new InvalidWordsCountInCommandException(7);
                         switch (splittingCommand[++processedArgumentNumber]){
-                            case "name", "NAME"->{
-
-                            }
-                            case "password", "PASSWORD"->{
+                            case "name", "NAME", "password", "PASSWORD"->{
+                                ServerCommand.CommandID commandID =
+                                        splittingCommand[processedArgumentNumber].equalsIgnoreCase("name") ? ServerCommand.CommandID.RENAME_USER : ServerCommand.CommandID.CHANGE_PASSWORD;
                                 if(splittingCommand[++processedArgumentNumber].equalsIgnoreCase("for")){
                                     String targetUserName = splittingCommand[++processedArgumentNumber];
                                     if(splittingCommand[++processedArgumentNumber].equalsIgnoreCase("on"))
-                                        throw new SyntaxErrorException();
-                                    if(executor.getUserName().equals(targetUserName) ||
-                                            !checkPrivileges ||
-                                            (
-                                                    executor.hasPrivilege(Privilege.CHANGE_PASSWORD_FOR_ANOTHER_USER) &&
-                                                    (!checkRank || executor.getRank() > userManager.getUserRank(targetUserName))
-                                            )
-                                    ) userManager.changePassword(targetUserName, splittingCommand[++processedArgumentNumber]);
-                                    else throw new PermissionsDeniedException();
+                                        throw new SyntaxErrorException(--processedArgumentNumber);
+                                    return new ServerCommand(executorName, targetUserName, commandID, splittingCommand[++processedArgumentNumber]);
                                 }
-                                else throw new SyntaxErrorException();
+                                else throw new SyntaxErrorException(--processedArgumentNumber);
 
                             }
                         }
                     }
                     case "password", "PASSWORD"->{
                         if(splittingCommand.length != 3)
-                            throw new InvalidArgumentsCountException(3);
-                        userManager.changePassword(executor.getUserName(), splittingCommand[++processedArgumentNumber]);
+                            throw new InvalidWordsCountInCommandException(3);
+                        return new ServerCommand(executorName, executorName, ServerCommand.CommandID.CHANGE_PASSWORD, splittingCommand[++processedArgumentNumber]);
                     }
-                    default -> throw new SyntaxErrorException();
+                    default -> throw new SyntaxErrorException(processedArgumentNumber);
                 }
 
             }
             case "grant", "GRANT"->{
+                switch (splittingCommand[++processedArgumentNumber]){
+                    case "all", "ALL" ->{
+                        if(splittingCommand[++processedArgumentNumber].equalsIgnoreCase("privileges")){
 
+                        }
+                        else throw new SyntaxErrorException(--processedArgumentNumber);
+                    }
+                    case "privileges", "PRIVILEGES" ->{
+
+                    }
+                    default -> throw new SyntaxErrorException(processedArgumentNumber);
+                }
             }
-            default -> throw new InvalidCommandException();
+            default -> throw new SyntaxErrorException(processedArgumentNumber);
         }
+        return null;
     }
 }

@@ -86,7 +86,7 @@ public class MainWindow extends JFrame implements MessagePrinter {
 
     private void init() {
         messageField = new JTextFiledWithGhostText(rb.getString("mainWindow.messageFieldGhostText"));
-        DragAndDropPanel dragAndDropPanel = new DragAndDropPanel(messageField);
+        DragAndDropPanel dragAndDropPanel = new DragAndDropPanel(messageField, this.rb);
         JComponent sendComponent = null;
         JButton sendBtn = new JButton(rb.getString("mainWindow.sendButton"));
         ActionListener sendMessage = (e) -> {

@@ -1,7 +1,11 @@
 package ui.components.draganddroppanel;
 
-import java.io.File;
+import ui.components.displayers.filedisplayers.FileDisplayer;
 
-public interface RemoveFileFromDragAndDropPanel {
-    void removeFileFromDragAndDropPanel(File fileForRemove);
+import java.io.File;
+import java.util.Collection;
+
+public interface DroppedFileControllerInterface {
+    void removeFileDisplayerFromDragAndDropPanel(FileDisplayer fileDisplayer);
+    Collection<FileDisplayer> getFileDisplayers();
 }

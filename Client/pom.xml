@@ -43,6 +43,11 @@
             <version>1.14</version>
         </dependency>
 <!--        <dependency>-->
+<!--            <groupId>com.google.guava</groupId>-->
+<!--            <artifactId>guava</artifactId>-->
+<!--            <version>31.1-jre</version>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
 <!--            <groupId>com.jetbrains.intellij.java</groupId>-->
 <!--            <artifactId>java-compiler-ant-tasks</artifactId>-->
 <!--            <version>221.5787.30</version>-->

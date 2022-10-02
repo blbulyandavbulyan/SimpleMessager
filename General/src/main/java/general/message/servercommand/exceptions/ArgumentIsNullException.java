@@ -1,4 +1,4 @@
 package general.message.servercommand.exceptions;
 
-public class ArgumentIsNullException {
+public class ArgumentIsNullException extends CommandException{
 }

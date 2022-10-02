@@ -1,2 +1,4 @@
-package general.message.servercommand.exceptions;public class CommandExceptions {
+package general.message.servercommand.exceptions;
+
+public class CommandException extends RuntimeException{
 }

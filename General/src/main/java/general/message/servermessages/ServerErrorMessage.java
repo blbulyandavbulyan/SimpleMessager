@@ -1,4 +1,4 @@
-package general.servermessages;
+package general.message.servermessages;
 
 import java.io.Serial;
 
@@ -14,12 +14,17 @@ public class ServerErrorMessage extends ServerMessage{
         NO_TARGET_GROUP
     }
     private final ServerErrorCode serverErrorCode;
-    private final 
-    public ServerErrorMessage(String receiver, ServerErrorCode serverErrorCode) {
+    private final String additionalInformationAboutError;
+    public ServerErrorMessage(String receiver, String additionalInformationAboutError, ServerErrorCode serverErrorCode) {
         super(receiver);
         this.serverErrorCode = serverErrorCode;
+        this.additionalInformationAboutError = additionalInformationAboutError;
     }
     public ServerErrorCode getServerErrorCode() {
         return serverErrorCode;
+    }
+
+    public String getAdditionalInformationAboutError() {
+        return additionalInformationAboutError;
     }
 }
