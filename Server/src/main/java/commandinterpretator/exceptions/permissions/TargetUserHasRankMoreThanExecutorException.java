@@ -1,4 +1,0 @@
-package commandinterpretator.exceptions.permissions;
-
-public class TargetUserHasRankMoreThanExecutorException extends PermissionsDeniedException{
-}
