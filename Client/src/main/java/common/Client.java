@@ -1,10 +1,13 @@
 package common;
 
+import common.enumerationtostream.ConvertEnumerationToStream;
 import serverconnection.ServerConnection;
 import serverconnection.exceptions.RegisterOrLoginInterrupted;
-import ui.windows.ConnectToServerDialog;
-import ui.windows.MainWindow;
-import ui.windows.LoginOrRegisterWindow;
+import serverconnection.exceptions.ServerHasDBProblemsException;
+import ui.common.DisplayErrors;
+import ui.windows.connecting.ConnectToServerDialog;
+import ui.windows.main.MainWindow;
+import ui.windows.connecting.LoginOrRegisterWindow;
 
 import javax.swing.*;
 import java.io.*;
@@ -13,8 +16,6 @@ import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
-
-import static ui.common.DisplayErrors.showErrorMessage;
 
 public class Client {
     static ResourceBundle guiRb = ResourceBundle.getBundle("resources/locales/guitext");
@@ -35,7 +36,6 @@ public class Client {
         }
     }
     public static void main(String[] args) throws IOException {
-        //TODO add read server address and server ports from command line arguments
         Integer serverPort = null;
         String serverAddress = null;
         ResourceBundle commandLineRb = ResourceBundle.getBundle("resources/locales/command_line_interface");
@@ -117,10 +117,16 @@ public class Client {
                     mw.setVisible(true);
                     repeat = false;
                 }
+                catch (ServerHasDBProblemsException e){
+                    e.printStackTrace();
+                    DisplayErrors.showErrorMessage(null, "connectionErrors.serverHasDbProblem", "errorMessages.connectionErrors.serverHasDbProblem", guiRb);
+                    
+                }
                 catch (RegisterOrLoginInterrupted ignored){
                     repeat = false;
                 }
                 catch(ConnectException | UnknownHostException e){
+                    e.printStackTrace();
                     JOptionPane.showMessageDialog(null, e instanceof UnknownHostException ? guiRb.getString("errorMessages.UnknownHost") + ' ' + e.getMessage() : e.getMessage(), guiRb.getString("errorCaptions.ConnectionError"), JOptionPane.ERROR_MESSAGE);
                     ConnectToServerDialog connectToServerDialog = new ConnectToServerDialog(guiRb);
                     connectToServerDialog.setVisible(true);

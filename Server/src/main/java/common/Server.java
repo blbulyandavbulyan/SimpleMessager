@@ -1,8 +1,8 @@
 package common;
 
-import general.message.textmessage.TextMessage;
-import threads.ClientServerThread;
+import threads.ClientProcessingServerThread;
 import threads.LoginOrRegisterClientThread;
+import threads.exceptions.ServerThreadException;
 import userprocessing.UserManager;
 
 import java.io.*;
@@ -16,7 +16,7 @@ public class Server {
     private static int PORT = 1234;
     private static String listenAddress = "localhost";
     private static int backlog = 0;
-    static final Map<String, ClientServerThread> clients = new HashMap<>();
+    static final Map<String, ClientProcessingServerThread> clients = new HashMap<>();
     static final Set<LoginOrRegisterClientThread> unregisteredUsers = new HashSet<>();
     static final Map<String, String> helpForArguments = new HashMap<>();
     static final PrintStream sPs = System.out;
@@ -44,7 +44,7 @@ public class Server {
         );
         helpForArguments.put(
                 "--listen-address",
-                "Использование: --listen-address %address%, где %address% - ip адресс, на котором будет принимать соединения сервер."
+                "Использование: --listen-address %address%, где %address% - ip адрес, на котором будет принимать соединения сервер."
         );
         helpForArguments.put(
                 "--backlog",
@@ -62,7 +62,7 @@ public class Server {
 
 
 
-    public static void addClient(ClientServerThread clientThread){
+    public static void addClient(ClientProcessingServerThread clientThread){
         clients.put(clientThread.getClientName(), clientThread);
     }
 
@@ -70,11 +70,11 @@ public class Server {
         return clients.containsKey(clientName);
     }
 
-    public static Collection<ClientServerThread> getClients(){
+    public static Collection<ClientProcessingServerThread> getClients(){
         return clients.values();
     }
 
-    public static ClientServerThread getClient(String clientName){
+    public static ClientProcessingServerThread getClient(String clientName){
         return clients.get(clientName);
     }
 
@@ -83,7 +83,7 @@ public class Server {
     }
 
     public static void clearClients(){
-        for (ClientServerThread client : Server.getClients()) {
+        for (ClientProcessingServerThread client : Server.getClients()) {
             client.terminate();
         }
         Server.clients.clear();
@@ -178,17 +178,33 @@ public class Server {
             System.exit(RunErrorCodes.RUN_ERROR_CODES.INVALID_ARGUMENT_COUNTS.errorCode);
             return;
         }
-        try(ServerSocket sSocket = new ServerSocket(); UserManager userManager = new UserManager(java.sql.DriverManager.getConnection(String.format("jdbc:%s:%s", dbmsName, dbSubname)))){
+        try(ServerSocket sSocket = new ServerSocket();
+            UserManager userManager = new UserManager(java.sql.DriverManager.getConnection(String.format("jdbc:%s:%s", dbmsName, dbSubname)))){
             InetSocketAddress bindAddr = new InetSocketAddress(listenAddress, PORT);
             sSocket.bind(bindAddr, backlog);
             while(true){
                 System.out.println("Сервер запущен, ожидаю подключения....");
-                Socket client = sSocket.accept();
-                System.out.println("Новое соединение установлено!");
-                unregisteredUsers.add(new LoginOrRegisterClientThread(client, userManager));
+                Socket client = null;
+                try{
+                    client = sSocket.accept();
+                    System.out.println("Новое соединение установлено!");
+                    unregisteredUsers.add(new LoginOrRegisterClientThread(client, userManager));
+                }
+                catch (ServerThreadException e){
+                    e.printStackTrace();
+                    try{
+                        if(client != null)client.close();
+                    }
+                    catch (IOException ignore){
+
+                    }
+                }
+                catch (Throwable throwable){
+                    throwable.printStackTrace();
+                }
             }
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
+        } catch (SQLException e) {
+            e.printStackTrace();
         } finally {
             for (var client : clients.values())client.terminate();
             for(var unnamedClient : unregisteredUsers)unnamedClient.terminate();
