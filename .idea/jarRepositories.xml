@@ -17,11 +17,6 @@
       <option name="url" value="${parent.basedir}/lib" />
     </remote-repository>
     <remote-repository>
-      <option name="id" value="localrep" />
-      <option name="name" value="local repository" />
-      <option name="url" value="file://$PROJECT_DIR$/Server/lib" />
-    </remote-repository>
-    <remote-repository>
       <option name="id" value="jetbrains.3rdparty" />
       <option name="name" value="jetbrains.3rdparty" />
       <option name="url" value="https://cache-redirector.jetbrains.com/intellij-dependencies" />
@@ -40,6 +35,11 @@
       <option name="id" value="localrep" />
       <option name="name" value="local repository" />
       <option name="url" value="../lib" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="localrep" />
+      <option name="name" value="local repository" />
+      <option name="url" value="file://$PROJECT_DIR$/Server/lib" />
     </remote-repository>
     <remote-repository>
       <option name="id" value="localrep" />
@@ -68,13 +68,13 @@
     </remote-repository>
     <remote-repository>
       <option name="id" value="localrep" />
-      <option name="name" value="org.blbulyandavbulyan" />
-      <option name="url" value="file:${parent.basedir}/lib" />
+      <option name="name" value="local repository" />
+      <option name="url" value="file://$PROJECT_DIR$/Client/lib" />
     </remote-repository>
     <remote-repository>
       <option name="id" value="localrep" />
-      <option name="name" value="local repository" />
-      <option name="url" value="file://$PROJECT_DIR$/Client/lib" />
+      <option name="name" value="org.blbulyandavbulyan" />
+      <option name="url" value="file:${parent.basedir}/lib" />
     </remote-repository>
     <remote-repository>
       <option name="id" value="localrep" />
