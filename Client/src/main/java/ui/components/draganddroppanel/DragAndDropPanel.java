@@ -1,7 +1,5 @@
 package ui.components.draganddroppanel;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
 import ui.components.displayers.filedisplayers.FileDisplayer;
 import ui.components.displayers.generators.FileDisplayerGenerator;
 import ui.components.draganddroppanel.interfaces.DroppedFilesListener;

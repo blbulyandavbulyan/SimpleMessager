@@ -1,7 +1,6 @@
 package commandinterpretator;
 
 import commandinterpretator.exceptions.syntax.InvalidWordsCountInCommandException;
-import commandinterpretator.exceptions.syntax.InvalidCommandException;
 import commandinterpretator.exceptions.syntax.SyntaxErrorException;
 import general.message.servercommand.ServerCommand;
 

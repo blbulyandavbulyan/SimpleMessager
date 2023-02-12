@@ -1,10 +1,11 @@
 package commandinterpretator.exceptions.syntax;
 
-public class InvalidWordsCountInCommandException extends SyntaxErrorException{
+import commandinterpretator.exceptions.CommandInterpreterException;
+
+public class InvalidWordsCountInCommandException extends CommandInterpreterException {
     private final int requireWordsCount;
 
     public InvalidWordsCountInCommandException(int requireWordsCount) {
-        super(numberOfInvalidWord);
         this.requireWordsCount = requireWordsCount;
     }
 
