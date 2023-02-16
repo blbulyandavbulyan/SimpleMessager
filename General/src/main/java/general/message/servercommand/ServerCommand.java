@@ -69,4 +69,16 @@ public class ServerCommand extends Message {
         this.argument = argument;
         selfCheck();
     }
+
+    public Object getArgument() {
+        return argument;
+    }
+
+    public Object getTarget() {
+        return target;
+    }
+
+    public CommandID getCommandID() {
+        return commandID;
+    }
 }
