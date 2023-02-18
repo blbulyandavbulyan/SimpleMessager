@@ -3,7 +3,7 @@ package common;
 import threads.ClientProcessingServerThread;
 import threads.LoginOrRegisterClientThread;
 import threads.exceptions.ServerThreadException;
-import userprocessing.UserManager;
+import manager.userprocessing.UserManager;
 
 import java.io.*;
 import java.net.InetSocketAddress;

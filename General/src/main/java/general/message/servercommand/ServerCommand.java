@@ -1,72 +1,112 @@
 package general.message.servercommand;
 
 import general.message.Message;
-import general.message.servercommand.exceptions.ArgumentIsNullException;
-import general.message.servercommand.exceptions.InvalidCommandArgumentsException;
-import general.message.servercommand.exceptions.TargetIsNullOrEmptyException;
+import general.message.servercommand.exceptions.*;
 
 import java.io.Serial;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.function.Predicate;
 
 public class ServerCommand extends Message {
     @Serial
     private static final long serialVersionUID = -6937887162749222729L;
-    public enum CommandID{
-        BAN_USER,
-        BAN_GROUP,
-        ADD_USER,
-        ADD_GROUP,
-        DELETE_USER,
-        DELETE_USERS,
+    public enum TargetType{
+        USER(String.class),
+        USERS(String[].class),
+        GROUP(String.class),
+        GROUPS(String[].class);
+        final Class<?> requiredTargetDataType;
+        TargetType(Class<?> requiredTargetDataType){
+            this.requiredTargetDataType = requiredTargetDataType;
+        }
 
-        DELETE_GROUP,
-        DELETE_GROUPS,
-        RENAME_USER,
-        RENAME_GROUP,
-        CHANGE_PASSWORD,
-        CHANGE_USER_RANK,
-        CHANGE_GROUP_RANK
-
-    }
-    private final Object argument;
-    private final Object target;
-    private final CommandID commandID;
-    public void selfCheck(){
-        switch (commandID){
-            //single targets command check
-            case ADD_USER, DELETE_USER, ADD_GROUP, DELETE_GROUP, BAN_USER, BAN_GROUP->{
-                if(target != null && !(target instanceof String))throw new InvalidCommandArgumentsException(null, String.class);
-                if(target == null ||  ((String)target).isBlank()) throw new TargetIsNullOrEmptyException();
-
-            }
-            case CHANGE_GROUP_RANK, CHANGE_USER_RANK->{
-                if(target != null && !(target instanceof String))throw new InvalidCommandArgumentsException(null, String.class);
-                if(target == null ||  ((String)target).isBlank()) throw new TargetIsNullOrEmptyException();
-                if(!(argument instanceof Integer))throw new InvalidCommandArgumentsException(null, Integer.class);
-            }
-            case RENAME_GROUP, RENAME_USER, CHANGE_PASSWORD -> {
-                if(target != null && !(target instanceof String))throw new InvalidCommandArgumentsException(null, String.class);
-                if(target == null ||  ((String)target).isBlank()) throw new TargetIsNullOrEmptyException();
-                if(argument == null)throw new ArgumentIsNullException();
-                if(!(argument instanceof String))throw new InvalidCommandArgumentsException(null, String.class);
-
-            }
-            case DELETE_USERS, DELETE_GROUPS ->{
-                if(target == null) throw new TargetIsNullOrEmptyException();
-                if(target instanceof String[] targets) {
-                    for (int i = 0; i < targets.length; i++) {
-                        if(targets[i] == null || targets[i].isBlank())throw new TargetIsNullOrEmptyException(i);
-                    }
-                }
-                else throw new InvalidCommandArgumentsException(null, String[].class);
-
-            }
+        public Class<?> getRequiredTargetDataType() {
+            return requiredTargetDataType;
         }
     }
-    public ServerCommand(String sender, Object target, CommandID commandID, Object argument) {
+    public enum Command {
+        BAN,
+        ADD,
+        DELETE,
+        RENAME(String.class, TargetType.USER, TargetType.GROUP),
+        CHANGE_PASSWORD(String.class, TargetType.USER);
+        final Set<TargetType> avaliableCommands;
+        final Class<?> requiredArgumentType;
+//        CHANGE_USER_RANK,
+//        CHANGE_GROUP_RANK
+        Command(Class<?> requiredArgumentType, TargetType ... avaliableCommands){
+            this.avaliableCommands = new HashSet<>();
+            this.avaliableCommands.addAll(Arrays.stream(avaliableCommands).toList());
+            this.requiredArgumentType = requiredArgumentType;
+        }
+        Command(){
+            this(null, TargetType.values());
+        }
+        public boolean containsTarget(TargetType targetType){
+            return avaliableCommands.contains(targetType);
+        }
+    }
+
+    private final Object argument;
+    private final Object target;
+    private final Command command;
+    private final TargetType targetType;
+    private static HashMap<Class, Predicate<Object>> objectCheckers;
+    static {
+        objectCheckers = new HashMap<>();
+        objectCheckers.put(String.class, obj -> {
+            String str = (String) obj;
+            return !(str != null && str.isBlank() && str.isEmpty());
+        });
+        objectCheckers.put(String[].class, obj -> {
+            String []strs = (String[]) obj;
+            Predicate<Object> checkString = objectCheckers.get(String.class);
+            if(strs == null || strs.length == 0)return false;
+            for (String str : strs) {
+                if (!checkString.test(str)) return false;
+            }
+            return true;
+        });
+    }
+    public void selfCheck(){
+        //вначале делаем проверку основных параметров на null
+        if(command == null){
+            throw new CommandIsNullException();
+        }
+        if(targetType == null){
+            throw new TargetTypeIsNullException();
+        }
+        //проверка является ли допустимым данный тип цели для данной команды
+        if(!command.containsTarget(targetType)){
+            throw new CommandDoesNotContainThisKindOfTargetType();
+        }
+        else{
+            //если допустим, тогда проверям объект target
+            if(!targetType.requiredTargetDataType.equals(target.getClass())){
+                throw new TargetClassDoesNotEqualRequiredTargetDataType();
+            }
+            else if (!objectCheckers.get(targetType.requiredTargetDataType).test(target)){
+                throw new InvalidTargetValue();
+            }
+        }
+        //проверка на то, соответсвует ли тип аргумента для команды требуемому типу
+        if(command.requiredArgumentType != null && !command.requiredArgumentType.equals(argument.getClass())){
+            throw new ArgumentTypeIsNotEqualToRequired(command.requiredArgumentType, argument.getClass());
+        }
+        //тип соответсвует, можем проверить сам объект на корректность
+        else if(!objectCheckers.get(command.requiredArgumentType).test(argument)){
+                throw new InvalidArgumentValue();
+            }
+    }
+    public ServerCommand(String sender, Object target, Command command, TargetType targetType, Object argument) {
         super(sender, "SERVER");
-        this.commandID = commandID;
+        this.command = command;
         this.target = target;
         this.argument = argument;
+        this.targetType = targetType;
         selfCheck();
     }
 
@@ -78,7 +118,10 @@ public class ServerCommand extends Message {
         return target;
     }
 
-    public CommandID getCommandID() {
-        return commandID;
+    public Command getCommandID() {
+        return command;
+    }
+    public TargetType getTargetType(){
+        return targetType;
     }
 }

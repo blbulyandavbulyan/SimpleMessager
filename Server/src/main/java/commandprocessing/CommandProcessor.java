@@ -2,17 +2,26 @@ package commandprocessing;
 
 import commandprocessing.exceptions.PermissionsDenied;
 import general.message.servercommand.ServerCommand;
-import groupprocessing.GroupManager;
-import userprocessing.UserManager;
+import manager.ManagerInterface;
+import manager.groupprocessing.GroupManager;
+import manager.userprocessing.UserManager;
 
 import java.sql.SQLException;
+import java.util.HashMap;
 
 public class CommandProcessor {
     private UserManager userManager;
     private GroupManager groupManager;
+    private final HashMap<ServerCommand.TargetType, ManagerInterface> targetTypeToManagerInterfaceMapper;
     public CommandProcessor(UserManager userManager, GroupManager groupManager){
         this.userManager = userManager;
         this.groupManager = groupManager;
+        targetTypeToManagerInterfaceMapper = new HashMap<>();
+        //не универсальное решение, что если будет больше Manager ?
+        targetTypeToManagerInterfaceMapper.put(ServerCommand.TargetType.USER, userManager);
+        targetTypeToManagerInterfaceMapper.put(ServerCommand.TargetType.USERS, userManager);
+        targetTypeToManagerInterfaceMapper.put(ServerCommand.TargetType.GROUP, groupManager);
+        targetTypeToManagerInterfaceMapper.put(ServerCommand.TargetType.GROUPS, groupManager);
     }
     public Object processCommand(ServerCommand serverCommand){
         if(!canUserDoIt(serverCommand))
@@ -25,20 +34,11 @@ public class CommandProcessor {
     //если выполнится успешно - значит не будет исключения
     //если выполнится не успешно, значит будет исключение
     private void processCommandsWithSingleResult(ServerCommand serverCommand) throws SQLException {
-
-        switch (serverCommand.getCommandID()){
-            case ADD_USER -> {
-                if(!userManager.userIsExist((String) serverCommand.getTarget())){
-
-                }
-            }
-            case DELETE_USER -> {
-
-            }
-        }
+//
     }
     private boolean canUserDoIt(ServerCommand serverCommand){
         //fixme
         return false;
     }
+
 }

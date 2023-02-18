@@ -1,7 +1,8 @@
-package userprocessing;
+package manager.userprocessing;
 
-import userprocessing.exceptions.UserAlreadyExistsException;
-import userprocessing.exceptions.UserDoesNotExistsException;
+import manager.ManagerInterface;
+import manager.userprocessing.exceptions.UserAlreadyExistsException;
+import manager.userprocessing.exceptions.UserDoesNotExistsException;
 
 import java.io.Closeable;
 import java.nio.charset.StandardCharsets;
@@ -9,7 +10,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.*;
 
-public class UserManager implements Closeable {
+public class UserManager implements Closeable, ManagerInterface<User> {
     private final Connection connection;
     private final Statement statement;
     private final PreparedStatement selectPassHashForUserFromDB;
@@ -30,7 +31,7 @@ public class UserManager implements Closeable {
     public static void main(String[] args) throws SQLException {
         Connection conn = DriverManager.getConnection("jdbc:sqlite:server.db");
         UserManager userManager = new UserManager(conn);
-        System.out.println(userManager.removeUser("test"));
+        userManager.delete("test");
     }
     public UserManager(Connection connection) throws SQLException {
         if(connection == null)throw new NullPointerException("connection in class DBConnection is null");
@@ -63,11 +64,6 @@ public class UserManager implements Closeable {
         }
         return hexString.toString();
     }
-    public boolean userIsExist(String userName) throws SQLException {
-        selectCountUserWhereUserNameFromDB.setObject(1, userName);
-        var resultSet = selectCountUserWhereUserNameFromDB.executeQuery();
-        return resultSet.getLong(1) > 0;
-    }
     public boolean login(String userName, String password) throws SQLException {
         selectPassHashForUserFromDB.setObject(1, userName);
         var resultSet = selectPassHashForUserFromDB.executeQuery();
@@ -78,7 +74,8 @@ public class UserManager implements Closeable {
         else return false;
     }
      synchronized public void registerUser(String userName, String password) throws SQLException, UserAlreadyExistsException {
-        if(!userIsExist(userName)){
+        if(!exists(userName)){
+//            add(new User(userName, ));
             insertUserToDB.setObject(1, userName);
             insertUserToDB.setObject(2, getPasswordHash(password));
             insertUserToDB.execute();
@@ -86,13 +83,8 @@ public class UserManager implements Closeable {
         }
         else throw new UserAlreadyExistsException();
     }
-    synchronized public int removeUser(String userName) throws SQLException {
-        deleteUserFromDB.setObject(1, userName);
-        deleteUserFromDB.execute();
-        return deleteUserFromDB.getUpdateCount();
-    }
     synchronized public int getUserRank(String userName) throws SQLException {
-        if(userIsExist(userName)){
+        if(exists(userName)){
             selectUserRankFromDB.setObject(1, userName);
             ResultSet resultSet = selectUserRankFromDB.executeQuery();
             if(resultSet.next()){
@@ -103,12 +95,6 @@ public class UserManager implements Closeable {
             else throw new UnknownError();
         }
         else throw new UserDoesNotExistsException();
-    }
-    synchronized public void banUser(String userName){
-
-    }
-    synchronized public void unbanUser(String userName){
-
     }
     @Override
     public void close() {
@@ -146,5 +132,43 @@ public class UserManager implements Closeable {
 
     public void changePassword(String userName, String password) {
 
+    }
+
+    @Override
+    synchronized public void delete(String userName) {
+        try{
+            deleteUserFromDB.setObject(1, userName);
+            deleteUserFromDB.execute();
+        }
+        catch (SQLException e){
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    synchronized public void add(User obj) {
+
+    }
+
+    @Override
+    synchronized public void ban(String targetName) {
+
+    }
+
+    @Override
+    synchronized public void unban(String targetName) {
+
+    }
+
+    @Override
+    public boolean exists(String userName) {
+        try{
+            selectCountUserWhereUserNameFromDB.setObject(1, userName);
+            var resultSet = selectCountUserWhereUserNameFromDB.executeQuery();
+            return resultSet.getLong(1) > 0;
+        }
+        catch (SQLException e){
+            throw new RuntimeException(e);
+        }
     }
 }

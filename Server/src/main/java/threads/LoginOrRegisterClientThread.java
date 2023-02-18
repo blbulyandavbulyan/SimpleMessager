@@ -4,8 +4,8 @@ import common.Server;
 import general.loginorregisterrequest.LoginOrRegisterRequest;
 import threads.exceptions.ServerThreadException;
 import threads.exceptions.loginorregisterexceptions.UserManagerIsNullException;
-import userprocessing.UserManager;
-import userprocessing.exceptions.UserAlreadyExistsException;
+import manager.userprocessing.UserManager;
+import manager.userprocessing.exceptions.UserAlreadyExistsException;
 
 import java.io.*;
 import java.net.Socket;

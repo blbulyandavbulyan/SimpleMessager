@@ -200,7 +200,7 @@ public class MainWindow extends JFrame implements MessagePrinter {
         if (connection == null) throw new NullPointerException("connection is null");
         if (connection.isClosed()) throw new RuntimeException("connection is closed");
         init();
-        this.messageSender = connection;
+        this.messageSender = (MessageSender) connection;
         this.myUserName = connection.getUserName();
         this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         this.setTitle(myUserName);
@@ -221,7 +221,7 @@ public class MainWindow extends JFrame implements MessagePrinter {
         });
         this.setMinimumSize(new Dimension(662, 378));
         this.setSize(this.getMinimumSize());
-        readerThread = new MessagesReaderThread(connection, this);
+        readerThread = new MessagesReaderThread(connection, (serverconnection.interfaces.MessagePrinter) this);
     }
 
     private MainWindow(ResourceBundle rb) {
