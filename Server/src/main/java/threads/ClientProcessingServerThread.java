@@ -6,6 +6,7 @@ import java.util.Objects;
 
 import general.message.Message;
 import common.Server;
+import general.message.servercommand.ServerCommand;
 import general.message.servermessages.ServerErrorMessage;
 
 public class ClientProcessingServerThread extends ClientServerThread{
@@ -35,8 +36,9 @@ public class ClientProcessingServerThread extends ClientServerThread{
                     else if(msg.getReceiver()!= null){
                         String msgReceiver = msg.getReceiver();
                         if(msgReceiver.equalsIgnoreCase("SERVER")){
-                            //todo проверить является ли msg экземпляром ServerCommand, если да, то приступить к её обработке
-                            //if()
+                            if(msg instanceof ServerCommand){
+                                //todo добавить обработку команды
+                            }
                         }
                         else if(!Objects.equals(msgReceiver, clientName)){
                             if(Server.IsClientExists(msgReceiver)) Server.getClient(msgReceiver).sendMessage(msg);
