@@ -118,7 +118,7 @@ public class ServerCommand extends Message {
         return target;
     }
 
-    public Command getCommandID() {
+    public Command getCommand() {
         return command;
     }
     public TargetType getTargetType(){
