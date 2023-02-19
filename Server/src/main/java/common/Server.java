@@ -13,14 +13,21 @@ import java.sql.SQLException;
 import java.util.*;
 
 public class Server {
-    private static int PORT = 1234;
-    private static String listenAddress = "localhost";
-    private static int backlog = 0;
+//    private static int PORT = 1234;
+//    private static String listenAddress = "localhost";
+//    private static int backlog = 0;
     static final Map<String, ClientProcessingServerThread> clients = new HashMap<>();
     static final Set<LoginOrRegisterClientThread> unregisteredUsers = new HashSet<>();
     static final Map<String, String> helpForArguments = new HashMap<>();
     static final PrintStream sPs = System.out;
     static boolean showMessagesFromUser = true;
+    private static class StartupParameters{
+        int port = 1234;
+        String listenAddress = "localhost";
+        String dbSubname = "server.db";
+        String dbmsName = "sqlite";
+        int backlog = 0;
+    }
     private static class RunErrorCodes {
         private static int nextErrorCode = -1;
         enum RUN_ERROR_CODES {
@@ -108,80 +115,11 @@ public class Server {
         clients.remove(clientName);
     }
     public static void main(String[] args) throws IOException {
-        String dbSubname = "server.db";
-        String dbmsName = "sqlite";
-        try{
-            for(int i = 0; i < args.length;){
-                switch (args[i]){
-                    case "help", "-help", "--help"->{
-                        try{
-                            String argumentForHelp = args[i + 1];
-                            String helpForCommand = helpForArguments.get(argumentForHelp);
-                            if(helpForCommand == null){
-                                System.err.printf("Справки для аргумента %s нет\n", argumentForHelp);
-                                System.exit(RunErrorCodes.RUN_ERROR_CODES.NO_HELP_FOR_ARGUMENT.errorCode);
-                            }
-                        }
-                        catch (ArrayIndexOutOfBoundsException e){
-                            System.out.println("Для справки по определённому аргументу введите: help argument,\n где argument - интересующий вас argument");
-                            for (String argHelp : helpForArguments.values()) {
-                                System.out.println(argHelp);
-                            }
-                        }
-                        System.exit(0);
-                    }
-                    case "--listen-port" ->{
-                        try{
-                            PORT = Integer.parseInt(args[i + 1]);
-                            if(PORT < 0 || PORT > 65535){
-                                System.err.println("Введённый номер порта после --listen-port не принадлежит диапазону [0; 665535]");
-                                System.exit(RunErrorCodes.RUN_ERROR_CODES.PORT_OUT_OF_RANGE.errorCode);
-                            }
-                            i+=2;
-                        }
-                        catch (NumberFormatException e){
-                            System.err.println("Вы ввели не число после --listen-port");
-                            e.printStackTrace();
-                            System.exit(RunErrorCodes.RUN_ERROR_CODES.PORT_IS_NOT_A_NUMBER.errorCode);
-                        }
-                    }
-                    case "--listen-address" ->{
-                        listenAddress = args[i+1];
-                        i+=2;
-                    }
-                    case "--backlog" ->{
-                        try{
-                            backlog = Integer.parseInt(args[i+1]);
-                            i+=2;
-                        }
-                        catch (NumberFormatException e){
-                            System.exit(RunErrorCodes.RUN_ERROR_CODES.BACKLOG_IS_NOT_A_NUMBER.errorCode);
-                        }
-                    }
-                    case "--db-subname"->{
-                        dbSubname = args[i+1];
-                        i+=2;
-                    }
-                    case "--dbms-name"->{
-                        dbmsName = args[i+1];
-                        i+=2;
-                    }
-                    default -> {
-                        System.err.printf("Неверный аргумент %s", args[i]);
-                        System.exit(RunErrorCodes.RUN_ERROR_CODES.INVALID_ARGUMENT.errorCode);
-                    }
-                }
-            }
-        }
-        catch (ArrayIndexOutOfBoundsException e){
-            System.err.println("Кажется вы указали недостаточно аргументов. ");
-            System.exit(RunErrorCodes.RUN_ERROR_CODES.INVALID_ARGUMENT_COUNTS.errorCode);
-            return;
-        }
+        StartupParameters startupParameters = parseCommandLineArguments(args);
         try(ServerSocket sSocket = new ServerSocket();
-            UserManager userManager = new UserManager(java.sql.DriverManager.getConnection(String.format("jdbc:%s:%s", dbmsName, dbSubname)))){
-            InetSocketAddress bindAddr = new InetSocketAddress(listenAddress, PORT);
-            sSocket.bind(bindAddr, backlog);
+            UserManager userManager = new UserManager(java.sql.DriverManager.getConnection(String.format("jdbc:%s:%s", startupParameters.dbmsName, startupParameters.dbSubname)))){
+            InetSocketAddress bindAddr = new InetSocketAddress(startupParameters.listenAddress, startupParameters.port);
+            sSocket.bind(bindAddr, startupParameters.backlog);
             while(true){
                 System.out.println("Сервер запущен, ожидаю подключения....");
                 Socket client = null;
@@ -210,5 +148,76 @@ public class Server {
             for(var unnamedClient : unregisteredUsers)unnamedClient.terminate();
         }
     }
-
+    private static StartupParameters parseCommandLineArguments(String[] args){
+        StartupParameters startupParameters = new StartupParameters();
+        try{
+            for(int i = 0; i < args.length;){
+                switch (args[i]){
+                    case "help", "-help", "--help"->{
+                        try{
+                            String argumentForHelp = args[i + 1];
+                            String helpForCommand = helpForArguments.get(argumentForHelp);
+                            if(helpForCommand == null){
+                                System.err.printf("Справки для аргумента %s нет\n", argumentForHelp);
+                                System.exit(RunErrorCodes.RUN_ERROR_CODES.NO_HELP_FOR_ARGUMENT.errorCode);
+                            }
+                        }
+                        catch (ArrayIndexOutOfBoundsException e){
+                            System.out.println("Для справки по определённому аргументу введите: help argument,\n где argument - интересующий вас argument");
+                            for (String argHelp : helpForArguments.values()) {
+                                System.out.println(argHelp);
+                            }
+                        }
+                        System.exit(0);
+                    }
+                    case "--listen-port" ->{
+                        try{
+                            int port = Integer.parseInt(args[i + 1]);
+                            if(port < 0 || port > 65535){
+                                System.err.println("Введённый номер порта после --listen-port не принадлежит диапазону [0; 665535]");
+                                System.exit(RunErrorCodes.RUN_ERROR_CODES.PORT_OUT_OF_RANGE.errorCode);
+                            }
+                            else startupParameters.port = port;
+                            i+=2;
+                        }
+                        catch (NumberFormatException e){
+                            System.err.println("Вы ввели не число после --listen-port");
+                            e.printStackTrace();
+                            System.exit(RunErrorCodes.RUN_ERROR_CODES.PORT_IS_NOT_A_NUMBER.errorCode);
+                        }
+                    }
+                    case "--listen-address" ->{
+                        startupParameters.listenAddress = args[i+1];
+                        i+=2;
+                    }
+                    case "--backlog" ->{
+                        try{
+                            startupParameters.backlog = Integer.parseInt(args[i+1]);
+                            i+=2;
+                        }
+                        catch (NumberFormatException e){
+                            System.exit(RunErrorCodes.RUN_ERROR_CODES.BACKLOG_IS_NOT_A_NUMBER.errorCode);
+                        }
+                    }
+                    case "--db-subname"->{
+                        startupParameters.dbSubname = args[i+1];
+                        i+=2;
+                    }
+                    case "--dbms-name"->{
+                        startupParameters.dbmsName = args[i+1];
+                        i+=2;
+                    }
+                    default -> {
+                        System.err.printf("Неверный аргумент %s", args[i]);
+                        System.exit(RunErrorCodes.RUN_ERROR_CODES.INVALID_ARGUMENT.errorCode);
+                    }
+                }
+            }
+        }
+        catch (ArrayIndexOutOfBoundsException e){
+            System.err.println("Кажется вы указали недостаточно аргументов. ");
+            System.exit(RunErrorCodes.RUN_ERROR_CODES.INVALID_ARGUMENT_COUNTS.errorCode);
+        }
+        return startupParameters;
+    }
 }
