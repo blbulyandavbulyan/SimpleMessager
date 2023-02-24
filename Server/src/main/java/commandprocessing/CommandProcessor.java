@@ -77,6 +77,7 @@ public class CommandProcessor {
 //
 //            }
             case RENAME -> {
+
             }
             case CHANGE_PASSWORD -> {
                 userManager.changePassword((String) serverCommand.getTarget(), (String) serverCommand.getArgument());
@@ -96,23 +97,8 @@ public class CommandProcessor {
         if(serverCommand.getTargetType() == ServerCommand.TargetType.EXECUTOR && serverCommand.getCommand() == ServerCommand.Command.CHANGE_PASSWORD)
             return true;
         else {
-            if(executor.canExecute(serverCommand.getCommand()) && executor.allowedTargetType(serverCommand.getTargetType())){
-                ServerCommand.TargetType targetType = serverCommand.getTargetType();
-                switch (targetType){
-                    case USER -> {
-                        return executor.getRank() > userManager.getRank((String)serverCommand.getTarget());
-                    }
-                    case GROUP -> {
-                        return executor.getRank() > groupManager.getRank((String) serverCommand.getTarget());
-                    }
-                    default -> {
-                        return true;
-                    }
-                }
-            }
+            return executor.canExecute(serverCommand.getCommand()) && executor.allowedTargetType(serverCommand.getTargetType());
         }
-//        userManager
-        return false;
     }
 
 }
