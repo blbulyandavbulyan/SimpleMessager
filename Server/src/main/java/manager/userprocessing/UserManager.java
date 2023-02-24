@@ -3,6 +3,7 @@ package manager.userprocessing;
 import manager.ManagerInterface;
 import manager.userprocessing.exceptions.UserAlreadyExistsException;
 import manager.userprocessing.exceptions.UserDoesNotExistsException;
+import manager.userprocessing.exceptions.UserManagerException;
 
 import java.io.Closeable;
 import java.nio.charset.StandardCharsets;
@@ -17,6 +18,9 @@ public class UserManager implements Closeable, ManagerInterface<User> {
     private final PreparedStatement selectCountUserWhereUserNameFromDB;
     private final PreparedStatement insertUserToDB;
     private final PreparedStatement deleteUserFromDB;
+    private final PreparedStatement updateBannedForUser;
+    private final PreparedStatement selectBannedForUser;
+    private final PreparedStatement updateUserPassword;
     private static final MessageDigest digest;
     static {
         try {
@@ -44,9 +48,14 @@ public class UserManager implements Closeable, ManagerInterface<User> {
         insertUserToDB = connection.prepareStatement("INSERT INTO users(UserName, PassHash) VALUES(?, ?)");
         deleteUserFromDB = connection.prepareStatement("DELETE FROM users WHERE UserName = ?");
         selectUserRankFromDB = connection.prepareStatement("SELECT UserRank FROM users WHERE UserName = ?");
+        updateBannedForUser = connection.prepareStatement("UPDATE users SET Banned = ? WHERE UserName = ?");
+        selectBannedForUser = connection.prepareStatement("SELECT Banned FROM users WHERE UserName = ?");
+        updateUserPassword = connection.prepareStatement("UPDATE users SET PassHash = ? WHERE UserName = ?");
     }
     private void initDB() throws SQLException {
-        statement.execute("CREATE TABLE IF NOT EXISTS users (UserID INTEGER, UserName TEXT NOT NULL UNIQUE, PassHash TEXT NOT NULL, UserRank INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(UserID AUTOINCREMENT));");
+        statement.execute(
+                "CREATE TABLE IF NOT EXISTS users (UserID INTEGER, UserName TEXT NOT NULL UNIQUE, PassHash TEXT NOT NULL, UserRank INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(UserID AUTOINCREMENT));"
+        );
     }
     static private String getPasswordHash(String password){
         byte []hash;
@@ -83,18 +92,22 @@ public class UserManager implements Closeable, ManagerInterface<User> {
         }
         else throw new UserAlreadyExistsException();
     }
-    synchronized public int getUserRank(String userName) throws SQLException {
-        if(exists(userName)){
-            selectUserRankFromDB.setObject(1, userName);
-            ResultSet resultSet = selectUserRankFromDB.executeQuery();
-            if(resultSet.next()){
-                int userRank = resultSet.getInt(1);
-                resultSet.close();
-                return userRank;
-            }
-            else throw new UnknownError();
+    @Override
+    synchronized public int getRank(String userName){
+        try{
+            if (exists(userName)) {
+                selectUserRankFromDB.setObject(1, userName);
+                ResultSet resultSet = selectUserRankFromDB.executeQuery();
+                if (resultSet.next()) {
+                    int userRank = resultSet.getInt(1);
+                    resultSet.close();
+                    return userRank;
+                } else throw new UnknownError();
+            } else throw new UserDoesNotExistsException();
         }
-        else throw new UserDoesNotExistsException();
+        catch (SQLException e){
+            throw new UserManagerException(e);
+        }
     }
     @Override
     public void close() {
@@ -130,7 +143,22 @@ public class UserManager implements Closeable, ManagerInterface<User> {
         }
     }
 
-    public void changePassword(String userName, String password) {
+    public void changePassword(String userName, String password){
+        try{
+            if(exists(userName)){
+                updateUserPassword.setObject(1, password);
+                updateUserPassword.setObject(2, userName);
+                updateUserPassword.executeUpdate();
+            }
+            else throw new UserDoesNotExistsException();
+        }
+        catch (SQLException e){
+            throw new UserManagerException(e);
+        }
+    }
+
+    @Override
+    public void rename(String targetName, String newName) {
 
     }
 
@@ -149,15 +177,36 @@ public class UserManager implements Closeable, ManagerInterface<User> {
     synchronized public void add(User obj) {
 
     }
-
     @Override
-    synchronized public void ban(String targetName) {
-
+    synchronized public void ban(String userName) {
+        try{
+            if(exists(userName)){
+                updateBannedForUser.setObject(1, 1);
+                updateBannedForUser.setObject(2, userName);
+                updateBannedForUser.executeUpdate();
+            }
+            else throw new UserDoesNotExistsException();
+        }
+        catch (SQLException e){
+            throw new UserManagerException(e);
+        }
     }
-
     @Override
-    synchronized public void unban(String targetName) {
-
+    synchronized public void unban(String userName) {
+        try{
+            if (exists(userName)) {
+                updateBannedForUser.setObject(1, 0);
+                updateBannedForUser.setObject(2, userName);
+                updateBannedForUser.executeUpdate();
+            } else throw new UserDoesNotExistsException();
+        }
+        catch (SQLException e){
+            throw new UserManagerException(e);
+        }
+    }
+    synchronized public void unban(String[] userNames) throws SQLException {
+        for (String userName : userNames)
+            unban(userName);
     }
 
     @Override
@@ -166,6 +215,18 @@ public class UserManager implements Closeable, ManagerInterface<User> {
             selectCountUserWhereUserNameFromDB.setObject(1, userName);
             var resultSet = selectCountUserWhereUserNameFromDB.executeQuery();
             return resultSet.getLong(1) > 0;
+        }
+        catch (SQLException e){
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public boolean banned(String userName) {
+        try{
+            selectBannedForUser.setObject(1, userName);
+            int banned = selectBannedForUser.executeQuery().getInt(1);
+            return banned == 1;
         }
         catch (SQLException e){
             throw new RuntimeException(e);

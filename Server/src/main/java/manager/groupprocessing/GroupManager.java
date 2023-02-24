@@ -1,6 +1,5 @@
 package manager.groupprocessing;
 
-import general.privileges.Privilege;
 import manager.ManagerInterface;
 
 public class GroupManager implements ManagerInterface<Group> {
@@ -10,7 +9,12 @@ public class GroupManager implements ManagerInterface<Group> {
     }
 
     @Override
-    public void delete(String targetName) {
+    public void rename(String targetName, String newName) {
+
+    }
+
+    @Override
+    public void delete(String target) {
 
     }
 
@@ -20,17 +24,27 @@ public class GroupManager implements ManagerInterface<Group> {
     }
 
     @Override
-    public void ban(String targetName) {
+    public void ban(String target) {
 
     }
 
     @Override
-    public void unban(String targetName) {
+    public void unban(String target) {
 
     }
 
     @Override
     public boolean exists(String targetName) {
+        return false;
+    }
+
+    @Override
+    public int getRank(String groupName) {
+        return 0;
+    }
+
+    @Override
+    public boolean banned(String targetName) {
         return false;
     }
 }

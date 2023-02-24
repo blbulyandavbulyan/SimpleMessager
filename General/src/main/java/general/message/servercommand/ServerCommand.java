@@ -14,25 +14,33 @@ public class ServerCommand extends Message {
     @Serial
     private static final long serialVersionUID = -6937887162749222729L;
     public enum TargetType{
-        USER(String.class),
-        USERS(String[].class),
-        GROUP(String.class),
-        GROUPS(String[].class);
+        USER(String.class, false),
+        USERS(String[].class, true),
+        GROUP(String.class, false),
+        GROUPS(String[].class, true),
+        EXECUTOR(String.class,false);
         final Class<?> requiredTargetDataType;
-        TargetType(Class<?> requiredTargetDataType){
+        final boolean multiTargetsTargetType;
+        TargetType(Class<?> requiredTargetDataType, boolean multiTargetsTargetType){
             this.requiredTargetDataType = requiredTargetDataType;
+            this.multiTargetsTargetType = multiTargetsTargetType;
         }
 
         public Class<?> getRequiredTargetDataType() {
             return requiredTargetDataType;
         }
+
+        public boolean isMultiTargetsTargetType() {
+            return multiTargetsTargetType;
+        }
     }
     public enum Command {
         BAN,
+        UNBAN,
         ADD,
         DELETE,
         RENAME(String.class, TargetType.USER, TargetType.GROUP),
-        CHANGE_PASSWORD(String.class, TargetType.USER);
+        CHANGE_PASSWORD(String.class, TargetType.USER, TargetType.EXECUTOR);
         final Set<TargetType> avaliableCommands;
         final Class<?> requiredArgumentType;
 //        CHANGE_USER_RANK,
@@ -104,7 +112,8 @@ public class ServerCommand extends Message {
     public ServerCommand(String sender, Object target, Command command, TargetType targetType, Object argument) {
         super(sender, "SERVER");
         this.command = command;
-        this.target = target;
+        if(targetType != TargetType.EXECUTOR)this.target = target;
+        else this.target = sender;
         this.argument = argument;
         this.targetType = targetType;
         selfCheck();

@@ -11,6 +11,7 @@ public class User {
     private int rank;
     private Group group;
     private Set<ServerCommand.Command> allowedCommands;
+    private Set<ServerCommand.TargetType> allowedTargetTypes;
     public User(String userName, Group group, int userRank){
         this.userName = userName;
         this.group = group;
@@ -30,9 +31,10 @@ public class User {
     }
     public boolean canExecute(ServerCommand.Command command){
         return allowedCommands.contains(command);
-
     }
-
+    public boolean allowedTargetType(ServerCommand.TargetType targetType){
+        return allowedTargetTypes.contains(targetType);
+    }
     public void setRank(int rank) {
         this.rank = rank;
     }
