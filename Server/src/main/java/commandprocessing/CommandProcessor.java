@@ -77,10 +77,17 @@ public class CommandProcessor {
 //
 //            }
             case RENAME -> {
-
+                String targetName = (String) serverCommand.getTarget();
+                if(executor.getRank() > managerInterface.getRank(targetName))
+                    managerInterface.rename(targetName, (String) serverCommand.getArgument());
             }
             case CHANGE_PASSWORD -> {
-                userManager.changePassword((String) serverCommand.getTarget(), (String) serverCommand.getArgument());
+                String targetName = (String) serverCommand.getTarget();
+                if(serverCommand.getTargetType() != ServerCommand.TargetType.EXECUTOR){
+                    if(executor.getRank() > managerInterface.getRank(targetName))
+                        userManager.changePassword(targetName, (String) serverCommand.getArgument());
+                }
+                else userManager.changePassword((String) serverCommand.getTarget(), (String) serverCommand.getArgument());
             }
         }
         return null;
