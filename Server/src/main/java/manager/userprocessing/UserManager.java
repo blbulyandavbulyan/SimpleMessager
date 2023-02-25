@@ -109,6 +109,12 @@ public class UserManager implements Closeable, ManagerInterface<User> {
             throw new UserManagerException(e);
         }
     }
+
+    @Override
+    public void setRank(String targetName, Integer rank) {
+
+    }
+
     @Override
     public void close() {
         try {

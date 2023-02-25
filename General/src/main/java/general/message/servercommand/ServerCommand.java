@@ -39,22 +39,23 @@ public class ServerCommand extends Message {
         UNBAN,
         ADD,
         DELETE,
+        SET_RANK(Integer.class, TargetType.USER, TargetType.GROUP),
         RENAME(String.class, TargetType.USER, TargetType.GROUP),
         CHANGE_PASSWORD(String.class, TargetType.USER, TargetType.EXECUTOR);
-        final Set<TargetType> avaliableCommands;
+        final Set<TargetType> avaliableTargetTypes;
         final Class<?> requiredArgumentType;
 //        CHANGE_USER_RANK,
 //        CHANGE_GROUP_RANK
-        Command(Class<?> requiredArgumentType, TargetType ... avaliableCommands){
-            this.avaliableCommands = new HashSet<>();
-            this.avaliableCommands.addAll(Arrays.stream(avaliableCommands).toList());
+        Command(Class<?> requiredArgumentType, TargetType ... avaliableTargetTypes){
+            this.avaliableTargetTypes = new HashSet<>();
+            this.avaliableTargetTypes.addAll(Arrays.stream(avaliableTargetTypes).toList());
             this.requiredArgumentType = requiredArgumentType;
         }
         Command(){
             this(null, TargetType.values());
         }
         public boolean containsTarget(TargetType targetType){
-            return avaliableCommands.contains(targetType);
+            return avaliableTargetTypes.contains(targetType);
         }
     }
 

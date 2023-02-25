@@ -44,8 +44,12 @@ public class CommandProcessor {
         switch (command){
             //команда add закомментирована, поскольку есть небольшая сложность в её реализации её не слишком возможно унифицировать
             case ADD -> {
-
+                //todo write add processing here
             }
+            case SET_RANK -> {
+                managerInterface.setRank((String)serverCommand.getTarget(), (Integer)serverCommand.getArgument());
+            }
+
             case BAN, UNBAN, DELETE -> {
                 //это универсальный обработчик для команд BAN, UNBAN, DELETE
                 //он так же потенциально может подойти для любой команды, функция исполнитель которой возвращает void и принимает имя цели

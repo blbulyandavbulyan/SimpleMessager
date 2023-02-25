@@ -44,6 +44,11 @@ public class GroupManager implements ManagerInterface<Group> {
     }
 
     @Override
+    public void setRank(String targetName, Integer rank) {
+
+    }
+
+    @Override
     public boolean banned(String targetName) {
         return false;
     }
