@@ -6,11 +6,9 @@ import java.util.Collection;
 import java.util.Scanner;
 public class ServerCommandReaderThread extends Thread{
     private final Scanner commandInput;
-    private final Server server;
     private boolean terminated = false;
-    public ServerCommandReaderThread(InputStream commandInput, Server server){
+    public ServerCommandReaderThread(InputStream commandInput){
         this.commandInput = new Scanner(commandInput);
-        this.server = server;
     }
     @Override
     public void run() {
@@ -18,31 +16,31 @@ public class ServerCommandReaderThread extends Thread{
             String command = commandInput.nextLine();
             switch(command){
                 case "!DISCONNECT ALL" -> {
-                    server.clearClients();
-                    server.clearUnregisteredClients();
-                    server.print("SUCCESSFUL!");
+                    Server.clearClients();
+                    Server.clearUnregisteredClients();
+                    Server.serverPrint("SUCCESSFUL!");
                 }
                 case "!DISCONNECT AUTHORIZED CLIENTS"->{
-                    server.clearClients();
-                    server.print("SUCCESSFUL!");
+                    Server.clearClients();
+                    Server.serverPrint("SUCCESSFUL!");
                 }
                 case "!DISCONNECT UNAUTHORIZED CLIENTS"->{
-                    server.clearUnregisteredClients();
-                    server.print("SUCCESSFUL!");
+                    Server.clearUnregisteredClients();
+                    Server.serverPrint("SUCCESSFUL!");
                 }
-                case  "!DON'T SHOW CHAT", "!DISABLE CHAT SHOWING" -> server.setShowMessagesFromUser(false);
-                case "!SHOW CHAT", "!ENABLE CHAT SHOWING"->server.setShowMessagesFromUser(true);
+                case  "!DON'T SHOW CHAT", "!DISABLE CHAT SHOWING" -> Server.setShowMessagesFromUser(false);
+                case "!SHOW CHAT", "!ENABLE CHAT SHOWING"->Server.setShowMessagesFromUser(true);
                 case "!LIST AUTHORIZED CLIENTS"->{
-                    //server.setShowMessagesFromUser(false);
-                    Collection<ClientProcessingServerThread> clients = server.getClients();
-                    server.print("Подключено авторизованных клиентов в количестве: %d\n".formatted(clients.size()));
+                    //Server.setShowMessagesFromUser(false);
+                    Collection<ClientProcessingServerThread> clients = Server.getClients();
+                    Server.serverPrint("Подключено авторизованных клиентов в количестве: %d\n".formatted(clients.size()));
                     for (ClientProcessingServerThread client : clients) {
 
                     }
 
                 }
                 case "!COUNT AUTHORIZED CLIENTS"->{
-                    System.out.printf("Подключено авторизованных клиентов в количестве: %d\n", server.getClients().size());
+                    System.out.printf("Подключено авторизованных клиентов в количестве: %d\n", Server.getClients().size());
                 }
                 case "!SHOW USERS" ->{
 

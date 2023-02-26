@@ -3,11 +3,9 @@ package manager.groupprocessing;
 import entities.Group;
 import manager.ManagerInterface;
 
-import java.sql.Connection;
-
 public class GroupManager implements ManagerInterface<Group> {
     //fixme this class is empty!
-    public GroupManager(Connection connection){
+    public GroupManager(){
 
     }
 

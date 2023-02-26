@@ -13,6 +13,8 @@ import java.security.NoSuchAlgorithmException;
 import java.sql.*;
 
 public class UserManager implements Closeable, ManagerInterface<User> {
+    private final Connection connection;
+    private final Statement statement;
     private final PreparedStatement selectPassHashForUserFromDB;
     private final PreparedStatement selectCountUserWhereUserNameFromDB;
     private final PreparedStatement insertUserToDB;
@@ -31,13 +33,17 @@ public class UserManager implements Closeable, ManagerInterface<User> {
 
     private final PreparedStatement selectUserRankFromDB;
 
-//    public static void main(String[] args) throws SQLException {
-//        Connection conn = DriverManager.getConnection("jdbc:sqlite:server.db");
-//        UserManager userManager = new UserManager(conn);
-//        userManager.delete("test");
-//    }
+    public static void main(String[] args) throws SQLException {
+        Connection conn = DriverManager.getConnection("jdbc:sqlite:server.db");
+        UserManager userManager = new UserManager(conn);
+        userManager.delete("test");
+    }
     public UserManager(Connection connection) throws SQLException {
         if(connection == null)throw new NullPointerException("connection in class DBConnection is null");
+
+        this.connection = connection;
+        statement = connection.createStatement();
+        initDB();
         selectPassHashForUserFromDB = connection.prepareStatement("SELECT PassHash FROM users WHERE UserName = ?");
         selectCountUserWhereUserNameFromDB = connection.prepareStatement("SELECT COUNT(*) FROM users WHERE UserName = ?");
         insertUserToDB = connection.prepareStatement("INSERT INTO users(UserName, PassHash) VALUES(?, ?)");
@@ -46,6 +52,11 @@ public class UserManager implements Closeable, ManagerInterface<User> {
         updateBannedForUser = connection.prepareStatement("UPDATE users SET Banned = ? WHERE UserName = ?");
         selectBannedForUser = connection.prepareStatement("SELECT Banned FROM users WHERE UserName = ?");
         updateUserPassword = connection.prepareStatement("UPDATE users SET PassHash = ? WHERE UserName = ?");
+    }
+    private void initDB() throws SQLException {
+        statement.execute(
+                "CREATE TABLE IF NOT EXISTS users (UserID INTEGER, UserName TEXT NOT NULL UNIQUE, PassHash TEXT NOT NULL, UserRank INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(UserID AUTOINCREMENT));"
+        );
     }
     static private String getPasswordHash(String password){
         byte []hash;
@@ -108,6 +119,11 @@ public class UserManager implements Closeable, ManagerInterface<User> {
     @Override
     public void close() {
         try {
+            statement.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        try {
             selectPassHashForUserFromDB.close();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -124,6 +140,11 @@ public class UserManager implements Closeable, ManagerInterface<User> {
         }
         try {
             deleteUserFromDB.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        try {
+            connection.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
