@@ -2,9 +2,11 @@ package manager.groupprocessing;
 
 import manager.ManagerInterface;
 
+import java.sql.Connection;
+
 public class GroupManager implements ManagerInterface<Group> {
     //fixme this class is empty!
-    public GroupManager(){
+    public GroupManager(Connection connection){
 
     }
 

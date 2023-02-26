@@ -1,5 +1,7 @@
 package common;
 
+import common.exceptions.ServerException;
+import manager.groupprocessing.GroupManager;
 import threads.ClientProcessingServerThread;
 import threads.LoginOrRegisterClientThread;
 import threads.exceptions.ServerThreadException;
@@ -9,18 +11,75 @@ import java.io.*;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.*;
 
-public class Server {
+public class Server extends Thread{
 //    private static int PORT = 1234;
 //    private static String listenAddress = "localhost";
 //    private static int backlog = 0;
-    static final Map<String, ClientProcessingServerThread> clients = new HashMap<>();
-    static final Set<LoginOrRegisterClientThread> unregisteredUsers = new HashSet<>();
-    static final Map<String, String> helpForArguments = new HashMap<>();
-    static final PrintStream sPs = System.out;
-    static boolean showMessagesFromUser = true;
+    private final Map<String, ClientProcessingServerThread> clients = new HashMap<>();
+    private final Set<LoginOrRegisterClientThread> unregisteredUsers = new HashSet<>();
+    private static final Map<String, String> helpForArguments = new HashMap<>();
+    private final PrintStream sPs;
+    private boolean showMessagesFromUser = true;
+    private StartupParameters startupParameters;
+    private Connection connection;
+    private UserManager userManager;
+    private GroupManager groupManager;
+    private void initDb() throws SQLException {
+        Statement statement = connection.createStatement();
+        statement.execute("CREATE TABLE IF NOT EXISTS groups(GroupID INTEGER, GroupName TEXT NOT NULL UNIQUE, GroupRank INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(GroupID AUTOINCREMENT));");
+        statement.execute("CREATE TABLE IF NOT EXISTS users (UserID INTEGER, UserName TEXT NOT NULL UNIQUE, PassHash TEXT NOT NULL, Banned INTEGER DEFAULT 0, UserRank INTEGER NOT NULL DEFAULT 0, gid INTEGER, CONSTRAINT fk_1 FOREIGN KEY (gid) REFERENCES groups(GroupID), PRIMARY KEY(UserID AUTOINCREMENT));");
+        statement.execute("CREATE TABLE IF NOT EXISTS allowed_commands_for_groups(id INTEGER, AllowedCommand TEXT NOT NULL, gid INTEGER NOT NULL, UNIQUE(AllowedCommand, gid), CONSTRAINT fk_2 FOREIGN KEY(gid) REFERENCES groups(GroupID), PRIMARY KEY(id AUTOINCREMENT));");
+        statement.execute("CREATE TABLE IF NOT EXISTS allowed_commands_for_users(id INTEGER, AllowedCommand TEXT NOT NULL, uid INTEGER NOT NULL, UNIQUE(AllowedCommand, uid), CONSTRAINT fk_3 FOREIGN KEY(uid) REFERENCES users(UserID), PRIMARY KEY(id AUTOINCREMENT));");
+        statement.close();
+    }
+    public Server(StartupParameters startupParameters, Connection connection, PrintStream printStream) throws SQLException {
+        this.sPs = printStream;
+        this.startupParameters = startupParameters;
+        this.connection = connection;
+        initDb();
+        this.userManager = new UserManager(connection);
+        this.groupManager = new GroupManager(connection);
+    }
+
+    @Override
+    public void run() {
+        try(ServerSocket sSocket = new ServerSocket()){
+            InetSocketAddress bindAddr = new InetSocketAddress(startupParameters.listenAddress, startupParameters.port);
+            sSocket.bind(bindAddr, startupParameters.backlog);
+            while(true){
+                System.out.println("Сервер запущен, ожидаю подключения....");
+                Socket client = null;
+                try{
+                    client = sSocket.accept();
+                    System.out.println("Новое соединение установлено!");
+                    unregisteredUsers.add(new LoginOrRegisterClientThread(client, this));
+                }
+                catch (ServerThreadException e){
+                    e.printStackTrace();
+                    try{
+                        if(client != null)client.close();
+                    }
+                    catch (IOException ignore){
+
+                    }
+                }
+                catch (Throwable throwable){
+                    throwable.printStackTrace();
+                }
+            }
+        } catch (IOException e ) {
+            throw new ServerException(e);
+        } finally {
+            for (var client : clients.values())client.terminate();
+            for(var unnamedClient : unregisteredUsers)unnamedClient.terminate();
+        }
+    }
+
     private static class StartupParameters{
         int port = 1234;
         String listenAddress = "localhost";
@@ -69,84 +128,55 @@ public class Server {
 
 
 
-    public static void addClient(ClientProcessingServerThread clientThread){
+    synchronized public void addClient(ClientProcessingServerThread clientThread){
         clients.put(clientThread.getClientName(), clientThread);
     }
 
-    public static boolean IsClientExists(String clientName){
+    public boolean IsClientExists(String clientName){
         return clients.containsKey(clientName);
     }
 
-    public static Collection<ClientProcessingServerThread> getClients(){
+    public Collection<ClientProcessingServerThread> getClients(){
         return clients.values();
     }
 
-    public static ClientProcessingServerThread getClient(String clientName){
+    public ClientProcessingServerThread getClient(String clientName){
         return clients.get(clientName);
     }
 
-    public static Collection<LoginOrRegisterClientThread> getUnregisteredClients(){
+    public Collection<LoginOrRegisterClientThread> getUnregisteredClients(){
         return unregisteredUsers;
     }
 
-    public static void clearClients(){
-        for (ClientProcessingServerThread client : Server.getClients()) {
+    public void clearClients(){
+        for (ClientProcessingServerThread client : getClients()) {
             client.terminate();
         }
-        Server.clients.clear();
+        clients.clear();
     }
 
-    public static void clearUnregisteredClients(){
+    public void clearUnregisteredClients(){
         for(LoginOrRegisterClientThread uclient : unregisteredUsers){
             uclient.terminate();
         }
-        Server.unregisteredUsers.clear();
+        unregisteredUsers.clear();
     }
-    synchronized static public void serverPrint(Object obj){
+    synchronized public void print(Object obj){
         sPs.println(obj);
     }
-    public static void setShowMessagesFromUser(boolean showMessagesFromUser){
-        Server.showMessagesFromUser = showMessagesFromUser;
+    public void setShowMessagesFromUser(boolean showMessagesFromUser){
+        this.showMessagesFromUser = showMessagesFromUser;
     }
-    public static void removeUnregisteredClient(LoginOrRegisterClientThread lorClientThread){
+    public void removeUnregisteredClient(LoginOrRegisterClientThread lorClientThread){
         unregisteredUsers.remove(lorClientThread);
     }
-    public static void removeClient(String clientName){
+    public void removeClient(String clientName){
         clients.remove(clientName);
     }
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws SQLException {
         StartupParameters startupParameters = parseCommandLineArguments(args);
-        try(ServerSocket sSocket = new ServerSocket();
-            UserManager userManager = new UserManager(java.sql.DriverManager.getConnection(String.format("jdbc:%s:%s", startupParameters.dbmsName, startupParameters.dbSubname)))){
-            InetSocketAddress bindAddr = new InetSocketAddress(startupParameters.listenAddress, startupParameters.port);
-            sSocket.bind(bindAddr, startupParameters.backlog);
-            while(true){
-                System.out.println("Сервер запущен, ожидаю подключения....");
-                Socket client = null;
-                try{
-                    client = sSocket.accept();
-                    System.out.println("Новое соединение установлено!");
-                    unregisteredUsers.add(new LoginOrRegisterClientThread(client, userManager));
-                }
-                catch (ServerThreadException e){
-                    e.printStackTrace();
-                    try{
-                        if(client != null)client.close();
-                    }
-                    catch (IOException ignore){
-
-                    }
-                }
-                catch (Throwable throwable){
-                    throwable.printStackTrace();
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            for (var client : clients.values())client.terminate();
-            for(var unnamedClient : unregisteredUsers)unnamedClient.terminate();
-        }
+        Server server = new Server(startupParameters, java.sql.DriverManager.getConnection(String.format("jdbc:%s:%s", startupParameters.dbmsName, startupParameters.dbSubname)), System.out);
+        server.start();
     }
     private static StartupParameters parseCommandLineArguments(String[] args){
         StartupParameters startupParameters = new StartupParameters();
@@ -219,5 +249,12 @@ public class Server {
             System.exit(RunErrorCodes.RUN_ERROR_CODES.INVALID_ARGUMENT_COUNTS.errorCode);
         }
         return startupParameters;
+    }
+
+    public UserManager getUserManager() {
+        return userManager;
+    }
+    public  GroupManager getGroupManager(){
+        return groupManager;
     }
 }
