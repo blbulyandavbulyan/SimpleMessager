@@ -1,6 +1,6 @@
 package manager.groupprocessing;
 
-import entities.Group;
+import general.entities.Group;
 import manager.ManagerInterface;
 
 import java.sql.Connection;

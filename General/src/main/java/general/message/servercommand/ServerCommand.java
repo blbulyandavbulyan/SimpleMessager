@@ -2,8 +2,8 @@ package general.message.servercommand;
 
 import general.message.Message;
 import general.message.servercommand.exceptions.*;
-import entities.Group;
-import entities.User;
+import general.entities.Group;
+import general.entities.User;
 
 import java.io.Serial;
 import java.util.Arrays;

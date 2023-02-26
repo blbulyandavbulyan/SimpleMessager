@@ -1,4 +1,4 @@
-package entities;
+package general.entities;
 
 import general.message.servercommand.ServerCommand;
 

@@ -1,7 +1,7 @@
 package manager.userprocessing;
 
 import manager.ManagerInterface;
-import entities.User;
+import general.entities.User;
 import manager.userprocessing.exceptions.UserAlreadyExistsException;
 import manager.userprocessing.exceptions.UserDoesNotExistsException;
 import manager.userprocessing.exceptions.UserManagerException;
