@@ -163,6 +163,17 @@ public class UserManager implements Closeable, ManagerInterface<User> {
     synchronized public void add(User obj) {
 
     }
+
+    @Override
+    public User get(String userName) {
+        return null;
+    }
+
+    @Override
+    public User[] getAll() {
+        return new User[0];
+    }
+
     @Override
     synchronized public void ban(String userName) {
         try{

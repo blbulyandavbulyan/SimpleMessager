@@ -16,7 +16,7 @@ import java.util.function.Consumer;
 public class CommandProcessor {
     private UserManager userManager;
     private GroupManager groupManager;
-    private final HashMap<ServerCommand.TargetType, ManagerInterface> targetTypeToManagerInterfaceMapper;
+    private final HashMap<ServerCommand.InputTargetType, ManagerInterface> targetTypeToManagerInterfaceMapper;
     //эта переменная хранит экземпляр класса User для исполнителя команды, делается это для ускоренной проверки привилегий
     private final User executor;
     public CommandProcessor(UserManager userManager, GroupManager groupManager, User executor){
@@ -25,10 +25,10 @@ public class CommandProcessor {
         this.groupManager = groupManager;
         targetTypeToManagerInterfaceMapper = new HashMap<>();
         //не универсальное решение, что если будет больше Manager ?
-        targetTypeToManagerInterfaceMapper.put(ServerCommand.TargetType.USER, userManager);
-        targetTypeToManagerInterfaceMapper.put(ServerCommand.TargetType.USERS, userManager);
-        targetTypeToManagerInterfaceMapper.put(ServerCommand.TargetType.GROUP, groupManager);
-        targetTypeToManagerInterfaceMapper.put(ServerCommand.TargetType.GROUPS, groupManager);
+        targetTypeToManagerInterfaceMapper.put(ServerCommand.InputTargetType.USER, userManager);
+        targetTypeToManagerInterfaceMapper.put(ServerCommand.InputTargetType.USERS, userManager);
+        targetTypeToManagerInterfaceMapper.put(ServerCommand.InputTargetType.GROUP, groupManager);
+        targetTypeToManagerInterfaceMapper.put(ServerCommand.InputTargetType.GROUPS, groupManager);
     }
     public Object processCommand(ServerCommand serverCommand){
         //обязательная самопроверка команды на корректность
@@ -45,6 +45,12 @@ public class CommandProcessor {
             }
             case SET_RANK -> {
                 managerInterface.setRank((String)serverCommand.getTarget(), (Integer)serverCommand.getArgument());
+            }
+            case GET_ENTITY -> {
+
+            }
+            case GET_ENTITIES -> {
+
             }
 
             case BAN, UNBAN, DELETE -> {
@@ -73,10 +79,6 @@ public class CommandProcessor {
                     else throw new UserRankIsLessThanTargetRank(serverCommand);
                 }
             }
-//            case RENAME, CHANGE_PASSWORD -> {
-//                BiConsumer<String, String> commandFunction = command == ServerCommand.Command.RENAME ? managerInterface::rename : userManager::changePassword;
-//
-//            }
             case RENAME -> {
                 String targetName = (String) serverCommand.getTarget();
                 if(executor.getRank() > managerInterface.getRank(targetName))
@@ -84,7 +86,7 @@ public class CommandProcessor {
             }
             case CHANGE_PASSWORD -> {
                 String targetName = (String) serverCommand.getTarget();
-                if(serverCommand.getTargetType() != ServerCommand.TargetType.EXECUTOR){
+                if(serverCommand.getTargetType() != ServerCommand.InputTargetType.EXECUTOR){
                     if(executor.getRank() > managerInterface.getRank(targetName))
                         userManager.changePassword(targetName, (String) serverCommand.getArgument());
                 }
@@ -102,7 +104,7 @@ public class CommandProcessor {
     }
     private boolean canUserExecuteThisCommand(ServerCommand serverCommand){
         //быстрая проверка на право выполнения команды CHANGE_PASSWORD если она направлена на исполнителя:
-        if(serverCommand.getTargetType() == ServerCommand.TargetType.EXECUTOR && serverCommand.getCommand() == ServerCommand.Command.CHANGE_PASSWORD)
+        if(serverCommand.getTargetType() == ServerCommand.InputTargetType.EXECUTOR && serverCommand.getCommand() == ServerCommand.Command.CHANGE_PASSWORD)
             return true;
         else {
             return executor.canExecute(serverCommand.getCommand()) && executor.allowedTargetType(serverCommand.getTargetType());

@@ -27,6 +27,16 @@ public class GroupManager implements ManagerInterface<Group> {
     }
 
     @Override
+    public Group get(String userName) {
+        return null;
+    }
+
+    @Override
+    public Group[] getAll() {
+        return new Group[0];
+    }
+
+    @Override
     public void ban(String target) {
 
     }
