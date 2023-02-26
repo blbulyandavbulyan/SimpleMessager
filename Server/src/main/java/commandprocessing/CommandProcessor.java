@@ -1,20 +1,17 @@
 package commandprocessing;
 
 import commandprocessing.exceptions.CommandProcessingException;
-import commandprocessing.exceptions.ExecutionError;
 import commandprocessing.exceptions.PermissionsDeniedException;
 import commandprocessing.exceptions.UserRankIsLessThanTargetRank;
 import general.message.servercommand.ServerCommand;
 import manager.ManagerInterface;
 import manager.groupprocessing.GroupManager;
-import manager.userprocessing.User;
+import entities.User;
 import manager.userprocessing.UserManager;
 
 import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 public class CommandProcessor {
     private UserManager userManager;

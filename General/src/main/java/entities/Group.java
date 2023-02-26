@@ -1,7 +1,6 @@
-package manager.groupprocessing;
+package entities;
 
 import general.privileges.Privilege;
-import manager.userprocessing.User;
 
 import java.util.Arrays;
 import java.util.HashSet;

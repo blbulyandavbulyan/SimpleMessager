@@ -1,7 +1,6 @@
-package manager.userprocessing;
+package entities;
 
 import general.message.servercommand.ServerCommand;
-import manager.groupprocessing.Group;
 
 import java.util.HashSet;
 import java.util.Set;

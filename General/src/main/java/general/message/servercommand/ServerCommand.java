@@ -2,6 +2,8 @@ package general.message.servercommand;
 
 import general.message.Message;
 import general.message.servercommand.exceptions.*;
+import entities.Group;
+import entities.User;
 
 import java.io.Serial;
 import java.util.Arrays;
@@ -39,20 +41,24 @@ public class ServerCommand extends Message {
         UNBAN,
         ADD,
         DELETE,
-        SET_RANK(Integer.class, TargetType.USER, TargetType.GROUP),
-        RENAME(String.class, TargetType.USER, TargetType.GROUP),
-        CHANGE_PASSWORD(String.class, TargetType.USER, TargetType.EXECUTOR);
+        GET_USERS(null, User[].class),
+        GET_GROUPS(null, Group[].class),
+        SET_RANK(Integer.class, null, TargetType.USER, TargetType.GROUP),
+        RENAME(String.class, null, TargetType.USER, TargetType.GROUP),
+        CHANGE_PASSWORD(String.class, null, TargetType.USER, TargetType.EXECUTOR);
         final Set<TargetType> avaliableTargetTypes;
         final Class<?> requiredArgumentType;
+        final Class<?> outputDataType;
 //        CHANGE_USER_RANK,
 //        CHANGE_GROUP_RANK
-        Command(Class<?> requiredArgumentType, TargetType ... avaliableTargetTypes){
+        Command(Class<?> requiredArgumentType, Class<?> outputDataType, TargetType ... avaliableTargetTypes){
             this.avaliableTargetTypes = new HashSet<>();
             this.avaliableTargetTypes.addAll(Arrays.stream(avaliableTargetTypes).toList());
             this.requiredArgumentType = requiredArgumentType;
+            this.outputDataType = outputDataType;
         }
         Command(){
-            this(null, TargetType.values());
+            this(null, null, TargetType.values());
         }
         public boolean containsTarget(TargetType targetType){
             return avaliableTargetTypes.contains(targetType);
