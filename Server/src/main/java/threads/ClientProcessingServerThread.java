@@ -25,7 +25,7 @@ public class ClientProcessingServerThread extends ClientServerThread{
         try{
             clientObjOut.writeUTF("WELCOME TO SERVER!");
             clientObjOut.flush();
-            server.print("Поток для клиента %s запущен\n".formatted(clientName));
+            serverLogger.info("Поток для клиента %s запущен\n".formatted(clientName));
             while(!isTerminated()){
                 try{
                     Message msg = (Message) clientObjIn.readObject();
@@ -63,7 +63,7 @@ public class ClientProcessingServerThread extends ClientServerThread{
             }
         }
         catch(EOFException  e){
-            server.print("Пользователь %s отключился.\n".formatted(clientName));
+            serverLogger.info("Пользователь %s отключился.\n".formatted(clientName));
         }
         catch (IOException e){
             e.printStackTrace();

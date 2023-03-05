@@ -14,41 +14,41 @@ public class ServerCommandReaderThread extends Thread{
     }
     @Override
     public void run() {
-        while(!terminated){
-            String command = commandInput.nextLine();
-            switch(command){
-                case "!DISCONNECT ALL" -> {
-                    server.clearClients();
-                    server.clearUnregisteredClients();
-                    server.print("SUCCESSFUL!");
-                }
-                case "!DISCONNECT AUTHORIZED CLIENTS"->{
-                    server.clearClients();
-                    server.print("SUCCESSFUL!");
-                }
-                case "!DISCONNECT UNAUTHORIZED CLIENTS"->{
-                    server.clearUnregisteredClients();
-                    server.print("SUCCESSFUL!");
-                }
-                case  "!DON'T SHOW CHAT", "!DISABLE CHAT SHOWING" -> server.setShowMessagesFromUser(false);
-                case "!SHOW CHAT", "!ENABLE CHAT SHOWING"->server.setShowMessagesFromUser(true);
-                case "!LIST AUTHORIZED CLIENTS"->{
-                    //server.setShowMessagesFromUser(false);
-                    Collection<ClientProcessingServerThread> clients = server.getClients();
-                    server.print("Подключено авторизованных клиентов в количестве: %d\n".formatted(clients.size()));
-                    for (ClientProcessingServerThread client : clients) {
-
-                    }
-
-                }
-                case "!COUNT AUTHORIZED CLIENTS"->{
-                    System.out.printf("Подключено авторизованных клиентов в количестве: %d\n", server.getClients().size());
-                }
-                case "!SHOW USERS" ->{
-
-                }
-            }
-        }
+//        while(!terminated){
+//            String command = commandInput.nextLine();
+//            switch(command){
+//                case "!DISCONNECT ALL" -> {
+//                    server.clearClients();
+//                    server.clearUnregisteredClients();
+//                    server.printInfo("SUCCESSFUL!");
+//                }
+//                case "!DISCONNECT AUTHORIZED CLIENTS"->{
+//                    server.clearClients();
+//                    server.printInfo("SUCCESSFUL!");
+//                }
+//                case "!DISCONNECT UNAUTHORIZED CLIENTS"->{
+//                    server.clearUnregisteredClients();
+//                    server.printInfo("SUCCESSFUL!");
+//                }
+//                case  "!DON'T SHOW CHAT", "!DISABLE CHAT SHOWING" -> server.setShowMessagesFromUser(false);
+//                case "!SHOW CHAT", "!ENABLE CHAT SHOWING"->server.setShowMessagesFromUser(true);
+//                case "!LIST AUTHORIZED CLIENTS"->{
+//                    //server.setShowMessagesFromUser(false);
+//                    Collection<ClientProcessingServerThread> clients = server.getClients();
+//                    server.printInfo("Подключено авторизованных клиентов в количестве: %d\n".formatted(clients.size()));
+//                    for (ClientProcessingServerThread client : clients) {
+//
+//                    }
+//
+//                }
+//                case "!COUNT AUTHORIZED CLIENTS"->{
+//                    System.out.printf("Подключено авторизованных клиентов в количестве: %d\n", server.getClients().size());
+//                }
+//                case "!SHOW USERS" ->{
+//
+//                }
+//            }
+//        }
     }
     public void terminate(){
         terminated = true;

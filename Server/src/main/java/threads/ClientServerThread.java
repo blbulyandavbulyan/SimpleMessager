@@ -1,6 +1,7 @@
 package threads;
 
 import common.Server;
+import interfaces.ServerLogger;
 import threads.exceptions.clientserverthread.ClientThreadIsTerminatedException;
 import threads.exceptions.clientserverthread.ClientSocketIsClosedException;
 import threads.exceptions.clientserverthread.ClientSocketIsNullException;
@@ -13,16 +14,18 @@ import java.net.Socket;
 
 public abstract class ClientServerThread extends Thread{
     protected final Server server;
+    protected final ServerLogger serverLogger;
     protected final Socket clientSocket;
     protected ObjectInputStream clientObjIn;
     protected ObjectOutputStream clientObjOut;
     private boolean terminated = false;//переменная становится true, если был вызван метод terminate();
     private boolean objStreamInited = false;
-    protected ClientServerThread(Socket clientSocket, Server server) {
+    protected ClientServerThread(Socket clientSocket, Server server, ServerLogger serverLogger) {
         if(clientSocket == null)throw new ClientSocketIsNullException();
         if(clientSocket.isClosed())throw new ClientSocketIsClosedException();
         this.clientSocket = clientSocket;
         this.server = server;
+        this.serverLogger = serverLogger;
     }
     protected ClientServerThread(ClientServerThread clientServerThread){
         if(clientServerThread.terminated)throw new ClientThreadIsTerminatedException();
@@ -31,6 +34,7 @@ public abstract class ClientServerThread extends Thread{
         clientObjOut = clientServerThread.clientObjOut;
         objStreamInited = clientServerThread.objStreamInited;
         this.server = clientServerThread.server;
+        this.serverLogger = clientServerThread.serverLogger;
     }
     protected void initObjStreams() throws IOException {
         if(!objStreamInited){

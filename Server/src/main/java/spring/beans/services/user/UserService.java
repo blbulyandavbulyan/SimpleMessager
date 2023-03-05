@@ -24,7 +24,7 @@ public class UserService implements ManagerInterface<User>, LoginAndRegisterUser
     public boolean login(String userName, String password){
         User user = get(userName);
         if(user == null)return false;
-        return bCryptPasswordEncoder.matches(user.getPasswordHash(), password);
+        return bCryptPasswordEncoder.matches(password, user.getPasswordHash());
     }
     @Override
     public void register(String userName, String password){
