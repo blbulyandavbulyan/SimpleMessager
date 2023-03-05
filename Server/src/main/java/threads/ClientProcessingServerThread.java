@@ -5,7 +5,6 @@ import java.net.SocketException;
 import java.util.Objects;
 
 import general.message.Message;
-import common.Server;
 import general.message.servercommand.ServerCommand;
 import general.message.servermessages.ServerErrorMessage;
 
@@ -26,7 +25,7 @@ public class ClientProcessingServerThread extends ClientServerThread{
         try{
             clientObjOut.writeUTF("WELCOME TO SERVER!");
             clientObjOut.flush();
-            Server.serverPrint("Поток для клиента %s запущен\n".formatted(clientName));
+            serverLogger.info("Поток для клиента %s запущен\n".formatted(clientName));
             while(!isTerminated()){
                 try{
                     Message msg = (Message) clientObjIn.readObject();
@@ -38,15 +37,16 @@ public class ClientProcessingServerThread extends ClientServerThread{
                         if(msgReceiver.equalsIgnoreCase("SERVER")){
                             if(msg instanceof ServerCommand){
                                 //todo добавить обработку команды
+
                             }
                         }
                         else if(!Objects.equals(msgReceiver, clientName)){
-                            if(Server.IsClientExists(msgReceiver)) Server.getClient(msgReceiver).sendMessage(msg);
+                            if(server.IsClientExists(msgReceiver)) server.getClient(msgReceiver).sendMessage(msg);
                             else sendMessage(new ServerErrorMessage(clientName, msgReceiver, ServerErrorMessage.ServerErrorCode.MESSAGE_DELIVERY_ERROR_NO_USER_WITH_THIS_NAME));
                         }
                     }
                     else{
-                        for (ClientProcessingServerThread client : Server.getClients()) {
+                        for (ClientProcessingServerThread client : server.getClients()) {
                             if(client != this)client.sendMessage(msg);
                         }
                     }
@@ -63,13 +63,13 @@ public class ClientProcessingServerThread extends ClientServerThread{
             }
         }
         catch(EOFException  e){
-            Server.serverPrint("Пользователь %s отключился.\n".formatted(clientName));
+            serverLogger.info("Пользователь %s отключился.\n".formatted(clientName));
         }
         catch (IOException e){
             e.printStackTrace();
         }
         finally {
-            Server.removeClient(clientName);
+            server.removeClient(clientName);
         }
     }
     public String getClientName() {
