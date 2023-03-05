@@ -6,7 +6,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.env.AbstractEnvironment;
 import org.springframework.core.env.Environment;
+import org.springframework.core.env.MutablePropertySources;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
@@ -20,6 +22,9 @@ import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 import java.util.Properties;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
+import java.util.regex.Pattern;
+import java.util.stream.StreamSupport;
 
 @Configuration
 @EnableJpaRepositories(basePackageClasses = {UserRepository.class, GroupRepository.class})
@@ -52,11 +57,11 @@ public class SpringConfig {
         Consumer<String> extractAndPutProperty = (property)->{
             jpaProperties.put(property, env.getRequiredProperty(property));
         };
-        extractAndPutProperty.accept("hibernate.dialect");
-        extractAndPutProperty.accept("hibernate.hbm2ddl.auto");
-        extractAndPutProperty.accept("hibernate.ejb.naming_strategy");
-        extractAndPutProperty.accept("hibernate.show_sql");
-        extractAndPutProperty.accept("hibernate.format_sql");
+        MutablePropertySources propSrcs = ((AbstractEnvironment) env).getPropertySources();
+        Predicate<String> checkNameForHibernateProperty = Pattern.compile("hibernate\\.\\S+").asPredicate();
+        StreamSupport.stream(propSrcs.spliterator(), false)
+                .filter(propertySource -> checkNameForHibernateProperty.test(propertySource.getName()))
+                .forEach(propertySource -> extractAndPutProperty.accept(propertySource.getName()));
         entityManagerFactoryBean.setJpaProperties(jpaProperties);
         return entityManagerFactoryBean;
     }

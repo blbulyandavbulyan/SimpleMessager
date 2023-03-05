@@ -4,31 +4,31 @@ import commandprocessing.exceptions.CommandProcessingException;
 import commandprocessing.exceptions.PermissionsDeniedException;
 import commandprocessing.exceptions.UserRankIsLessThanTargetRank;
 import general.message.servercommand.ServerCommand;
-import manager.ManagerInterface;
-import manager.groupprocessing.GroupManager;
+import interfaces.ManagerInterface;
 import entities.User;
-import manager.userprocessing.UserManager;
+import spring.beans.services.group.GroupService;
+import spring.beans.services.user.UserService;
 
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.function.Consumer;
 
 public class CommandProcessor {
-    private UserManager userManager;
-    private GroupManager groupManager;
+    private UserService userService;
+    private GroupService groupService;
     private final HashMap<ServerCommand.InputTargetType, ManagerInterface> targetTypeToManagerInterfaceMapper;
     //эта переменная хранит экземпляр класса User для исполнителя команды, делается это для ускоренной проверки привилегий
     private final User executor;
-    public CommandProcessor(UserManager userManager, GroupManager groupManager, User executor){
+    public CommandProcessor(UserService userService, GroupService groupService, User executor){
         this.executor = executor;
-        this.userManager = userManager;
-        this.groupManager = groupManager;
+        this.userService = userService;
+        this.groupService = groupService;
         targetTypeToManagerInterfaceMapper = new HashMap<>();
         //не универсальное решение, что если будет больше Manager ?
-        targetTypeToManagerInterfaceMapper.put(ServerCommand.InputTargetType.USER, userManager);
-        targetTypeToManagerInterfaceMapper.put(ServerCommand.InputTargetType.USERS, userManager);
-        targetTypeToManagerInterfaceMapper.put(ServerCommand.InputTargetType.GROUP, groupManager);
-        targetTypeToManagerInterfaceMapper.put(ServerCommand.InputTargetType.GROUPS, groupManager);
+        targetTypeToManagerInterfaceMapper.put(ServerCommand.InputTargetType.USER, userService);
+        targetTypeToManagerInterfaceMapper.put(ServerCommand.InputTargetType.USERS, userService);
+        targetTypeToManagerInterfaceMapper.put(ServerCommand.InputTargetType.GROUP, groupService);
+        targetTypeToManagerInterfaceMapper.put(ServerCommand.InputTargetType.GROUPS, groupService);
     }
     public Object processCommand(ServerCommand serverCommand){
         //обязательная самопроверка команды на корректность
@@ -86,11 +86,10 @@ public class CommandProcessor {
             }
             case CHANGE_PASSWORD -> {
                 String targetName = (String) serverCommand.getTarget();
-                if(serverCommand.getTargetType() != ServerCommand.InputTargetType.EXECUTOR){
-                    if(executor.getRank() > managerInterface.getRank(targetName))
-                        userManager.changePassword(targetName, (String) serverCommand.getArgument());
+                if(serverCommand.getTargetType() == ServerCommand.InputTargetType.EXECUTOR || executor.getRank() > managerInterface.getRank(targetName)){
+                    userService.setPassword(targetName, (String) serverCommand.getArgument());
                 }
-                else userManager.changePassword((String) serverCommand.getTarget(), (String) serverCommand.getArgument());
+                else throw new PermissionsDeniedException(serverCommand);
             }
         }
         return null;

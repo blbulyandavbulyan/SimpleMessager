@@ -2,14 +2,13 @@ package threads;
 
 import common.Server;
 import general.loginorregisterrequest.LoginOrRegisterRequest;
-import loginandregister.LoginAndRegisterUserInterface;
+import interfaces.loginandregister.LoginAndRegisterUserInterface;
 import threads.exceptions.ServerThreadException;
-import loginandregister.exceptions.UserAlreadyExistsException;
+import interfaces.loginandregister.exceptions.UserAlreadyExistsException;
 
 import java.io.*;
 import java.net.Socket;
 import java.net.SocketException;
-import java.sql.SQLException;
 
 public class LoginOrRegisterClientThread extends ClientServerThread{
     public static final int TRIES_LIMIT = 10;

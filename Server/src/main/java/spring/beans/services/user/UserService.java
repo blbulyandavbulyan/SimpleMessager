@@ -1,16 +1,16 @@
-package spring.beans.services;
+package spring.beans.services.user;
 
 import entities.User;
-import loginandregister.LoginAndRegisterUserInterface;
-import loginandregister.exceptions.UserAlreadyExistsException;
-import manager.ManagerInterface;
+import interfaces.loginandregister.LoginAndRegisterUserInterface;
+import interfaces.loginandregister.exceptions.UserAlreadyExistsException;
+import interfaces.ManagerInterface;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import spring.beans.repositories.UserRepository;
+import spring.beans.services.user.exceptions.UserDoesNotExistsException;
 
+@Service
 public class UserService implements ManagerInterface<User>, LoginAndRegisterUserInterface {
     @Autowired
     UserRepository userRepository;
@@ -18,11 +18,11 @@ public class UserService implements ManagerInterface<User>, LoginAndRegisterUser
     BCryptPasswordEncoder bCryptPasswordEncoder;
     @Override
     public int getRank(String targetName) {
-        return userRepository.findByName(targetName).getRank();
+        return get(targetName).getRank();
     }
     @Override
     public boolean login(String userName, String password){
-        User user = userRepository.findByName(userName);
+        User user = get(userName);
         if(user == null)return false;
         return bCryptPasswordEncoder.matches(user.getPasswordHash(), password);
     }
@@ -36,13 +36,14 @@ public class UserService implements ManagerInterface<User>, LoginAndRegisterUser
     }
     @Override
     public void setRank(String targetName, Integer rank) {
-        User user = userRepository.findByName(targetName);
+        User user = get(targetName);
         user.setRank(rank);
+        userRepository.save(user);
     }
 
     @Override
     public void rename(String targetName, String newName) {
-        User user = userRepository.findByName(targetName);
+        User user = get(targetName);
         user.setName(newName);
         userRepository.save(user);
     }
@@ -54,12 +55,14 @@ public class UserService implements ManagerInterface<User>, LoginAndRegisterUser
 
     @Override
     public void add(User obj) {
-        userRepository.save(obj);
+        if(!userRepository.existsByName(obj.getName()))
+            userRepository.save(obj);
+        else throw new UserAlreadyExistsException();
     }
 
     @Override
     public User get(String userName) {
-        return userRepository.findByName(userName);
+        return userRepository.findByName(userName).orElseThrow(UserDoesNotExistsException::new);
     }
 
     @Override
@@ -69,28 +72,30 @@ public class UserService implements ManagerInterface<User>, LoginAndRegisterUser
 
     @Override
     public void ban(String targetName) {
-        User user = userRepository.findByName(targetName);
+        User user = get(targetName);
         user.setBanned(true);
         userRepository.save(user);
     }
 
     @Override
     public void unban(String targetName) {
-        User user = userRepository.findByName(targetName);
+        User user = get(targetName);
         user.setBanned(false);
         userRepository.save(user);
     }
 
     public boolean exists(String username){
-        User user = new User();
-        user.setName(username);
-        ExampleMatcher exampleMatcher = ExampleMatcher.matching().withIgnorePaths("id").withMatcher("name", ExampleMatcher.GenericPropertyMatchers.exact());
-        Example<User> userExample = Example.of(user, exampleMatcher);
-        return userRepository.exists(userExample);
+        return userRepository.existsByName(username);
     }
 
     @Override
     public boolean banned(String targetName) {
-        return userRepository.findByName(targetName).isBanned();
+        return get(targetName).isBanned();
+    }
+
+    public void setPassword(String targetName, String password) {
+        User user = get(targetName);
+        user.setPasswordHash(bCryptPasswordEncoder.encode(password));
+        userRepository.save(user);
     }
 }

@@ -2,12 +2,10 @@ package common;
 
 import common.exceptions.ServerException;
 import spring.configs.SpringConfig;
-import loginandregister.LoginAndRegisterUserInterface;
-import org.springframework.beans.factory.annotation.Autowired;
+import interfaces.loginandregister.LoginAndRegisterUserInterface;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.stereotype.Component;
-import spring.beans.services.GroupService;
-import spring.beans.services.UserService;
+import spring.beans.services.group.GroupService;
+import spring.beans.services.user.UserService;
 import threads.ClientProcessingServerThread;
 import threads.LoginOrRegisterClientThread;
 import threads.exceptions.ServerThreadException;
@@ -17,7 +15,6 @@ import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.*;
-@Component("server")
 public class Server extends Thread{
     private final Map<String, ClientProcessingServerThread> clients = new HashMap<>();
     private final Set<LoginOrRegisterClientThread> unregisteredUsers = new HashSet<>();
@@ -25,13 +22,12 @@ public class Server extends Thread{
     private final PrintStream sPs;
     private boolean showMessagesFromUser = true;
     private StartupParameters startupParameters;
-    @Autowired
     private UserService userService;
-    @Autowired
     private GroupService groupService;
     public Server(StartupParameters startupParameters, PrintStream printStream){
         this.sPs = printStream;
         this.startupParameters = startupParameters;
+
     }
 
     @Override
@@ -68,13 +64,6 @@ public class Server extends Thread{
         }
     }
 
-    private static class StartupParameters{
-        int port = 1234;
-        String listenAddress = "localhost";
-        String dbSubname = "server.db";
-        String dbmsName = "sqlite";
-        int backlog = 0;
-    }
     private static class RunErrorCodes {
         private static int nextErrorCode = -1;
         enum RUN_ERROR_CODES {
@@ -218,14 +207,14 @@ public class Server extends Thread{
                             System.exit(RunErrorCodes.RUN_ERROR_CODES.BACKLOG_IS_NOT_A_NUMBER.errorCode);
                         }
                     }
-                    case "--db-subname"->{
-                        startupParameters.dbSubname = args[i+1];
-                        i+=2;
-                    }
-                    case "--dbms-name"->{
-                        startupParameters.dbmsName = args[i+1];
-                        i+=2;
-                    }
+//                    case "--db-subname"->{
+//                        startupParameters.dbSubname = args[i+1];
+//                        i+=2;
+//                    }
+//                    case "--dbms-name"->{
+//                        startupParameters.dbmsName = args[i+1];
+//                        i+=2;
+//                    }
                     default -> {
                         System.err.printf("Неверный аргумент %s", args[i]);
                         System.exit(RunErrorCodes.RUN_ERROR_CODES.INVALID_ARGUMENT.errorCode);

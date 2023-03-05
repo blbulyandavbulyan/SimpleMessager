@@ -1,6 +1,6 @@
-package loginandregister;
+package interfaces.loginandregister;
 
-import loginandregister.exceptions.UserAlreadyExistsException;
+import interfaces.loginandregister.exceptions.UserAlreadyExistsException;
 
 public interface LoginAndRegisterUserInterface {
     boolean login(String userName, String password);

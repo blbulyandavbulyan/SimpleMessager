@@ -1,4 +1,4 @@
-package manager;
+package interfaces;
 //этот интерфейс предназначен для обобщения классов UserManager и GroupManager
 public interface ManagerInterface<T> {
     int getRank(String targetName);

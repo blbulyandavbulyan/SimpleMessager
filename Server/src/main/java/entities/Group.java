@@ -7,6 +7,7 @@ import lombok.Setter;
 
 import java.util.Set;
 @Entity
+@Table(name = "groups")
 @Getter
 @Setter
 public class Group {
@@ -16,10 +17,10 @@ public class Group {
     private Long id;
     @Column
     private String name;
-    @ElementCollection
-    private Set<ServerCommand.Command> allowedCommands;
-    @ElementCollection
-    private Set<ServerCommand.InputTargetType> allowedInputTargetType;
+//    @ElementCollection
+//    private Set<ServerCommand.Command> allowedCommands;
+//    @ElementCollection
+//    private Set<ServerCommand.InputTargetType> allowedInputTargetType;
     @OneToMany
     private Set<User> users;
     @Column
@@ -40,12 +41,12 @@ public class Group {
     public boolean containsUser(User user){
         return users.contains(user);
     }
-    public boolean isCommandAllowed(ServerCommand.Command command){
-        return allowedCommands.contains(command);
-    }
-    public void allowCommand(ServerCommand.Command command){
-        allowedCommands.add(command);
-    }
+//    public boolean isCommandAllowed(ServerCommand.Command command){
+//        return allowedCommands.contains(command);
+//    }
+//    public void allowCommand(ServerCommand.Command command){
+//        allowedCommands.add(command);
+//    }
     public void addUser(User user){
         users.add(user);
     }
