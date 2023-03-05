@@ -22,9 +22,13 @@ public class UserService implements ManagerInterface<User>, LoginAndRegisterUser
     }
     @Override
     public boolean login(String userName, String password){
-        User user = get(userName);
-        if(user == null)return false;
-        return bCryptPasswordEncoder.matches(password, user.getPasswordHash());
+        try {
+            User user = get(userName);
+            return bCryptPasswordEncoder.matches(password, user.getPasswordHash());
+        }
+        catch (UserDoesNotExistsException e){
+            return false;
+        }
     }
     @Override
     public void register(String userName, String password){
