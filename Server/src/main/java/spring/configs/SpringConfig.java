@@ -9,6 +9,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.AbstractEnvironment;
+import org.springframework.core.env.EnumerablePropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.MutablePropertySources;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
@@ -22,6 +23,7 @@ import spring.beans.repositories.UserRepository;
 
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
+import java.util.Arrays;
 import java.util.Properties;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -56,14 +58,17 @@ public class SpringConfig {
         entityManagerFactoryBean.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
         entityManagerFactoryBean.setPackagesToScan("entities");
         Properties jpaProperties = new Properties();
-        Consumer<String> extractAndPutProperty = (property)->{
-            jpaProperties.put(property, env.getRequiredProperty(property));
-        };
-        MutablePropertySources propSrcs = ((AbstractEnvironment) env).getPropertySources();
         Predicate<String> checkNameForHibernateProperty = Pattern.compile("hibernate\\.\\S+").asPredicate();
+        MutablePropertySources propSrcs = ((AbstractEnvironment) env).getPropertySources();
         StreamSupport.stream(propSrcs.spliterator(), false)
-                .filter(propertySource -> checkNameForHibernateProperty.test(propertySource.getName()))
-                .forEach(propertySource -> extractAndPutProperty.accept(propertySource.getName()));
+                .filter(ps -> ps instanceof EnumerablePropertySource)
+                .map(ps -> ((EnumerablePropertySource) ps).getPropertyNames())
+                .flatMap(Arrays::<String>stream)
+                .filter(checkNameForHibernateProperty)
+                .forEach(
+                        propName -> {
+                            jpaProperties.setProperty(propName, env.getProperty(propName));
+                        });
         entityManagerFactoryBean.setJpaProperties(jpaProperties);
         return entityManagerFactoryBean;
     }
