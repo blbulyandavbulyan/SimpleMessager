@@ -1,49 +1,37 @@
 package common;
 
 import common.exceptions.ServerException;
-import manager.groupprocessing.GroupManager;
+import spring.configs.SpringConfig;
+import loginandregister.LoginAndRegisterUserInterface;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.stereotype.Component;
+import spring.beans.services.GroupService;
+import spring.beans.services.UserService;
 import threads.ClientProcessingServerThread;
 import threads.LoginOrRegisterClientThread;
 import threads.exceptions.ServerThreadException;
-import manager.userprocessing.UserManager;
 
 import java.io.*;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.*;
-
+@Component("server")
 public class Server extends Thread{
-//    private static int PORT = 1234;
-//    private static String listenAddress = "localhost";
-//    private static int backlog = 0;
     private final Map<String, ClientProcessingServerThread> clients = new HashMap<>();
     private final Set<LoginOrRegisterClientThread> unregisteredUsers = new HashSet<>();
     private static final Map<String, String> helpForArguments = new HashMap<>();
     private final PrintStream sPs;
     private boolean showMessagesFromUser = true;
     private StartupParameters startupParameters;
-    private Connection connection;
-    private UserManager userManager;
-    private GroupManager groupManager;
-    private void initDb() throws SQLException {
-        Statement statement = connection.createStatement();
-        statement.execute("CREATE TABLE IF NOT EXISTS groups(GroupID INTEGER, GroupName TEXT NOT NULL UNIQUE, GroupRank INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(GroupID AUTOINCREMENT));");
-        statement.execute("CREATE TABLE IF NOT EXISTS users (UserID INTEGER, UserName TEXT NOT NULL UNIQUE, PassHash TEXT NOT NULL, Banned INTEGER DEFAULT 0, UserRank INTEGER NOT NULL DEFAULT 0, gid INTEGER, CONSTRAINT fk_1 FOREIGN KEY (gid) REFERENCES groups(GroupID), PRIMARY KEY(UserID AUTOINCREMENT));");
-        statement.execute("CREATE TABLE IF NOT EXISTS allowed_commands_for_groups(id INTEGER, AllowedCommand TEXT NOT NULL, gid INTEGER NOT NULL, UNIQUE(AllowedCommand, gid), CONSTRAINT fk_2 FOREIGN KEY(gid) REFERENCES groups(GroupID), PRIMARY KEY(id AUTOINCREMENT));");
-        statement.execute("CREATE TABLE IF NOT EXISTS allowed_commands_for_users(id INTEGER, AllowedCommand TEXT NOT NULL, uid INTEGER NOT NULL, UNIQUE(AllowedCommand, uid), CONSTRAINT fk_3 FOREIGN KEY(uid) REFERENCES users(UserID), PRIMARY KEY(id AUTOINCREMENT));");
-        statement.close();
-    }
-    public Server(StartupParameters startupParameters, Connection connection, PrintStream printStream) throws SQLException {
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private GroupService groupService;
+    public Server(StartupParameters startupParameters, PrintStream printStream){
         this.sPs = printStream;
         this.startupParameters = startupParameters;
-        this.connection = connection;
-        initDb();
-        this.userManager = new UserManager(connection);
-        this.groupManager = new GroupManager(connection);
     }
 
     @Override
@@ -173,9 +161,10 @@ public class Server extends Thread{
     public void removeClient(String clientName){
         clients.remove(clientName);
     }
-    public static void main(String[] args) throws SQLException {
+    public static void main(String[] args){
+        AnnotationConfigApplicationContext annotationConfigApplicationContext = new AnnotationConfigApplicationContext(SpringConfig.class);
         StartupParameters startupParameters = parseCommandLineArguments(args);
-        Server server = new Server(startupParameters, java.sql.DriverManager.getConnection(String.format("jdbc:%s:%s", startupParameters.dbmsName, startupParameters.dbSubname)), System.out);
+        Server server = new Server(startupParameters, System.out);
         server.start();
     }
     private static StartupParameters parseCommandLineArguments(String[] args){
@@ -251,10 +240,7 @@ public class Server extends Thread{
         return startupParameters;
     }
 
-    public UserManager getUserManager() {
-        return userManager;
-    }
-    public  GroupManager getGroupManager(){
-        return groupManager;
+    public LoginAndRegisterUserInterface getLoginOrRegisterUser(){
+        return userService;
     }
 }

@@ -1,9 +1,9 @@
 package general.message.servercommand;
 
+import general.dtos.GroupDto;
+import general.dtos.UserDto;
 import general.message.Message;
 import general.message.servercommand.exceptions.*;
-import general.entities.Group;
-import general.entities.User;
 
 import java.io.Serial;
 import java.util.*;
@@ -34,10 +34,10 @@ public class ServerCommand extends Message {
         }
     }
     public enum OutputTargetType{
-        USER(User.class),
-        USERS(User[].class),
-        GROUP(Group.class),
-        GROUPS(Group[].class);
+        USER(UserDto.class),
+        USERS(UserDto[].class),
+        GROUP(GroupDto.class),
+        GROUPS(GroupDto[].class);
         final Class<?> outputType;
         OutputTargetType(Class<?> outputType){
             this.outputType = outputType;

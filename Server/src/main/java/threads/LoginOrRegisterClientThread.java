@@ -2,8 +2,9 @@ package threads;
 
 import common.Server;
 import general.loginorregisterrequest.LoginOrRegisterRequest;
+import loginandregister.LoginAndRegisterUserInterface;
 import threads.exceptions.ServerThreadException;
-import manager.userprocessing.exceptions.UserAlreadyExistsException;
+import loginandregister.exceptions.UserAlreadyExistsException;
 
 import java.io.*;
 import java.net.Socket;
@@ -20,6 +21,7 @@ public class LoginOrRegisterClientThread extends ClientServerThread{
     @Override
     public void run() {
         try{
+            LoginAndRegisterUserInterface loginAndRegisterUserInterface = server.getLoginOrRegisterUser();
             server.print("Поток для регистрации/логина клиента %d запущен\n".formatted( clientSocket.hashCode()));
             initObjStreams();
             int triesCounter = 0;
@@ -50,13 +52,13 @@ public class LoginOrRegisterClientThread extends ClientServerThread{
                 try{
                     switch (lor.getOperation()){
                         case REGISTER -> {
-                            server.getUserManager().registerUser(userName, password);
+                            loginAndRegisterUserInterface.register(userName, password);
                             server.addClient(new ClientProcessingServerThread(this, userName));
                             server.print("Клиент %s зарегистрировался\n".formatted(userName));
                             return;
                         }
                         case LOGIN -> {
-                            if (server.getUserManager().login(userName, password)) {
+                            if (loginAndRegisterUserInterface.login(userName, password)) {
                                 server.addClient(new ClientProcessingServerThread(this, userName));
                                 server.print("Клиент %s вошёл\n".formatted(userName));
                                 return;
@@ -72,12 +74,12 @@ public class LoginOrRegisterClientThread extends ClientServerThread{
                         }
                     }
                 }
-                catch (SQLException e){
-                    clientObjOut.writeUTF("SERVER HAS DataBase problem");
-                    clientObjOut.flush();
-                    terminate();
-                    throw e;
-                }
+//                catch (SQLException e){
+//                    clientObjOut.writeUTF("SERVER HAS DataBase problem");
+//                    clientObjOut.flush();
+//                    terminate();
+//                    throw e;
+//                }
                 catch (UserAlreadyExistsException e){
                     clientObjOut.writeUTF("USER ALREADY EXISTS");
                     clientObjOut.flush();
@@ -89,7 +91,7 @@ public class LoginOrRegisterClientThread extends ClientServerThread{
         catch (EOFException | SocketException e){
             if(!clientSocket.isClosed())e.printStackTrace();
         }
-        catch (IOException | SQLException | ClassNotFoundException e){
+        catch (IOException | ClassNotFoundException e){
             try {
                 clientSocket.close();
             } catch (IOException ex) {

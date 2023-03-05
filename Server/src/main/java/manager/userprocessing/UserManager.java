@@ -1,17 +1,17 @@
 package manager.userprocessing;
 
 import manager.ManagerInterface;
-import general.entities.User;
-import manager.userprocessing.exceptions.UserAlreadyExistsException;
+import entities.User;
+import loginandregister.exceptions.UserAlreadyExistsException;
 import manager.userprocessing.exceptions.UserDoesNotExistsException;
 import manager.userprocessing.exceptions.UserManagerException;
+import org.springframework.stereotype.Component;
 
 import java.io.Closeable;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.*;
-
 public class UserManager implements Closeable, ManagerInterface<User> {
     private final PreparedStatement selectPassHashForUserFromDB;
     private final PreparedStatement selectCountUserWhereUserNameFromDB;
@@ -72,7 +72,7 @@ public class UserManager implements Closeable, ManagerInterface<User> {
         }
         else return false;
     }
-     synchronized public void registerUser(String userName, String password) throws SQLException, UserAlreadyExistsException {
+     synchronized public void register(String userName, String password) throws SQLException, UserAlreadyExistsException {
         if(!exists(userName)){
 //            add(new User(userName, ));
             insertUserToDB.setObject(1, userName);

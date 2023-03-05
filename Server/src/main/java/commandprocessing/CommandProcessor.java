@@ -6,7 +6,7 @@ import commandprocessing.exceptions.UserRankIsLessThanTargetRank;
 import general.message.servercommand.ServerCommand;
 import manager.ManagerInterface;
 import manager.groupprocessing.GroupManager;
-import general.entities.User;
+import entities.User;
 import manager.userprocessing.UserManager;
 
 import java.sql.SQLException;

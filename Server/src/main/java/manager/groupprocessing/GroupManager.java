@@ -1,10 +1,10 @@
 package manager.groupprocessing;
 
-import general.entities.Group;
+import entities.Group;
 import manager.ManagerInterface;
+import org.springframework.stereotype.Component;
 
 import java.sql.Connection;
-
 public class GroupManager implements ManagerInterface<Group> {
     //fixme this class is empty!
     public GroupManager(Connection connection){

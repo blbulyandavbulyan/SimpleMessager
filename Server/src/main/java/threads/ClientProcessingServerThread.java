@@ -37,6 +37,7 @@ public class ClientProcessingServerThread extends ClientServerThread{
                         if(msgReceiver.equalsIgnoreCase("SERVER")){
                             if(msg instanceof ServerCommand){
                                 //todo добавить обработку команды
+
                             }
                         }
                         else if(!Objects.equals(msgReceiver, clientName)){
