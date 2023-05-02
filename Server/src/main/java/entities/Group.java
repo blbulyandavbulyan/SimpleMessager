@@ -1,14 +1,10 @@
 package entities;
 
-import general.message.servercommand.ServerCommand;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.Cascade;
 
 import java.util.Collection;
-import java.util.LinkedList;
-import java.util.Set;
 @Entity
 @Table(name = "groups")
 @Getter
