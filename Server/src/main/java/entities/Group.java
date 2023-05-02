@@ -1,10 +1,13 @@
 package entities;
 
 import general.message.servercommand.ServerCommand;
-import javax.persistence.*;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Cascade;
 
+import java.util.Collection;
+import java.util.LinkedList;
 import java.util.Set;
 @Entity
 @Table(name = "groups")
@@ -21,8 +24,8 @@ public class Group {
 //    private Set<ServerCommand.Command> allowedCommands;
 //    @ElementCollection
 //    private Set<ServerCommand.InputTargetType> allowedInputTargetType;
-    @OneToMany
-    private Set<User> users;
+    @OneToMany(cascade = CascadeType.PERSIST)
+    private Collection<User> users;
     @Column
     private int rank;
     @Column
@@ -36,6 +39,7 @@ public class Group {
     }
 
     public Group() {
+//        users = new LinkedList<>();
     }
 
     public boolean containsUser(User user){

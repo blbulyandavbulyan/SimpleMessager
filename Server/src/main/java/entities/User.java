@@ -1,7 +1,7 @@
 package entities;
 
 import general.message.servercommand.ServerCommand;
-import javax.persistence.*;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -21,7 +21,7 @@ public class User {
     @Column
     @Getter(AccessLevel.NONE)
     private int rank;
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "group_id")
     private Group group;
     @Column
