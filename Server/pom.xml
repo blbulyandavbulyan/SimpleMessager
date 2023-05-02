@@ -13,7 +13,7 @@
         <springVersion>6.0.8</springVersion>
         <springDataVersion>3.0.5</springDataVersion>
         <springSecurityVersion>6.0.3</springSecurityVersion>
-        <slf4jVersion></slf4jVersion>
+        <slf4jVersion>2.0.2</slf4jVersion>
     </properties>
     <artifactId>Server</artifactId>
     <version>1.0.0</version>
@@ -45,7 +45,7 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
-            <version>2.0.2</version>
+            <version>${slf4jVersion}</version>
         </dependency>
 
 
