@@ -2,6 +2,7 @@ package ui.windows.main;
 
 
 import general.message.filemessages.FileMessage;
+import general.message.filemessages.FileMessageFactory;
 import processings.audioprocessing.record.RecordStopButtonActionListener;
 import serverconnection.exceptions.ConnectionClosed;
 import serverconnection.interfaces.MessageSender;
@@ -120,7 +121,7 @@ public class MainWindow extends JFrame implements MessagePrinter {
                 Set<File> droppedFiles = dragAndDropPanel.getDroppedFiles();
                 for (File droppedFile : droppedFiles) {
                     try {
-                        FileMessage fileMessage = FileMessage.create(myUserName, null, droppedFile);
+                        FileMessage fileMessage = FileMessageFactory.create(myUserName, null, droppedFile);
                         messageSender.sendMessage(fileMessage);
                         printMessage(fileMessage);
                     } catch (IOException | NoSuchMethodException | InvocationTargetException | InstantiationException |

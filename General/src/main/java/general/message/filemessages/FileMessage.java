@@ -15,20 +15,13 @@ import java.util.function.Predicate;
 public abstract class FileMessage extends Message {
     @Serial
     private static final long serialVersionUID = -4876801809226719046L;
-    private static final java.util.Map<String, Class<? extends FileMessage>> mimeToClassMap;
-    static {
-        mimeToClassMap = new HashMap<>();
-        mimeToClassMap.put("image/jpeg", ImageFileMessage.class);
-        mimeToClassMap.put("image/png", ImageFileMessage.class);
-
-    }
     protected final String fileName;
     protected final String MIMEType;
     protected final byte[] fileData;
-    protected FileMessage(String sender, String receiver, File file, Predicate<String> isThisFileValidFormat) throws IOException, FileMessageCreatingException {
-        super(sender, receiver);;
-        if(!isThisFileValidFormat.test(MIMEType = Files.probeContentType(file.toPath())))throw new FileHasInvalidFormatException();
+    protected FileMessage(String sender, String receiver, File file) throws IOException, FileMessageCreatingException {
+        super(sender, receiver);
         this.fileName = file.getName();
+        this.MIMEType = Files.probeContentType(file.toPath());
         this.fileData = Files.readAllBytes(file.toPath());
     }
     protected FileMessage(String sender, String receiver, String fileName, String MIMEType, byte[] fileData){
@@ -45,14 +38,5 @@ public abstract class FileMessage extends Message {
     }
     public byte[] getFileData() {
         return fileData;
-    }
-    public static FileMessage create(String sender, String receiver, File file) throws IOException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
-        String fileMIMEType = Files.probeContentType(file.toPath());
-        Class<? extends FileMessage> fileMessageClass = mimeToClassMap.get(fileMIMEType);
-        if(fileMessageClass != null){
-            return fileMessageClass.getConstructor(String.class, String.class, File.class)
-                    .newInstance(sender, receiver, file);
-        }
-        else throw new FileHasInvalidFormatException();
     }
 }
