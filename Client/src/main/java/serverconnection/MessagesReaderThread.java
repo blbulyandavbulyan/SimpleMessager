@@ -1,18 +1,19 @@
 package serverconnection;
 
+import general.message.Message;
 import serverconnection.interfaces.MessageGetter;
-import serverconnection.interfaces.MessagePrinter;
 
 import java.io.*;
 import java.net.SocketException;
+import java.util.function.Consumer;
 
 public class MessagesReaderThread extends Thread{
-    private MessageGetter messageGetter;
-    private MessagePrinter mp;
+    private final MessageGetter messageGetter;
+    private final Consumer<Message> messageConsumer;
     private boolean terminated = false;
-    public MessagesReaderThread(MessageGetter messageGetter, MessagePrinter mp){
+    public MessagesReaderThread(MessageGetter messageGetter, Consumer<Message> messageConsumer){
         this.messageGetter = messageGetter;
-        this.mp = mp;
+        this.messageConsumer = messageConsumer;
         start();
     }
     @Override
@@ -21,7 +22,7 @@ public class MessagesReaderThread extends Thread{
         try {
             while (true){
                 if(terminated)return;
-                mp.printMessage(messageGetter.getMessage());
+                messageConsumer.accept(messageGetter.getMessage());
             }
         }
         catch (SocketException e){

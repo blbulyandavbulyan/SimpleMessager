@@ -3,6 +3,7 @@ package ui.windows.main;
 
 import general.message.filemessages.FileMessage;
 import general.message.filemessages.FileMessageFactory;
+import general.message.voicemessage.exceptions.AudioDataIsEmptyException;
 import processings.audioprocessing.record.RecordStopButtonActionListener;
 import serverconnection.exceptions.ConnectionClosed;
 import serverconnection.interfaces.MessageSender;
@@ -150,14 +151,19 @@ public class MainWindow extends JFrame implements MessagePrinter {
                     }
                 },
                 (audioData)->{
-                    int selectedIndex = dialogsTappedPane.getSelectedIndex();
-                    VoiceMessage voiceMessage = new VoiceMessage(
-                            myUserName, selectedIndex > 0 ? dialogsTappedPane.getTitleAt(selectedIndex) : null,
-                            audioData, audioFormat);
                     try {
+                        int selectedIndex = dialogsTappedPane.getSelectedIndex();
+                        VoiceMessage voiceMessage = new VoiceMessage(
+                                myUserName, selectedIndex > 0 ? dialogsTappedPane.getTitleAt(selectedIndex) : null,
+                                audioData, audioFormat);
                         messageSender.sendMessage(voiceMessage);
                         printMessage(voiceMessage);
-                    } catch (IOException e) {
+                    }
+                    catch (AudioDataIsEmptyException audioDataIsEmptyException){
+                        showErrorMessage(this, "errorMessages.emptyAudioMessage", "errorCaptions.sendingError", rb);
+                        audioDataIsEmptyException.printStackTrace();
+                    }
+                    catch (IOException e) {
                         throw new RuntimeException(e);
                     }
                 }
@@ -281,7 +287,7 @@ public class MainWindow extends JFrame implements MessagePrinter {
         });
         this.setMinimumSize(new Dimension(662, 378));
         this.setSize(this.getMinimumSize());
-        readerThread = new MessagesReaderThread(connection, this);
+        readerThread = new MessagesReaderThread(connection, this::printMessage);
     }
 
     private MainWindow(ResourceBundle rb) {
