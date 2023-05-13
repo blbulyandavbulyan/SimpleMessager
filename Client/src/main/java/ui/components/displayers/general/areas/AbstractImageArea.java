@@ -16,9 +16,7 @@ public abstract class AbstractImageArea extends JPanel {
         super.paintComponent(g);
         displayedImage.paintIcon(this, g, 0, 0);
     }
-    public double getImageAspectRatio(){
-        return getImageAspectRatio(originalImage);
-    }
+
     public static double getImageAspectRatio(ImageIcon imageIcon){
         return (double) imageIcon.getIconWidth()/imageIcon.getIconHeight();
     }

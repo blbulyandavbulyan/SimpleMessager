@@ -43,9 +43,7 @@ public class CommandProcessor {
             case ADD -> {
                 //todo write add processing here
             }
-            case SET_RANK -> {
-                managerInterface.setRank((String)serverCommand.getTarget(), (Integer)serverCommand.getArgument());
-            }
+            case SET_RANK -> managerInterface.setRank((String)serverCommand.getTarget(), (Integer)serverCommand.getArgument());
             case GET_ENTITY -> {
 
             }

@@ -22,7 +22,7 @@ public class RecordAudioThread extends Thread{
     public void run() {
         final int CHUNK_SIZE = 1024;
         DataLine.Info info = new DataLine.Info(TargetDataLine.class, audioFormat);
-        try(TargetDataLine microphone = (TargetDataLine) AudioSystem.getLine(info);){
+        try(TargetDataLine microphone = (TargetDataLine) AudioSystem.getLine(info)){
             synchronized (recordFinishedMonitor){
                 byte[] data = new byte[CHUNK_SIZE];
                 microphone.open(audioFormat);

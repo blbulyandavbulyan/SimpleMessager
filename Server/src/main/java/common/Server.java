@@ -52,9 +52,6 @@ public class Server extends Thread implements ServerLogger {
 
                     }
                 }
-                catch (Throwable throwable){
-                    throwable.printStackTrace();
-                }
             }
         } catch (IOException e ) {
             throw new ServerException(e);

@@ -45,9 +45,7 @@ public abstract class ClientServerThread extends Thread{
     public boolean isTerminated(){
         return terminated;
     }
-    public boolean isObjStreamInited() {
-        return objStreamInited;
-    }
+
     public void terminate(){
         terminated = true;
         if(!clientSocket.isClosed()) {
