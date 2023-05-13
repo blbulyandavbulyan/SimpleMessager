@@ -16,9 +16,10 @@ public class RecordStopButtonActionListener implements ActionListener {
     RecordAudioThread recordAudioThread;
     private final Consumer<RECORD_STATES> recordStateChangeAction;
     private final Consumer<byte[]> audioDataConsumer;
+    private final AudioFormat audioFormat;
 
     public RecordStopButtonActionListener(AudioFormat audioFormat, long minRecordLengthInSeconds, Consumer<RECORD_STATES> recordStateChangeAction, Consumer<byte[]> audioDataConsumer) throws LineUnavailableException {
-        recordAudioThread = new RecordAudioThread(audioFormat, true);
+        this.audioFormat = audioFormat;
         this.minRecordLengthInSeconds = minRecordLengthInSeconds;
         this.recordStateChangeAction = recordStateChangeAction;
         this.audioDataConsumer = audioDataConsumer;
@@ -26,30 +27,25 @@ public class RecordStopButtonActionListener implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        try {
-            if (recordStarted) {
-                recordLengthInSeconds = (System.currentTimeMillis() - recordLengthInSeconds) / 1000;
-                if (recordLengthInSeconds > minRecordLengthInSeconds) {
-                    recordStarted = false;
-                    byte [] audioData = recordAudioThread.stopRecord();
-                    if(audioDataConsumer != null)audioDataConsumer.accept(audioData);
-                    if (recordStateChangeAction != null) recordStateChangeAction.accept(RECORD_STATES.RECORD_STOPPED);
-                }
-            } else {
-                recordStarted = true;
-                recordAudioThread.startRecord();
-                recordLengthInSeconds = System.currentTimeMillis();
-                if (recordStateChangeAction != null) {
-                    recordStateChangeAction.accept(RECORD_STATES.RECORD_STARTED);
-                }
+        if (recordStarted) {
+            recordLengthInSeconds = (System.currentTimeMillis() - recordLengthInSeconds) / 1000;
+            if (recordLengthInSeconds > minRecordLengthInSeconds) {
+                recordStarted = false;
+                byte[] audioData = recordAudioThread.getAudio();
+                if (audioDataConsumer != null) audioDataConsumer.accept(audioData);
+                if (recordStateChangeAction != null) recordStateChangeAction.accept(RECORD_STATES.RECORD_STOPPED);
             }
-        } catch (Exception ex) {
-            throw new RuntimeException(ex);
+        } else {
+            recordStarted = true;
+            recordAudioThread = new RecordAudioThread(audioFormat);
+            recordLengthInSeconds = System.currentTimeMillis();
+            if (recordStateChangeAction != null) {
+                recordStateChangeAction.accept(RECORD_STATES.RECORD_STARTED);
+            }
         }
-
     }
 
-    public byte[] getAudio() throws InterruptedException {
+    public byte[] getAudio(){
         return recordAudioThread.getAudio();
     }
 }

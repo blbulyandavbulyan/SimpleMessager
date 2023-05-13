@@ -63,9 +63,7 @@ public class SpringConfig {
                 .flatMap(Arrays::<String>stream)
                 .filter(checkNameForHibernateProperty)
                 .forEach(
-                        propName -> {
-                            jpaProperties.setProperty(propName, env.getProperty(propName));
-                        });
+                        propName -> jpaProperties.setProperty(propName, env.getProperty(propName)));
         entityManagerFactoryBean.setJpaProperties(jpaProperties);
         return entityManagerFactoryBean;
     }

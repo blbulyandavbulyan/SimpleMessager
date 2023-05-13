@@ -149,12 +149,4 @@ public class DragAndDropPanel extends JPanel implements DroppedFileControllerInt
         droppedFilesMap.clear();
         cardLayout.show(this, "whenNoDropComponent");
     }
-//    public static void main(String[] args) {
-//        JFrame jFrame = new JFrame();
-//        jFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-//        DragAndDropPanel dragAndDropPanel = new DragAndDropPanel(new JLabel("Перетащите файлы сюда"));
-//        jFrame.getContentPane().add(dragAndDropPanel);
-//        jFrame.pack();
-//        jFrame.setVisible(true);
-//    }
 }

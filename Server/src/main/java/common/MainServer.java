@@ -41,14 +41,6 @@ public class MainServer {
                 "--backlog",
                 "Использование: --backlog %backlog%, где %backlog% - число, которое означает максимальное число клиентов в очереди на подключение,\n если указать значение <= 0, то будет выбрано значение по умолчанию."
         );
-//        helpForArguments.put(
-//                "--db-subname",
-//                "Использование: --db-subname %subname%, где %subname% - параметр подключения к БД.\n В случае если драйвер базы стоит по умолчанию, то данный параметр просто представляет путь к файлу базы данных SQLite.\n Он не обязательно должен существовать, если он не существует, то он будет создан.\n Если же выбран другой драйвер, то значение параметра, зависит от него. \nВсе необходимые таблицы добавляются автоматически, если в БД их нет"
-//        );
-//        helpForArguments.put(
-//                "--dbms-name",
-//                "Использование: --dbms-name %driver-name%, где %driver-name% - имя драйвера, для подключения к базе.\n Драйвер должен быть включён в jar архив, по умолчанию поддерживается только SQLite"
-//        );
     }
     public static void main(String[] args) {
         AnnotationConfigApplicationContext annotationConfigApplicationContext = new AnnotationConfigApplicationContext(SpringConfig.class);
@@ -110,14 +102,6 @@ public class MainServer {
                             System.exit(RunErrorCodes.RUN_ERROR_CODES.BACKLOG_IS_NOT_A_NUMBER.errorCode);
                         }
                     }
-//                    case "--db-subname"->{
-//                        startupParameters.dbSubname = args[i+1];
-//                        i+=2;
-//                    }
-//                    case "--dbms-name"->{
-//                        startupParameters.dbmsName = args[i+1];
-//                        i+=2;
-//                    }
                     default -> {
                         System.err.printf("Неверный аргумент %s", args[i]);
                         System.exit(RunErrorCodes.RUN_ERROR_CODES.INVALID_ARGUMENT.errorCode);

@@ -26,10 +26,6 @@ public class User {
     private boolean banned = false;
     @Column
     private String passwordHash;
-//    @ElementCollection
-//    private Set<ServerCommand.Command> allowedCommands;
-//    @ElementCollection
-//    private Set<ServerCommand.InputTargetType> allowedInputTargetTypes;
 
     public User() {
     }
@@ -38,10 +34,8 @@ public class User {
     }
     public boolean canExecute(ServerCommand.Command command){
         return true;
-//        return allowedCommands.contains(command) || group.isCommandAllowed(command);
     }
     public boolean allowedTargetType(ServerCommand.InputTargetType inputTargetType){
         return true;
-//        return allowedInputTargetTypes.contains(inputTargetType);
     }
 }

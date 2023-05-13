@@ -21,7 +21,6 @@ public class Server extends Thread implements ServerLogger {
     private final Set<LoginOrRegisterClientThread> unregisteredUsers = new HashSet<>();
     private final Logger logger = LoggerFactory.getLogger(Server.class);
 
-    private boolean showMessagesFromUser = true;
     private StartupParameters startupParameters;
     private UserService userService;
     private GroupService groupService;
@@ -97,9 +96,6 @@ public class Server extends Thread implements ServerLogger {
             uclient.terminate();
         }
         unregisteredUsers.clear();
-    }
-    public void setShowMessagesFromUser(boolean showMessagesFromUser){
-        this.showMessagesFromUser = showMessagesFromUser;
     }
     public void removeUnregisteredClient(LoginOrRegisterClientThread lorClientThread){
         unregisteredUsers.remove(lorClientThread);

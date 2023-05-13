@@ -22,13 +22,6 @@ public class TextFileDisplayer extends FileDisplayer {
         });
         this.add(fileNameLabel);
     }
-//    public static void main(String[] args) throws FileNotFoundException {
-////        JFrame jFrame = new JFrame();
-////        jFrame.getContentPane().add(new TextFileDisplayer(new File("/home/david/smb.conf.back"), null));
-////        jFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-////        jFrame.pack();
-////        jFrame.setVisible(true);
-//    }
 
     @Override
     public void selectOrDeselectFile() {

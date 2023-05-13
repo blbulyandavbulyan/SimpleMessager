@@ -7,17 +7,8 @@ import java.awt.event.ItemEvent;
 public class ShowUnshowPasswordPanel extends JPanel {
     private final JPasswordField passwordField;
     private final ShowUnshowCheckBox showPassword;
-    private char echoChar;
+    private final char echoChar;
 
-    public static void main(String[] args) {
-//        JFrame jFrame = new JFrame();
-//        jFrame.setLayout(new BorderLayout());
-//        JPanel passwordField = new ShowUnshowPasswordPanel("Enter your password");
-//        jFrame.add(passwordField);
-//        jFrame.setPreferredSize(new Dimension(500, 200));
-//        jFrame.pack();
-//        jFrame.setVisible(true);
-    }
     public ShowUnshowPasswordPanel(){
         this(new JPasswordField());
     }

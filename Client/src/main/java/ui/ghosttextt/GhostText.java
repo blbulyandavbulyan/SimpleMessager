@@ -18,7 +18,7 @@ public class GhostText implements FocusListener, DocumentListener, PropertyChang
     private boolean isEmpty;
     private boolean enabled = true;
     private Color ghostColor;
-    private Color foregroundColor;
+    private final Color foregroundColor;
     private String ghostText;
     private SpecificShowUnshowGhostTextActions specificShowUnshowGhostTextActions;
     private final Consumer<String> specialSetText;

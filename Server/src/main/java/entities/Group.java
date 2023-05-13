@@ -16,10 +16,6 @@ public class Group {
     private Long id;
     @Column
     private String name;
-//    @ElementCollection
-//    private Set<ServerCommand.Command> allowedCommands;
-//    @ElementCollection
-//    private Set<ServerCommand.InputTargetType> allowedInputTargetType;
     @OneToMany(cascade = CascadeType.PERSIST)
     private Collection<User> users;
     @Column
@@ -35,21 +31,8 @@ public class Group {
     }
 
     public Group() {
-//        users = new LinkedList<>();
     }
 
-    public boolean containsUser(User user){
-        return users.contains(user);
-    }
-//    public boolean isCommandAllowed(ServerCommand.Command command){
-//        return allowedCommands.contains(command);
-//    }
-//    public void allowCommand(ServerCommand.Command command){
-//        allowedCommands.add(command);
-//    }
-    public void addUser(User user){
-        users.add(user);
-    }
     public boolean isBanned() {
         return banned;
     }

@@ -7,7 +7,7 @@ import javax.swing.*;
 import java.awt.*;
 
 public class JTextFiledWithGhostText extends JTextField implements GhostTextInterface {
-    private GhostText ghostText;
+    private final GhostText ghostText;
     public JTextFiledWithGhostText(String ghostTextStr){
         this.ghostText = new GhostText(this, ghostTextStr, super::setText);
     }

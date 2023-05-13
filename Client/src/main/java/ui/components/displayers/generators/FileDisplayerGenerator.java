@@ -26,14 +26,6 @@ public class FileDisplayerGenerator {
         mimeToClassMap.put("text/plain", TextFileDisplayer.class);
     }
 
-//    public FileDisplayerGenerator(ResourceBundle rb) {
-//        this.rb = rb;
-//        if(rb == null)throw new NullPointerException();
-//        //fixme
-//        if(!rb.containsKey("menu.delete"))
-//            throw new MissingResourceException("Error creation FileDisplayerGenerator", rb.getBaseBundleName() , "menu.delete");
-//    }
-
     public static boolean isThisFormatValid(DataFlavor dataFlavor){
         return mimeToClassMap.containsKey(dataFlavor.getMimeType());
     }
@@ -54,13 +46,5 @@ public class FileDisplayerGenerator {
             }
         }
         else throw new InvalidMIMETypeException();
-    }
-
-    public static void main(String[] args) throws IOException {
-//        JFrame jFrame = new JFrame();
-//        jFrame.getContentPane().add(getFileDsiplayer(new File("/home/david/solution.txt")));
-//        jFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-//        jFrame.pack();
-//        jFrame.setVisible(true);
     }
 }

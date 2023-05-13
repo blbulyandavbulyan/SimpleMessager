@@ -76,19 +76,4 @@ public class ShowUnshowCheckBox extends JCheckBox {
         }
         );
     }
-//    @Override public void setSize(Dimension d){
-//        super.setSize(d);
-//        redrawSvgIcons(d);
-//        revalidate();
-//    }
-//    @Override public void setSize(int width, int height){
-//        super.setSize(width, height);
-//        redrawSvgIcons(width, height);
-//        revalidate();
-//    }
-//    @Override public void setPreferredSize(Dimension preferredSize){
-//        super.setPreferredSize(preferredSize);
-//        redrawSvgIcons(preferredSize);
-//        revalidate();
-//    }
 }

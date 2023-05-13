@@ -14,8 +14,11 @@ public class CommandProcessingException extends ServerException {
     public CommandProcessingException(){
 
     }
-
     public CommandProcessingException(Exception e) {
         super(e);
+    }
+
+    public ServerCommand getServerCommand() {
+        return serverCommand;
     }
 }

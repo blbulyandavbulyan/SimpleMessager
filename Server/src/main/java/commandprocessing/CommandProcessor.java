@@ -14,8 +14,8 @@ import java.util.HashMap;
 import java.util.function.Consumer;
 
 public class CommandProcessor {
-    private UserService userService;
-    private GroupService groupService;
+    private final UserService userService;
+    private final GroupService groupService;
     private final HashMap<ServerCommand.InputTargetType, ManagerInterface> targetTypeToManagerInterfaceMapper;
     //эта переменная хранит экземпляр класса User для исполнителя команды, делается это для ускоренной проверки привилегий
     private final User executor;

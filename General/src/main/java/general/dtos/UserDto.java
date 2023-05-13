@@ -6,7 +6,5 @@ public interface UserDto {
     int getRank();
     GroupDto getGroup();
     boolean getBanned();
-//    Set<ServerCommand.Command> getAllowedCommands();
-//    Set<ServerCommand.InputTargetType> getAllowedInputTargetTypes();
 
 }
