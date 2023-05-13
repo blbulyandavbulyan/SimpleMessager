@@ -10,16 +10,6 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>Client</artifactId>
     <version>1.1.0</version>
-<!--    <repositories>-->
-<!--        <repository>-->
-<!--            <id>jetbrains.releases</id>-->
-<!--            <url>https://www.jetbrains.com/intellij-repository/releases</url>-->
-<!--        </repository>-->
-<!--        <repository>-->
-<!--            <id>jetbrains.3rdparty</id>-->
-<!--            <url>https://cache-redirector.jetbrains.com/intellij-dependencies</url>-->
-<!--        </repository>-->
-<!--    </repositories>-->
     <dependencies>
         <dependency>
             <groupId>org.apache.xmlgraphics</groupId>
@@ -43,32 +33,6 @@
             <version>1.1.0</version>
             <scope>compile</scope>
         </dependency>
-        <!--        <dependency>-->
-<!--            <groupId>com.google.guava</groupId>-->
-<!--            <artifactId>guava</artifactId>-->
-<!--            <version>31.1-jre</version>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>com.jetbrains.intellij.java</groupId>-->
-<!--            <artifactId>java-compiler-ant-tasks</artifactId>-->
-<!--            <version>221.5787.30</version>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>com.jetbrains.intellij.java</groupId>-->
-<!--            <artifactId>java-gui-forms-rt</artifactId>-->
-<!--            <version>221.5787.30</version>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>com.intellij</groupId>-->
-<!--            <artifactId>forms_rt</artifactId>-->
-<!--            <version>7.0.3</version>-->
-<!--        </dependency>-->
-
-        <!--        <dependency>-->
-<!--             <groupId>org.apache.maven.plugins</groupId>-->
-<!--             <artifactId>maven-antrun-plugin</artifactId>-->
-<!--            <version>3.1.0</version>-->
-<!--        </dependency>-->
     </dependencies>
 
     <build>
@@ -79,31 +43,6 @@
             </resource>
         </resources>
         <plugins>
-<!--            <plugin>-->
-<!--                <groupId>org.apache.maven.plugins</groupId>-->
-<!--                <artifactId>maven-antrun-plugin</artifactId>-->
-<!--                <version>3.1.0</version>-->
-<!--                <executions>-->
-<!--                    <execution>-->
-<!--                        <phase>compile</phase>-->
-<!--                        <configuration>-->
-<!--                            <target>-->
-<!--                                <path id="j2sp">-->
-<!--                                    <pathelement location="${project.basedir}/src/main/java"/>-->
-<!--                                </path>-->
-<!--                                <taskdef name="javac2" classpathref="maven.runtime.classpath" classname="com.intellij.ant.Javac2"/>-->
-<!--                                <javac2 destdir="${project.basedir}/target/classes">-->
-<!--                                    <src refid="j2sp"/>-->
-<!--                                </javac2>-->
-<!--                            </target>-->
-<!--                        </configuration>-->
-<!--                        <goals>-->
-<!--                            <goal>run</goal>-->
-<!--                        </goals>-->
-<!--                    </execution>-->
-<!--                </executions>-->
-<!--            </plugin>-->
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
