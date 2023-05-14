@@ -6,7 +6,6 @@ import org.blbulyandavbulyan.smclient.serverconnection.interfaces.MessageGetter;
 import org.blbulyandavbulyan.smclient.serverconnection.interfaces.MessageSender;
 import org.blbulyandavbulyan.smclient.serverconnection.interfaces.StatusMessagePrinter;
 import org.blbulyandavbulyan.smclient.userdata.LoginOrRegisterResultGetter;
-import serverconnection.exceptions.*;
 import org.blbulyandavbulyan.smgeneral.message.Message;
 
 import java.io.*;
@@ -14,7 +13,6 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.Objects;
 
-import userdata.*;
 public class ServerConnection implements MessageGetter, MessageSender {
     private String userName;
     private final Socket socket;

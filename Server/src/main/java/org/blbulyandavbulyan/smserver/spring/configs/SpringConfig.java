@@ -29,7 +29,7 @@ import java.util.stream.StreamSupport;
 
 @Configuration
 @EnableJpaRepositories(basePackageClasses = {UserRepository.class, GroupRepository.class})
-@ComponentScan("spring.beans")
+@ComponentScan("org.blbulyandavbulyan.smserver.spring.beans")
 @PropertySource(value = "application.properties")
 @EnableTransactionManagement
 

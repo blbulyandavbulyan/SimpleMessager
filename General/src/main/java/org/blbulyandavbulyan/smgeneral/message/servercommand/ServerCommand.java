@@ -3,7 +3,6 @@ package org.blbulyandavbulyan.smgeneral.message.servercommand;
 import org.blbulyandavbulyan.smgeneral.dtos.GroupDto;
 import org.blbulyandavbulyan.smgeneral.dtos.UserDto;
 import org.blbulyandavbulyan.smgeneral.message.Message;
-import general.message.servercommand.exceptions.*;
 import org.blbulyandavbulyan.smgeneral.message.servercommand.exceptions.*;
 
 import java.io.Serial;
