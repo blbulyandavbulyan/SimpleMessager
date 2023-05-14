@@ -1,6 +1,6 @@
 package org.blbulyandavbulyan.smserver.commandprocessing.exceptions;
 
-import general.message.servercommand.ServerCommand;
+import org.blbulyandavbulyan.smgeneral.message.servercommand.ServerCommand;
 
 public class PermissionsDeniedException extends CommandProcessingException{
     private final ServerCommand serverCommand;

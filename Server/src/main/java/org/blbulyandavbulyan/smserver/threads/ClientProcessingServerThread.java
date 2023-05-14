@@ -4,9 +4,9 @@ import java.io.*;
 import java.net.SocketException;
 import java.util.Objects;
 
-import general.message.Message;
-import general.message.servercommand.ServerCommand;
-import general.message.servermessages.ServerErrorMessage;
+import org.blbulyandavbulyan.smgeneral.message.Message;
+import org.blbulyandavbulyan.smgeneral.message.servercommand.ServerCommand;
+import org.blbulyandavbulyan.smgeneral.message.servermessages.ServerErrorMessage;
 
 public class ClientProcessingServerThread extends ClientServerThread{
     private final String clientName;

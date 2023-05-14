@@ -1,13 +1,13 @@
 package org.blbulyandavbulyan.smclient.serverconnection;
 
-import general.loginorregisterrequest.LoginOrRegisterRequest;
+import org.blbulyandavbulyan.smgeneral.loginorregisterrequest.LoginOrRegisterRequest;
 import org.blbulyandavbulyan.smclient.serverconnection.exceptions.*;
 import org.blbulyandavbulyan.smclient.serverconnection.interfaces.MessageGetter;
 import org.blbulyandavbulyan.smclient.serverconnection.interfaces.MessageSender;
 import org.blbulyandavbulyan.smclient.serverconnection.interfaces.StatusMessagePrinter;
 import org.blbulyandavbulyan.smclient.userdata.LoginOrRegisterResultGetter;
 import serverconnection.exceptions.*;
-import general.message.Message;
+import org.blbulyandavbulyan.smgeneral.message.Message;
 
 import java.io.*;
 import java.net.InetSocketAddress;

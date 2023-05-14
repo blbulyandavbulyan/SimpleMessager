@@ -1,6 +1,6 @@
 package org.blbulyandavbulyan.smclient.ui.components.displayers.messagedisplaying.messagepanels.filemessagespanels;
 
-import general.message.filemessages.ImageFileMessage;
+import org.blbulyandavbulyan.smgeneral.message.filemessages.ImageFileMessage;
 import org.blbulyandavbulyan.smclient.ui.components.displayers.general.areas.MiniatureImageArea;
 import org.blbulyandavbulyan.smclient.ui.components.displayers.general.viewwindows.ViewImageWindow;
 

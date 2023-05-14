@@ -3,7 +3,7 @@ package org.blbulyandavbulyan.smserver.commandprocessing;
 import org.blbulyandavbulyan.smserver.commandprocessing.exceptions.CommandProcessingException;
 import org.blbulyandavbulyan.smserver.commandprocessing.exceptions.PermissionsDeniedException;
 import org.blbulyandavbulyan.smserver.commandprocessing.exceptions.UserRankIsLessThanTargetRank;
-import general.message.servercommand.ServerCommand;
+import org.blbulyandavbulyan.smgeneral.message.servercommand.ServerCommand;
 import org.blbulyandavbulyan.smserver.interfaces.ManagerInterface;
 import org.blbulyandavbulyan.smserver.entities.User;
 import org.blbulyandavbulyan.smserver.spring.beans.services.group.GroupService;

@@ -1,6 +1,6 @@
 package org.blbulyandavbulyan.smclient.ui.components.displayers.messagedisplaying.messagepanels.standartmessagepanels;
 
-import general.message.Message;
+import org.blbulyandavbulyan.smgeneral.message.Message;
 import org.blbulyandavbulyan.smclient.ui.components.displayers.messagedisplaying.messagepanels.MessagePanel;
 
 import javax.swing.*;

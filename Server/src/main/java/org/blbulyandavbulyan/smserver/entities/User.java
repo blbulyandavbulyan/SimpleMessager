@@ -1,6 +1,6 @@
 package org.blbulyandavbulyan.smserver.entities;
 
-import general.message.servercommand.ServerCommand;
+import org.blbulyandavbulyan.smgeneral.message.servercommand.ServerCommand;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;

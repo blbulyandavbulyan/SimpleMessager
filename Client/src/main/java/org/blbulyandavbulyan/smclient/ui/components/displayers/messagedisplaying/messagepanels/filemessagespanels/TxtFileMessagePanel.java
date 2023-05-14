@@ -1,6 +1,6 @@
 package org.blbulyandavbulyan.smclient.ui.components.displayers.messagedisplaying.messagepanels.filemessagespanels;
 
-import general.message.filemessages.FileMessage;
+import org.blbulyandavbulyan.smgeneral.message.filemessages.FileMessage;
 
 import java.util.ResourceBundle;
 

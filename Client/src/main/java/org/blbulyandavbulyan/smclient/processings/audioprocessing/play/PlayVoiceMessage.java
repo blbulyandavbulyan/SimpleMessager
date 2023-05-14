@@ -1,6 +1,6 @@
 package org.blbulyandavbulyan.smclient.processings.audioprocessing.play;
 
-import general.message.voicemessage.VoiceMessage;
+import org.blbulyandavbulyan.smgeneral.message.voicemessage.VoiceMessage;
 
 public class PlayVoiceMessage extends PlayAudio {
     public PlayVoiceMessage(VoiceMessage voiceMessage, Runnable doAfterPlaying){

@@ -1,6 +1,6 @@
 package org.blbulyandavbulyan.smclient.serverconnection;
 
-import general.message.Message;
+import org.blbulyandavbulyan.smgeneral.message.Message;
 import org.blbulyandavbulyan.smclient.serverconnection.interfaces.MessageGetter;
 
 import java.io.*;

@@ -1,7 +1,7 @@
 package org.blbulyandavbulyan.smserver.threads;
 
 import org.blbulyandavbulyan.smserver.common.Server;
-import general.loginorregisterrequest.LoginOrRegisterRequest;
+import org.blbulyandavbulyan.smgeneral.loginorregisterrequest.LoginOrRegisterRequest;
 import org.blbulyandavbulyan.smserver.interfaces.ServerLogger;
 import org.blbulyandavbulyan.smserver.interfaces.loginandregister.LoginAndRegisterUserInterface;
 import org.blbulyandavbulyan.smserver.threads.exceptions.ServerThreadException;

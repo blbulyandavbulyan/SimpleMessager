@@ -1,9 +1,9 @@
 package org.blbulyandavbulyan.smclient.ui.windows.main;
 
 
-import general.message.filemessages.FileMessage;
-import general.message.filemessages.FileMessageFactory;
-import general.message.voicemessage.exceptions.AudioDataIsEmptyException;
+import org.blbulyandavbulyan.smgeneral.message.filemessages.FileMessage;
+import org.blbulyandavbulyan.smgeneral.message.filemessages.FileMessageFactory;
+import org.blbulyandavbulyan.smgeneral.message.voicemessage.exceptions.AudioDataIsEmptyException;
 import org.blbulyandavbulyan.smclient.serverconnection.MessagesReaderThread;
 import org.blbulyandavbulyan.smclient.serverconnection.ServerConnection;
 import org.blbulyandavbulyan.smclient.serverconnection.exceptions.ConnectionClosed;
@@ -12,9 +12,9 @@ import org.blbulyandavbulyan.smclient.serverconnection.interfaces.MessageSender;
 import org.blbulyandavbulyan.smclient.ui.common.DisplayErrors;
 import org.blbulyandavbulyan.smclient.ui.windows.exceptions.PersonalMessageIsEmpty;
 import org.blbulyandavbulyan.smclient.processings.audioprocessing.record.RecordStopButtonActionListener;
-import general.message.Message;
-import general.message.textmessage.TextMessage;
-import general.message.voicemessage.VoiceMessage;
+import org.blbulyandavbulyan.smgeneral.message.Message;
+import org.blbulyandavbulyan.smgeneral.message.textmessage.TextMessage;
+import org.blbulyandavbulyan.smgeneral.message.voicemessage.VoiceMessage;
 import org.blbulyandavbulyan.smclient.ui.components.custom.jtabbedpanewithcloseabletabs.JTabbedPaneWithCloseableTabs;
 import org.blbulyandavbulyan.smclient.ui.components.displayers.messagedisplaying.messagepanels.filemessagespanels.ImageFileMessagePanel;
 import org.blbulyandavbulyan.smclient.ui.components.draganddroppanel.DragAndDropPanel;

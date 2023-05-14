@@ -1,6 +1,6 @@
 package org.blbulyandavbulyan.smclient.serverconnection.interfaces;
 
-import general.message.Message;
+import org.blbulyandavbulyan.smgeneral.message.Message;
 
 public interface MessagePrinter {
     void printMessage(Message msg);

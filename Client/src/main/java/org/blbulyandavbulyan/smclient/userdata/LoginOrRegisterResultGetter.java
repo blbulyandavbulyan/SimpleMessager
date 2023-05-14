@@ -1,6 +1,6 @@
 package org.blbulyandavbulyan.smclient.userdata;
 
-import general.loginorregisterrequest.LoginOrRegisterRequest;
+import org.blbulyandavbulyan.smgeneral.loginorregisterrequest.LoginOrRegisterRequest;
 import org.blbulyandavbulyan.smclient.serverconnection.interfaces.StatusMessagePrinter;
 
 import java.io.Closeable;

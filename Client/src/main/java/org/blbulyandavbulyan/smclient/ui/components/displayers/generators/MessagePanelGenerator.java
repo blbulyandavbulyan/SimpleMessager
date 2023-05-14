@@ -1,9 +1,9 @@
 package org.blbulyandavbulyan.smclient.ui.components.displayers.generators;
 
-import general.message.Message;
-import general.message.filemessages.ImageFileMessage;
-import general.message.textmessage.TextMessage;
-import general.message.voicemessage.VoiceMessage;
+import org.blbulyandavbulyan.smgeneral.message.Message;
+import org.blbulyandavbulyan.smgeneral.message.filemessages.ImageFileMessage;
+import org.blbulyandavbulyan.smgeneral.message.textmessage.TextMessage;
+import org.blbulyandavbulyan.smgeneral.message.voicemessage.VoiceMessage;
 import org.blbulyandavbulyan.smclient.ui.components.displayers.messagedisplaying.exceptions.UnknownMessageTypeException;
 import org.blbulyandavbulyan.smclient.ui.components.displayers.messagedisplaying.messagepanels.MessagePanel;
 import org.blbulyandavbulyan.smclient.ui.components.displayers.messagedisplaying.messagepanels.filemessagespanels.ImageFileMessagePanel;

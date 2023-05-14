@@ -1,5 +1,5 @@
 package org.blbulyandavbulyan.smclient.ui.windows.connecting;
-import general.loginorregisterrequest.LoginOrRegisterRequest;
+import org.blbulyandavbulyan.smgeneral.loginorregisterrequest.LoginOrRegisterRequest;
 import org.blbulyandavbulyan.smclient.ui.components.custom.textfieldswithghosttext.JPasswordFieldWithGhostText;
 import org.blbulyandavbulyan.smclient.ui.components.custom.textfieldswithghosttext.JTextFiledWithGhostText;
 import org.blbulyandavbulyan.smclient.ui.components.custom.passwordfieldwithshowpasscheckbox.ShowUnshowPasswordPanel;

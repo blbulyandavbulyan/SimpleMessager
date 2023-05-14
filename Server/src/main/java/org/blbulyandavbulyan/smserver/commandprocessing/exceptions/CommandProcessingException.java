@@ -1,7 +1,7 @@
 package org.blbulyandavbulyan.smserver.commandprocessing.exceptions;
 
 import org.blbulyandavbulyan.smserver.common.exceptions.ServerException;
-import general.message.servercommand.ServerCommand;
+import org.blbulyandavbulyan.smgeneral.message.servercommand.ServerCommand;
 
 public class CommandProcessingException extends ServerException {
     private ServerCommand serverCommand;

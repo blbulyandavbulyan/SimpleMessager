@@ -1,6 +1,6 @@
 package org.blbulyandavbulyan.smclient.ui.components.displayers.messagedisplaying.messagepanels;
 
-import general.message.Message;
+import org.blbulyandavbulyan.smgeneral.message.Message;
 import org.blbulyandavbulyan.smclient.ui.components.displayers.messagedisplaying.exceptions.ResourceBundleIsNullException;
 import org.blbulyandavbulyan.smclient.ui.components.displayers.messagedisplaying.exceptions.MessageIsNullException;
 

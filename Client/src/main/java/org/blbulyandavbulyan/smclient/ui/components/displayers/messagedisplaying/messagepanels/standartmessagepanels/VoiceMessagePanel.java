@@ -1,7 +1,7 @@
 package org.blbulyandavbulyan.smclient.ui.components.displayers.messagedisplaying.messagepanels.standartmessagepanels;
 
 import org.blbulyandavbulyan.smclient.processings.audioprocessing.play.PlayVoiceMessage;
-import general.message.voicemessage.VoiceMessage;
+import org.blbulyandavbulyan.smgeneral.message.voicemessage.VoiceMessage;
 
 import javax.swing.*;
 import java.util.ResourceBundle;
