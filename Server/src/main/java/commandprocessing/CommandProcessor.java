@@ -92,13 +92,7 @@ public class CommandProcessor {
         }
         return null;
     }
-    //данный метод будет обрабатывать команды, которые могут выполнится либо успешно, либо нет, в зависимости от того, есть ли у пользователя требуемые права на её выполнения
-    //при этом, ни каких выходных данных от него не ожидается
-    //если выполнится успешно - значит не будет исключения
-    //если выполнится не успешно, значит будет исключение
-    private void processCommandsWithSingleResult(ServerCommand serverCommand) throws SQLException {
-//
-    }
+
     private boolean canUserExecuteThisCommand(ServerCommand serverCommand){
         //быстрая проверка на право выполнения команды CHANGE_PASSWORD если она направлена на исполнителя:
         if(serverCommand.getTargetType() == ServerCommand.InputTargetType.EXECUTOR && serverCommand.getCommand() == ServerCommand.Command.CHANGE_PASSWORD)
