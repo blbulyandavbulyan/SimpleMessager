@@ -1,6 +1,6 @@
-import processings.audioprocessing.record.RecordStopButtonActionListener;
+import org.blbulyandavbulyan.client.processings.audioprocessing.record.RecordStopButtonActionListener;
 import general.message.voicemessage.VoiceMessage;
-import ui.components.displayers.messagedisplaying.messagepanels.standartmessagepanels.VoiceMessagePanel;
+import org.blbulyandavbulyan.client.ui.components.displayers.messagedisplaying.messagepanels.standartmessagepanels.VoiceMessagePanel;
 
 import javax.sound.sampled.*;
 import javax.swing.*;
