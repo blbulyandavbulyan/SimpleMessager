@@ -100,7 +100,7 @@
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
-                            <mainClass>common.MainServer</mainClass>
+                            <mainClass>org.blbulyandavbulyan.server.common.MainServer</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>
