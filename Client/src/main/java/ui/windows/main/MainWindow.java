@@ -32,6 +32,7 @@ import java.awt.event.*;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -119,7 +120,7 @@ public class MainWindow extends JFrame implements MessagePrinter {
                 }
             }
             else if(dragAndDropPanel.hasDroppedFiles()){
-                Set<File> droppedFiles = dragAndDropPanel.getDroppedFiles();
+                Collection<File> droppedFiles = dragAndDropPanel.getDroppedFiles();
                 for (File droppedFile : droppedFiles) {
                     try {
                         FileMessage fileMessage = FileMessageFactory.create(myUserName, null, droppedFile);

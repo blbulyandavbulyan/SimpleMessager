@@ -111,7 +111,7 @@ public class DragAndDropPanel extends JPanel implements DroppedFileControllerInt
         this.add("whenNoDropComponent", whenNoDropComponent);
         cardLayout.show(this, "whenNoDropComponent");
     }
-    public Set<File> getDroppedFiles(){
+    public Collection<File> getDroppedFiles(){
         return droppedFilesMap.keySet();
     }
 
