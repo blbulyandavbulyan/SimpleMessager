@@ -78,6 +78,7 @@ public class DragAndDropPanel extends JPanel implements DroppedFileControllerInt
                     evt.acceptDrop(DnDConstants.ACTION_COPY);
                     for(File droppedFile : (List<File>)( evt.getTransferable().getTransferData(DataFlavor.javaFileListFlavor)) ){
                         if(FileDisplayerGenerator.isThisFileHasValidFormat(droppedFile)){
+                            // FIXME: 14.05.2023 создаётся меню для удаления и оно ничего не делает
                             FileDisplayer fileDisplayer = FileDisplayerGenerator.getFileDsiplayer(droppedFile);
                             JMenuItem removeFileMenuItem = new JMenuItem(resourceBundle.getString("menu.delete"));
                             JPopupMenu rightClickContextMenu = new JPopupMenu();

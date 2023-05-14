@@ -12,6 +12,7 @@ public class FileDisplayersMouseProcessor extends MouseAdapter {
     private final DroppedFileControllerInterface droppedFileControllerInterface;
 
     public FileDisplayersMouseProcessor(DroppedFileControllerInterface droppedFileControllerInterface, ResourceBundle rb){
+        // FIXME: 14.05.2023 Убрать отсюда создание меню, или осмыслить его, т.к. тут оно ни к чему не привязано
         JMenuItem removeFileMenuItem = new JMenuItem(rb.getString("menu.delete"));
         JPopupMenu rightClickContextMenu = new JPopupMenu();
         rightClickContextMenu.add(removeFileMenuItem);
