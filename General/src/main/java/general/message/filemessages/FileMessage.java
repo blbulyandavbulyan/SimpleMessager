@@ -24,12 +24,7 @@ public abstract class FileMessage extends Message {
         this.MIMEType = Files.probeContentType(file.toPath());
         this.fileData = Files.readAllBytes(file.toPath());
     }
-    protected FileMessage(String sender, String receiver, String fileName, String MIMEType, byte[] fileData){
-        super(sender, receiver);
-        this.fileName = fileName;
-        this.MIMEType = MIMEType;
-        this.fileData = fileData;
-    }
+
     public String getFileName() {
         return fileName;
     }

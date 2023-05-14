@@ -44,13 +44,7 @@ public class GhostText implements FocusListener, DocumentListener, PropertyChang
         }
 
     }
-    public GhostText(final JTextComponent textComp, String ghostText)
-    {
-       this(textComp, ghostText, null, null);
-    }
-    public GhostText(final  JTextComponent textComp, String ghostText, SpecificShowUnshowGhostTextActions specificShowUnshowGhostTextActions){
-        this(textComp, ghostText, specificShowUnshowGhostTextActions, null);
-    }
+
     public GhostText(final JTextComponent textComp, String ghostText, Consumer<String> specialSetText)
     {
         this(textComp, ghostText, null, specialSetText);

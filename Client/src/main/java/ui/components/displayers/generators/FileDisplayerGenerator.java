@@ -26,9 +26,6 @@ public class FileDisplayerGenerator {
         mimeToClassMap.put("text/plain", TextFileDisplayer.class);
     }
 
-    public static boolean isThisFormatValid(DataFlavor dataFlavor){
-        return mimeToClassMap.containsKey(dataFlavor.getMimeType());
-    }
     public static boolean isThisFileHasValidFormat(File file) throws IOException {
         String fileTypeMIME = Files.probeContentType(file.toPath());
         return mimeToClassMap.containsKey(fileTypeMIME);

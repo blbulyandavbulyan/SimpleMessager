@@ -58,12 +58,7 @@ public class MainWindow extends JFrame implements MessagePrinter {
         mw.setSize(new Dimension(500, 500));
         mw.setVisible(true);
     }
-    private String[] getReceiversFromMessage(String msgStr){
-        final String regex = "@([\\w\\d]+)\b";
-        final Pattern pattern = Pattern.compile(regex, Pattern.MULTILINE);
-        final Matcher matcher = pattern.matcher(msgStr);
-        return matcher.results().map((matchResult -> matchResult.group(1))).toArray(String[]::new);
-    }
+
     private TextMessage getTextMessageWithReceiver(String msgStr, String senderName) throws PersonalMessageIsEmpty{
         String receiverName = null;
         String newMsgStr = msgStr;
