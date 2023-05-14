@@ -64,7 +64,7 @@
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
-                            <mainClass>org.blbulyandavbulyan.client.common.Client</mainClass>
+                            <mainClass>org.blbulyandavbulyan.smclient.common.Client</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>
