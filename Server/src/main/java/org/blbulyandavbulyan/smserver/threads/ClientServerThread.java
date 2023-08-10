@@ -52,7 +52,7 @@ public abstract class ClientServerThread extends Thread{
             try {
                 clientSocket.close();
             } catch (IOException e) {
-                e.printStackTrace();
+                serverLogger.error("Ошибка при закрытии соединения с клиентом", e);
             }
         }
     }
