@@ -22,18 +22,8 @@ public class Group {
     private int rank;
     @Column
     boolean banned = false;
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public Group() {
     }
 
-    public boolean isBanned() {
-        return banned;
-    }
 }
