@@ -9,8 +9,6 @@ import java.awt.event.ComponentEvent;
 import java.io.IOException;
 import java.io.InputStream;
 
-import static org.blbulyandavbulyan.smclient.ui.common.WorkWithSvg.redrawSvgIcon;
-
 public class ShowUnshowCheckBox extends JCheckBox {
     private static final String svgShowIcon;
     private static final String svgShowRolloverIcon;
