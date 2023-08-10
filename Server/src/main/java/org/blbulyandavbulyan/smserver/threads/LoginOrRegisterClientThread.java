@@ -74,12 +74,6 @@ public class LoginOrRegisterClientThread extends ClientServerThread{
                         }
                     }
                 }
-//                catch (SQLException e){
-//                    clientObjOut.writeUTF("SERVER HAS DataBase problem");
-//                    clientObjOut.flush();
-//                    terminate();
-//                    throw e;
-//                }
                 catch (UserAlreadyExistsException e){
                     clientObjOut.writeUTF("USER ALREADY EXISTS");
                     clientObjOut.flush();
@@ -89,13 +83,13 @@ public class LoginOrRegisterClientThread extends ClientServerThread{
             }
         }
         catch (EOFException | SocketException e){
-            if(!clientSocket.isClosed())e.printStackTrace();
+            if(!clientSocket.isClosed())serverLogger.error("Ошибка при обработке регистрации/авторизации", e);
         }
         catch (IOException | ClassNotFoundException e){
             try {
                 clientSocket.close();
             } catch (IOException ex) {
-                ex.printStackTrace();
+                serverLogger.error("Ошибка закрытия соединения с клиентом", ex);
             }
             e.printStackTrace();
         }
