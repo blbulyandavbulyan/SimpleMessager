@@ -5,9 +5,7 @@ import org.blbulyandavbulyan.smgeneral.message.servercommand.ServerCommand;
 
 public class CommandProcessingException extends ServerException {
     private ServerCommand serverCommand;
-    public CommandProcessingException(ServerCommand serverCommand){
-        this.serverCommand = serverCommand;
-    }
+
     public CommandProcessingException(String msg) {
         super(msg);
     }
