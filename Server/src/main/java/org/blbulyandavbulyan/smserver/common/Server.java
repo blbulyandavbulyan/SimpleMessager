@@ -21,8 +21,8 @@ public class Server extends Thread implements ServerLogger {
     private final Set<LoginOrRegisterClientThread> unregisteredUsers = new HashSet<>();
     private final Logger logger = LoggerFactory.getLogger(Server.class);
 
-    private StartupParameters startupParameters;
-    private UserService userService;
+    private final StartupParameters startupParameters;
+    private final UserService userService;
     private GroupService groupService;
     public Server(StartupParameters startupParameters, UserService userService, GroupService groupService){
         this.userService = userService;
@@ -44,7 +44,7 @@ public class Server extends Thread implements ServerLogger {
                     unregisteredUsers.add(new LoginOrRegisterClientThread(client, this, this));
                 }
                 catch (ServerThreadException e){
-                    e.printStackTrace();
+                    logger.error("Ошибка на серрвере при работе с клиентом", e);
                     try{
                         if(client != null)client.close();
                     }
@@ -77,23 +77,6 @@ public class Server extends Thread implements ServerLogger {
         return clients.get(clientName);
     }
 
-    public Collection<LoginOrRegisterClientThread> getUnregisteredClients(){
-        return unregisteredUsers;
-    }
-
-    public void clearClients(){
-        for (ClientProcessingServerThread client : getClients()) {
-            client.terminate();
-        }
-        clients.clear();
-    }
-
-    public void clearUnregisteredClients(){
-        for(LoginOrRegisterClientThread uclient : unregisteredUsers){
-            uclient.terminate();
-        }
-        unregisteredUsers.clear();
-    }
     public void removeUnregisteredClient(LoginOrRegisterClientThread lorClientThread){
         unregisteredUsers.remove(lorClientThread);
     }
@@ -112,5 +95,10 @@ public class Server extends Thread implements ServerLogger {
     @Override
     public void info(String msg) {
         logger.info(msg);
+    }
+
+    @Override
+    public void error(String s, Exception e) {
+        logger.error(s, e);
     }
 }
