@@ -3,12 +3,10 @@ package org.blbulyandavbulyan.smclient.ui.components.custom.buttons;
 import org.blbulyandavbulyan.smclient.ui.common.WorkWithSvg;
 
 import javax.swing.*;
-
 import java.awt.*;
-import java.awt.geom.*;
-import java.io.*;
-
-import static org.blbulyandavbulyan.smclient.ui.common.WorkWithSvg.redrawSvgIcon;
+import java.awt.geom.Ellipse2D;
+import java.io.IOException;
+import java.io.InputStream;
 
 public class RoundCloseButton extends JButton {
     private static final String svgIcon;
