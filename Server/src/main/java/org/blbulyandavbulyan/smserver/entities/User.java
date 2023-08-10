@@ -1,6 +1,5 @@
 package org.blbulyandavbulyan.smserver.entities;
 
-import org.blbulyandavbulyan.smgeneral.message.servercommand.ServerCommand;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -32,10 +31,5 @@ public class User {
     public int getRank(){
         return rank + (group != null ? group.getRank() : 0);
     }
-    public boolean canExecute(ServerCommand.Command command){
-        return true;
-    }
-    public boolean allowedTargetType(ServerCommand.InputTargetType inputTargetType){
-        return true;
-    }
+
 }
