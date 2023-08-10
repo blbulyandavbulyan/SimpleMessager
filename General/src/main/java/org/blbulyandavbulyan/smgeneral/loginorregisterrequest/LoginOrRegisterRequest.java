@@ -2,8 +2,6 @@ package org.blbulyandavbulyan.smgeneral.loginorregisterrequest;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.net.InetSocketAddress;
-import java.net.PortUnreachableException;
 
 public class LoginOrRegisterRequest implements Serializable {
     @Serial
